@@ -1,9 +1,12 @@
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import { BrowserRouter, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ChatConpent from "./components/ChatConpent";
+
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <Routes></Routes>
+    <Routes>
+      <Route path="/" element={<ChatConpent />} />
+    </Routes>
   </BrowserRouter>
 );

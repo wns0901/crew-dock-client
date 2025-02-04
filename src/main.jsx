@@ -1,12 +1,14 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ChatConpent from "./components/ChatConpent";
+import ChatComponent from "./components/ChatComponent";
+import LoginPage from "./domains/LoginPage/LoginPage";
 
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<ChatConpent />} />
+      <Route path="/" element={<ChatComponent />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
   </BrowserRouter>
 );

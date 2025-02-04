@@ -2,7 +2,7 @@ import { useState } from 'react';
 import ChatIcon from './ChatIcon';
 import ChatWindow from './ChatWindow';
 
-const ChatConpent = () => {
+const ChatComponent = () => {
 
   const [isOpened, setIsOpened] = useState(false);
 
@@ -13,12 +13,12 @@ const ChatConpent = () => {
   return (
     <>
     asdsa
-      <div onClick={toggleChat}>
+      <div >
     
-      {isOpened ? <ChatWindow /> : <ChatIcon />}
+      {isOpened ? <ChatWindow setIsOpened={setIsOpened}/> : <ChatIcon setIsOpened={setIsOpened}/>}
       </div>
     </>
   );
 };
 
-export default ChatConpent;
+export default ChatComponent;

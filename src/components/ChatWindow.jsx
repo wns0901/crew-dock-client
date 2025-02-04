@@ -1,10 +1,23 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 const ChatWindow = ({setIsOpened}) => {
   
+  const [chatRooms, setChatRooms] = useState([]);
+
   const closeWindow = () => {
     setIsOpened(false);
+  }
+
+  useEffect(() => {
+    getChatRooms().then((data) => {
+      setChatRooms(data);
+    });
+  }, []);
+
+  const getChatRooms = async () => {
+    const data = await axios.get('http://localhost:8080/chat-rooms/{userId}');
   }
 
   return (

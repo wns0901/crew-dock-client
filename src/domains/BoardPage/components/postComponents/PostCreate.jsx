@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { Category, CategoryLabel } from '../\bconstants/category';
+import { Category, CategoryLabel } from '../../constants/category';
+import MDEditor from '@uiw/react-md-editor';
+import PropTypes from 'prop-types';
 
-const PostCreate = () => {
+PostCreate.propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onImageUpload: PropTypes.func.isRequired,
+};
+
+const PostCreate = ({onSubmit, onCancel, onImageUpload}) => {
     const [category, setCategory] = useState('');
     const [title, setTitle] = useState('');
     const [content, setContnet] = useState('');
@@ -34,9 +42,10 @@ const PostCreate = () => {
             <MDEditor
                 value={content}
                 onChange={setContnet}
+                onImageUpload={onImageUpload}
             />
             <div>
-                <button type='cancle'>취소</button>
+                <button type='button' onClick={onCancel}>취소</button>
                 <button type='submit'>작성완료</button>
             </div>
         </form>

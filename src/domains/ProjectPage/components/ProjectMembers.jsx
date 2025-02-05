@@ -6,7 +6,7 @@ import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, Ta
 const ProjectMembers = () => {
   const { projectId } = useParams();
   console.log("프로젝트 ID:", projectId);
-  const [members, setMembers] = useState([]); // ✅ 초기값 빈 배열
+  const [members, setMembers] = useState([]); 
   const [openModal, setOpenModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [resignation, setResignation] = useState("");
@@ -18,7 +18,6 @@ const ProjectMembers = () => {
   }, [projectId]);
 
   const fetchMembers = async () => {
-    console.log("fetchMembers 실행됨"); // 함수 실행 확인
     try {
         const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
         console.log("API 응답 데이터:", response.data); 
@@ -81,20 +80,21 @@ const ProjectMembers = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>이름</TableCell>
               <TableCell>권한</TableCell>
-              <TableCell>전화번호</TableCell>
+              <TableCell>이름</TableCell>          
+              <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(members) && members.map((member) => (
+            {Array.isArray(members) && members
+            .filter((member) => member.status === "APPROVE")
+            .map((member) => (
               <TableRow key={member.id}>
-                <TableCell>{member.user.id}</TableCell>
-                <TableCell>{member.user.name}</TableCell>
                 <TableCell>{member.authority}</TableCell>
+                <TableCell>{member.user.name}</TableCell>
+              
                 <TableCell>{member.user.phoneNumber}</TableCell>
                 <TableCell>{member.position}</TableCell>
                 <TableCell>

@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Container, TextField, Button, Typography } from '@mui/material';
+import { LoginContext } from '../../contexts/LoginContextProvider';
 
 const LoginPage = () => {
+
+  const { login } = useContext(LoginContext);
 
   const [logintForm, setLoginForm] = useState({
     username: '',
@@ -15,13 +18,18 @@ const LoginPage = () => {
     });
   }
 
+  const submitForm = (e) => {
+    e.preventDefault();
+    login(logintForm.username, logintForm.password);
+  };
+
   return (
     <>
       <Container maxWidth="sm">
         <Typography variant="h4" component="h1" gutterBottom>
           Login
         </Typography>
-        <form noValidate autoComplete="off">
+        <form noValidate autoComplete="off" onSubmit={submitForm}>
           <TextField
             label="Email"
             variant="outlined"

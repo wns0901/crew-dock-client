@@ -1,19 +1,15 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-const ChatWindow = ({setIsOpened}) => {
+const ChatWindow = () => {
   
   const [chatRooms, setChatRooms] = useState([]);
 
-  const closeWindow = () => {
-    setIsOpened(false);
-  }
-
   useEffect(() => {
-    getChatRooms().then((data) => {
-      setChatRooms(data);
-    });
+    // getChatRooms().then((data) => {
+    //   setChatRooms(data);
+    // });
   }, []);
 
   const getChatRooms = async () => {
@@ -22,7 +18,7 @@ const ChatWindow = ({setIsOpened}) => {
 
   return (
     <ChatWindowModal>
-      <CloseBtn onClick={closeWindow}>X</CloseBtn>
+      {/* <CloseBtn onClick={closeWindow}>X</CloseBtn> */}
     </ChatWindowModal>
   );
 };
@@ -42,7 +38,7 @@ const ChatWindowModal = styled.div`
     border-radius: 10px;
     position: absolute;
     right: 3%;
-    bottom: 3%;
+    bottom: 12%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   `
 

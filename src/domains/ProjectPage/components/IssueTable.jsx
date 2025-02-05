@@ -1,74 +1,74 @@
-import React, { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Checkbox,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import React, { useState, useEffect } from "react";
+import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer } from "@mui/material";
+import IssueModal from "./IssueModal";
+import axios from "axios";
 
-const IssueTable = ({ tasks, onDelete, onEdit }) => {
-  const [selectedTasks, setSelectedTasks] = useState([]);
+const IssueTable = ({ projectId }) => {
+  const [issues, setIssues] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
-  const handleSelect = (id) => {
-    setSelectedTasks((prev) =>
-      prev.includes(id) ? prev.filter((taskId) => taskId !== id) : [...prev, id]
-    );
+  // 이슈 목록 가져오기
+  useEffect(() => {
+    axios({
+      method: "get",
+      url: "http://localhost:8081/projects/${projectId}/issues"
+    })
+    .then(response => {
+      const {data, status, statusText} = response;
+      console.log(data);
+      setIssues(data);
+    });
+  }, [projectId]);
+
+  // 모달 열기 (추가 또는 수정)
+  const handleOpenModal = (issue = null) => {
+    setSelectedIssue(issue);
+    setOpenModal(true);
+  };
+
+  // 모달 닫기
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedIssue(null);
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <div>
+      <TableContainer>
+        <Table>
         <TableHead>
           <TableRow>
-            <TableCell>
-              <Checkbox
-                onChange={(e) =>
-                  setSelectedTasks(e.target.checked ? tasks.map((t) => t.id) : [])
-                }
-              />
-            </TableCell>
             <TableCell>작업명</TableCell>
             <TableCell>담당자</TableCell>
             <TableCell>상태</TableCell>
             <TableCell>우선순위</TableCell>
             <TableCell>타임라인</TableCell>
-            <TableCell align="center">
-              <IconButton onClick={() => onDelete(selectedTasks)} color="error">
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {tasks.map((task) => (
-            <TableRow key={task.id} onClick={() => onEdit(task)}>
-              <TableCell>
-                <Checkbox
-                  checked={selectedTasks.includes(task.id)}
-                  onChange={() => handleSelect(task.id)}
-                />
-              </TableCell>
-              <TableCell>{task.name}</TableCell>
-              <TableCell>{task.assignee}</TableCell>
-              <TableCell>{task.status}</TableCell>
-              <TableCell>{task.priority}</TableCell>
-              <TableCell>
-                {task.startDate && task.endDate
-                  ? `${task.startDate.format("YYYY-MM-DD")} ~ ${task.endDate.format("YYYY-MM-DD")}`
-                  : "-"}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          <TableBody>
+            {issues.map((issue) => (
+              <TableRow key={issue.id} onClick={() => handleOpenModal(issue)} style={{ cursor: "pointer" }}>
+                <TableCell>{issue.issueName}</TableCell>
+                <TableCell>{issue.manager.username}</TableCell>
+                <TableCell>{issue.status}</TableCell>
+                <TableCell>{issue.priority}</TableCell>
+                <TableCell>{issue.startline} ~ {issue.deadline}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <TableFooter>
+          <Button variant="contained" onClick={() => handleOpenModal()}>+ 이슈 추가</Button>
+        </TableFooter>
+      </TableContainer>
+
+      {/* 모달창 */}
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
+          <IssueModal projectId={projectId} issue={selectedIssue} onClose={handleCloseModal} />
+        </Box>
+      </Modal>
+    </div>
   );
 };
-
-export default IssueTable;

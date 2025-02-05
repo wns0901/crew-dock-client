@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import IssueTable from "./IssueTable";
-import IssueForm from "./IssueForm";
+import IssueTable from "./components/IssueTable"
+import IssueModal from "./components/IssueModal";
 
 const projectMembers = [
   { id: 1, name: "펜틴" },
@@ -28,7 +28,6 @@ const ProjectIssuePage = () => {
 
   return (
     <div>
-      <IssueForm onSave={handleSaveTask} editTask={editTask} assignees={projectMembers} />
       <IssueTable tasks={tasks} onDelete={handleDeleteTasks} onEdit={setEditTask} />
     </div>
   );

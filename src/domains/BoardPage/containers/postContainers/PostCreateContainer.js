@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import PostCreate from "../../components/postComponents/PostCreate";
+import { useContext } from "react";
+import { LoginContext } from "../../../../contexts/LoginContextProvider";
 
 function PostCreateContainer() {
     const navigate = useNavigate();
-    const {userInfo} = ;    // 메소드 연결해주어야 함.
+    const {userInfo} = useContext(LoginContext);
 
     const onSubmit = async (postData) => { 
         

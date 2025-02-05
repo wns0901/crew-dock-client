@@ -12,16 +12,23 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^6.4.2",
+    "@mui/icons-material": "^6.4.3",
+    "@mui/material": "^6.4.3",
     "@reduxjs/toolkit": "^2.5.1",
     "@uiw/react-md-editor": "^4.0.5",
     "axios": "^1.7.9",
+<<<<<<< HEAD
     "prop-types": "^15.8.1",
+=======
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
+>>>>>>> 00a595689ead6efa416e89bcafa16a9869174819
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "styled-components": "^6.1.14"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

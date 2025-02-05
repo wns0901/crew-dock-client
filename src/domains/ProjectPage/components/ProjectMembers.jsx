@@ -28,6 +28,10 @@ const ProjectMembers = () => {
 };
 
   const handleOpenModal = (member) => {
+    if(member.authority === "CAPTAIN"){
+    alert("프로젝트장은 탈퇴할 수 없습니다.");
+    return;
+    }
     setSelectedMember(member);
     setOpenModal(true);
   };
@@ -149,12 +153,14 @@ const ProjectMembers = () => {
             onChange={(e) => setResignation(e.target.value)}
           />
           <Box mt={2} display="flex" justifyContent="flex-end">
-            <Button variant="outlined" onClick={handleCloseModal}>
+            <Button variant="outlined"
+            color='error'
+            onClick={handleCloseModal}>
               취소
             </Button>
             <Button
               variant="contained"
-              color="error"
+              color="primary"
               sx={{ ml: 2 }}
               onClick={handleResignation}
             >

@@ -8,6 +8,8 @@ const ProjectMain = () => {
     const location = useLocation();
     const isSettingsMode = location.pathname.includes("settings")
     || location.pathname.includes("members")
+    || location.pathname.includes("manage")
+    || location.pathname.includes("pending")
     ;
 
     return (

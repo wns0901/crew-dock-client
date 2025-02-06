@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import IssueTable from "./components/IssueTable"
-import IssueModal from "./components/IssueModal";
+import IssueUpdateModal from "./components/IssueUpdateModal";
+import IssueWriteModal from "./components/IssueWriteModal";
 
 const projectMembers = [
   { id: 1, name: "펜틴" },

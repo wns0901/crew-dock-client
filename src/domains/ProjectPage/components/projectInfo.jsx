@@ -126,11 +126,13 @@ const ProjectInfo = () => {
                         if (newValue === 0) navigate(`/projects/${projectId}`);
                         if (newValue === 1) navigate(`/projects/${projectId}/members`);
                         if (newValue === 2) navigate(`/projects/${projectId}/resignations`);
+                        if (newValue === 3) navigate(`/projects/${projectId}/settings`);
                     }}
                 >
                     <BottomNavigationAction label="커밋 기록" />
                     <BottomNavigationAction label="멤버 관리" />
                     <BottomNavigationAction label="탈퇴 신청 목록" />
+                    <BottomNavigationAction label="설정 및 관리" />
                 </BottomNavigation>
             </Box>
         </Box>

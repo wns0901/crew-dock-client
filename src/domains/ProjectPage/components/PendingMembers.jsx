@@ -69,7 +69,7 @@ const PendingMembers = () => {
               <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
               <TableCell>상태</TableCell>
-              <TableCell>액션</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

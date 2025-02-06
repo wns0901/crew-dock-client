@@ -40,7 +40,7 @@ const SettingsSidebar = () => {
                     if (newValue === 2) navigate(`/projects/${projectId}/pending`);
                 }}
             >
-                <BottomNavigationAction label="엑신청 명단세스" />
+                <BottomNavigationAction label="세부 사항" />
                 <BottomNavigationAction label="엑세스" />
                 <BottomNavigationAction label="신청 관리" />
             </BottomNavigation>

@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer } from "@mui/material";
-import IssueWriteModal from "./IssueWriteModal";  // IssueWriteModal 추가
-import IssueUpdateModal from "./IssueUpdateModal"; // IssueUpdateModal 추가
+import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer, Checkbox } from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import IssueWriteModal from "./IssueWriteModal";
+import IssueUpdateModal from "./IssueUpdateModal";
 import axios from "axios";
 
 const IssueTable = () => {
-  // 하드 코딩
-  const projectId = 1; // 프로젝트 ID
-  const userId = 1;    // 로그인한 유저 ID
-
+  const projectId = 1;
   const [issues, setIssues] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
-  const [openWriteModal, setOpenWriteModal] = useState(false); // 추가용 모달 상태
-
-  // 상태와 우선순위를 영어로 전달하기 위한 매핑
+  const [openWriteModal, setOpenWriteModal] = useState(false);
+  const [selectedIssues, setSelectedIssues] = useState([]);
+  
   const statusMap = {
     INPROGRESS: "진행중",
-    YET: "시작 안함",
+    YET: "시작안함",
     COMPLETE: "완료",
   };
 
@@ -27,45 +25,67 @@ const IssueTable = () => {
     LOW: "낮음",
   };
 
-  // 이슈 목록 가져오기
+  const fetchIssues = () => {
+    axios.get(`http://localhost:8081/projects/${projectId}/issues`)
+      .then(response => setIssues(response.data))
+      .catch(error => console.error("이슈 목록 불러오기 실패:", error));
+  };
+
   useEffect(() => {
-    axios({
-      method: "get",
-      url: `http://localhost:8081/projects/${projectId}/issues` // 프로젝트 ID만 전달
-    })
-    .then(response => {
-      setIssues(response.data);
-    })
-    .catch(error => {
-      console.error("이슈 목록을 불러오는 중 오류 발생:", error);
-    });
+    fetchIssues();
   }, [projectId]);
 
-  // 모달 열기 (추가 또는 수정)
-  const handleOpenModal = (issue = null) => {
+  const handleOpenModal = (issue) => {
     setSelectedIssue(issue);
     setOpenModal(true);
   };
 
-  // 모달 닫기
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedIssue(null);
+    fetchIssues();
   };
 
-  // IssueWriteModal 열기
   const handleOpenWriteModal = () => {
     setOpenWriteModal(true);
   };
 
-  // IssueWriteModal 닫기
   const handleCloseWriteModal = () => {
     setOpenWriteModal(false);
+    fetchIssues();
   };
 
-  // 한국어로 출력할 우선순위와 상태 변환
   const getStatusLabel = (status) => statusMap[status] || status;
   const getPriorityLabel = (priority) => priorityMap[priority] || priority;
+
+  const handleSelectIssue = (issueId) => {
+    setSelectedIssues((prev) =>
+      prev.includes(issueId) ? prev.filter((id) => id !== issueId) : [...prev, issueId]
+    );
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedIssues(issues.map((issue) => issue.id));
+    } else {
+      setSelectedIssues([]);
+    }
+  };
+
+  const handleDeleteIssues = () => {
+    if (selectedIssues.length === 0) return;
+    if (!window.confirm("선택한 이슈를 삭제하시겠습니까?")) return;
+
+    axios.delete(`http://localhost:8081/projects/${projectId}/issues`, {
+      data: selectedIssues
+    })
+    .then(() => {
+      alert("삭제 완료");
+      setSelectedIssues([]);
+      fetchIssues();
+    })
+    .catch(error => console.error("이슈 삭제 실패:", error));
+  };
 
   return (
     <div>
@@ -73,6 +93,13 @@ const IssueTable = () => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>
+                <Checkbox
+                  indeterminate={selectedIssues.length > 0 && selectedIssues.length < issues.length}
+                  checked={issues.length > 0 && selectedIssues.length === issues.length}
+                  onChange={handleSelectAll}
+                />
+              </TableCell>
               <TableCell>작업명</TableCell>
               <TableCell>담당자</TableCell>
               <TableCell>상태</TableCell>
@@ -82,8 +109,17 @@ const IssueTable = () => {
           </TableHead>
           <TableBody>
             {issues.map((issue) => (
-              <TableRow key={issue.id} onClick={() => handleOpenModal(issue)} style={{ cursor: "pointer" }}>
-                <TableCell style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <TableRow
+                key={issue.id}
+                style={{ cursor: "pointer" }}
+              >
+                <TableCell>
+                  <Checkbox
+                    checked={selectedIssues.includes(issue.id)}
+                    onChange={() => handleSelectIssue(issue.id)}
+                  />
+                </TableCell>
+                <TableCell onClick={() => handleOpenModal(issue)} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {issue.issueName}
                 </TableCell>
                 <TableCell>{issue.manager?.nickname || '담당자 정보 없음'}</TableCell>
@@ -95,19 +131,22 @@ const IssueTable = () => {
           </TableBody>
         </Table>
         <Button variant="contained" onClick={handleOpenWriteModal}>+ 이슈 추가</Button>
+        <Button variant="contained" color="error" onClick={handleDeleteIssues} disabled={selectedIssues.length === 0}>
+          <Delete />
+        </Button>
       </TableContainer>
 
-      {/* 이슈 추가 모달 */}
       <Modal open={openWriteModal} onClose={handleCloseWriteModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
           <IssueWriteModal projectId={projectId} onClose={handleCloseWriteModal} />
         </Box>
       </Modal>
 
-      {/* 이슈 수정 모달 */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
-          <IssueUpdateModal projectId={projectId} issue={selectedIssue} onClose={handleCloseModal} />
+          {selectedIssue && (
+            <IssueUpdateModal projectId={projectId} issue={selectedIssue} onClose={handleCloseModal} />
+          )}
         </Box>
       </Modal>
     </div>

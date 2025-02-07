@@ -1,32 +1,16 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
-
-const statusMap = {
-    '진행중': 'INPROGRESS',
-    '시작 안함': 'YET',
-    '완료': 'COMPLETE'
-};
-
-const priorityMap = {
-    '높음': 'HIGH',
-    '중간': 'MIDDLE',
-    '낮음': 'LOW'
-};
-
-const reverseStatusMap = Object.fromEntries(Object.entries(statusMap).map(([k, v]) => [v, k]));
-const reversePriorityMap = Object.fromEntries(Object.entries(priorityMap).map(([k, v]) => [v, k]));
+import axios from 'axios';
+import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, TextField, Typography, ButtonGroup, Modal } from '@mui/material';
 
 const IssueWriteModal = ({ projectId, issue, onClose }) => {
     const [formData, setFormData] = useState({
         issueName: '',
         managerId: '',
-        status: 'YET',
-        priority: 'MIDDLE',
+        status: '',
+        priority: '',
         startline: '',
         deadline: ''
     });
-    
     const [members, setMembers] = useState([]);
 
     useEffect(() => {
@@ -34,7 +18,7 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
             .then(response => setMembers(response.data))
             .catch(error => console.error("멤버 목록을 불러오는 중 오류 발생:", error));
     }, [projectId]);
-    
+
     useEffect(() => {
         if (issue) {
             setFormData({
@@ -47,11 +31,23 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
             });
         }
     }, [issue]);
-    
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+    const priorityMap = {
+        높음: "HIGH",
+        중간: "MIDDLE",
+        낮음: "LOW",
+      };
     
+      const statusMap = {
+        진행중: "INPROGRESS",
+        완료: "COMPLETE",
+        시작안함: "YET",
+      };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const requestData = {
@@ -66,61 +62,50 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
     };
 
     return (
-        <Modal show onHide={onClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>이슈 작성</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>작업명</Form.Label>
-                        <Form.Control type="text" name="issueName" value={formData.issueName} onChange={handleChange} required />
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-3">
-                        <Form.Label>담당자</Form.Label>
-                        <Form.Select name="managerId" value={formData.managerId} onChange={handleChange} required>
-                            <option value="">담당자를 선택하세요</option>
-                            {members.map(member => (
-                                <option key={member.id} value={member.id}>{member.nickname}</option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-3">
-                        <Form.Label>상태</Form.Label>
-                        <Form.Select name="status" value={formData.status} onChange={handleChange}>
-                            {Object.keys(statusMap).map(kor => (
-                                <option key={kor} value={kor}>{kor}</option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-3">
-                        <Form.Label>우선순위</Form.Label>
-                        <Form.Select name="priority" value={formData.priority} onChange={handleChange}>
-                            {Object.keys(priorityMap).map(kor => (
-                                <option key={kor} value={kor}>{kor}</option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-3">
-                        <Form.Label>시작일</Form.Label>
-                        <Form.Control type="date" name="startline" value={formData.startline} onChange={handleChange} required />
-                    </Form.Group>
-                    
-                    <Form.Group className="mb-3">
-                        <Form.Label>마감일</Form.Label>
-                        <Form.Control type="date" name="deadline" value={formData.deadline} onChange={handleChange} required />
-                    </Form.Group>
-                    
-                    <div className="d-flex justify-content-end gap-2">
-                        <Button variant="secondary" onClick={onClose}>취소</Button>
-                        <Button variant="primary" type="submit">저장</Button>
-                    </div>
-                </Form>
-            </Modal.Body>
+        <Modal open onClose={onClose}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Card sx={{ width: 400, padding: 3 }}>
+                    <CardContent>
+                        <TextField label="작업명" name="issueName" value={formData.issueName} onChange={handleChange} fullWidth margin="normal" required />
+
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>담당자</InputLabel>
+                            <Select name="managerId" value={formData.managerId} onChange={handleChange}>
+                                <MenuItem value="">담당자를 선택하세요.</MenuItem>
+                                {members.map(member => (
+                                    <MenuItem key={member.id} value={member.id}>{member.nickname}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>상태</InputLabel>
+                            <Select name="status" value={formData.status} onChange={handleChange}>
+                                {Object.keys(statusMap).map(kor => (
+                                    <MenuItem key={kor} value={kor}>{kor}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>우선순위</InputLabel>
+                            <Select name="priority" value={formData.priority} onChange={handleChange}>
+                                {Object.keys(priorityMap).map(kor => (
+                                    <MenuItem key={kor} value={kor}>{kor}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <TextField label="시작일" type="date" name="startline" value={formData.startline} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ shrink: true }} required />
+                        <TextField label="마감일" type="date" name="deadline" value={formData.deadline} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ shrink: true }} required />
+
+                        <ButtonGroup fullWidth sx={{ mt: 2 }}>
+                            <Button onClick={onClose} variant="outlined">취소</Button>
+                            <Button onClick={handleSubmit} variant="contained" color="primary">저장</Button>
+                        </ButtonGroup>
+                    </CardContent>
+                </Card>
+            </Box>
         </Modal>
     );
 };

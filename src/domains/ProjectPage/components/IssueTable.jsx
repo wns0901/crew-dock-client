@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer, Checkbox } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import React, { useState, useEffect, useContext } from "react";
+import { LoginContext } from '../../../contexts/LoginContextProvider';
+import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer, Checkbox, Chip, IconButton } from "@mui/material";
+import { Delete } from '@mui/icons-material';
 import IssueWriteModal from "./IssueWriteModal";
 import IssueUpdateModal from "./IssueUpdateModal";
 import axios from "axios";
@@ -12,22 +13,28 @@ const IssueTable = () => {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [openWriteModal, setOpenWriteModal] = useState(false);
   const [selectedIssues, setSelectedIssues] = useState([]);
+  const {userInfo} = useContext(LoginContext);
   
-  const statusMap = {
-    INPROGRESS: "진행중",
-    YET: "시작안함",
-    COMPLETE: "완료",
+  const statusColors = {
+    INPROGRESS: "warning",
+    YET: "info",
+    COMPLETE: "success",
   };
 
-  const priorityMap = {
-    HIGH: "높음",
-    MIDDLE: "중간",
-    LOW: "낮음",
+  const priorityColors = {
+    HIGH: "error",
+    MIDDLE: "primary",
+    LOW: "success",
   };
 
   const fetchIssues = () => {
     axios.get(`http://localhost:8081/projects/${projectId}/issues`)
-      .then(response => setIssues(response.data))
+      .then(response => {
+        setIssues(response.data);
+        console.log("이슈 목록:", response.data)
+        console.log("프로젝트 ID:", projectId)
+        console.log("현재 로그인한 userInfo:", userInfo)
+      })
       .catch(error => console.error("이슈 목록 불러오기 실패:", error));
   };
 
@@ -54,9 +61,6 @@ const IssueTable = () => {
     setOpenWriteModal(false);
     fetchIssues();
   };
-
-  const getStatusLabel = (status) => statusMap[status] || status;
-  const getPriorityLabel = (priority) => priorityMap[priority] || priority;
 
   const handleSelectIssue = (issueId) => {
     setSelectedIssues((prev) =>
@@ -90,8 +94,14 @@ const IssueTable = () => {
   return (
     <div>
       <TableContainer>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px" }}>
+          <h2>이슈 관리</h2>
+          <IconButton onClick={handleDeleteIssues} disabled={selectedIssues.length === 0}>
+            <Delete />
+          </IconButton>
+        </div>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
               <TableCell>
                 <Checkbox
@@ -109,10 +119,7 @@ const IssueTable = () => {
           </TableHead>
           <TableBody>
             {issues.map((issue) => (
-              <TableRow
-                key={issue.id}
-                style={{ cursor: "pointer" }}
-              >
+              <TableRow key={issue.id} style={{ cursor: "pointer" }}>
                 <TableCell>
                   <Checkbox
                     checked={selectedIssues.includes(issue.id)}
@@ -123,16 +130,19 @@ const IssueTable = () => {
                   {issue.issueName}
                 </TableCell>
                 <TableCell>{issue.manager?.nickname || '담당자 정보 없음'}</TableCell>
-                <TableCell>{getStatusLabel(issue.status)}</TableCell>
-                <TableCell>{getPriorityLabel(issue.priority)}</TableCell>
+                <TableCell>
+                  <Chip label={issue.status} color={statusColors[issue.status] || "default"} />
+                </TableCell>
+                <TableCell>
+                  <Chip label={issue.priority} color={priorityColors[issue.priority] || "default"} />
+                </TableCell>
                 <TableCell>{issue.startline} ~ {issue.deadline}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Button variant="contained" onClick={handleOpenWriteModal}>+ 이슈 추가</Button>
-        <Button variant="contained" color="error" onClick={handleDeleteIssues} disabled={selectedIssues.length === 0}>
-          <Delete />
+        <Button variant="contained" onClick={handleOpenWriteModal} sx={{ margin: "10px" }}>
+          + 작업 추가
         </Button>
       </TableContainer>
 

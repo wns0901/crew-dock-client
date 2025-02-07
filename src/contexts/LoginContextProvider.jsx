@@ -39,20 +39,20 @@ const LoginContextProvider = ({children}) => {
 
     api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-    try {
-      response = await auth.userInfo();
-    } catch (error) {
-      return;
-    }
+    // try {
+    //   response = await auth.userInfo();
+    // } catch (error) {
+    //   return;
+    // }
 
-    if (!response) return;
+    // if (!response) return;
 
-    data = response.data;
+    // data = response.data;
 
-    if (data === "UNAUTHORIZED" || response.status === 401) {
-      navigate("/login")
-      return;
-    }
+    // if (data === "UNAUTHORIZED" || response.status === 401) {
+    //   navigate("/login")
+    //   return;
+    // }
 
     loginSetting(accessToken);
   };

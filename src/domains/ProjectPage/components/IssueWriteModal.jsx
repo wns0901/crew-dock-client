@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { LoginContext } from '../../../contexts/LoginContextProvider';
 import axios from 'axios';
 import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, TextField, Typography, ButtonGroup, Modal } from '@mui/material';
 
 const IssueWriteModal = ({ projectId, issue, onClose }) => {
+    const { userInfo } = useContext(LoginContext);  // 로그인한 사용자 정보 가져오기
+
     const [formData, setFormData] = useState({
         issueName: '',
         managerId: '',
+        writerId: userInfo?.id || '',  // 🛠 안전한 초기화
         status: '',
         priority: '',
         startline: '',
         deadline: ''
     });
+
     const [members, setMembers] = useState([]);
 
     useEffect(() => {
@@ -19,13 +24,26 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
             .catch(error => console.error("멤버 목록을 불러오는 중 오류 발생:", error));
     }, [projectId]);
 
+    const reverseStatusMap = {
+        INPROGRESS: "진행중",
+        COMPLETE: "완료",
+        YET: "시작안함"
+    };
+
+    const reversePriorityMap = {
+        HIGH: "높음",
+        MIDDLE: "중간",
+        LOW: "낮음"
+    };
+
     useEffect(() => {
         if (issue) {
             setFormData({
                 issueName: issue.issueName,
-                managerId: issue.manager?.id || '',
-                status: reverseStatusMap[issue.status] || 'YET',
-                priority: reversePriorityMap[issue.priority] || 'MIDDLE',
+                managerId: issue.user?.id || '',
+                writerId: userInfo?.id || '',
+                status: reverseStatusMap[issue.status] || '',
+                priority: reversePriorityMap[issue.priority] || '',
                 startline: issue.startline,
                 deadline: issue.deadline
             });
@@ -39,16 +57,16 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
     const priorityMap = {
         높음: "HIGH",
         중간: "MIDDLE",
-        낮음: "LOW",
-      };
-    
-      const statusMap = {
+        낮음: "LOW"
+    };
+
+    const statusMap = {
         진행중: "INPROGRESS",
         완료: "COMPLETE",
-        시작안함: "YET",
-      };
+        시작안함: "YET"
+    };
 
-    const handleSubmit = (e) => {
+      const handleSubmit = (e) => {
         e.preventDefault();
         const requestData = {
             ...formData,
@@ -71,9 +89,11 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
                         <FormControl fullWidth margin="normal">
                             <InputLabel>담당자</InputLabel>
                             <Select name="managerId" value={formData.managerId} onChange={handleChange}>
-                                <MenuItem value="">담당자를 선택하세요.</MenuItem>
+                            <MenuItem value="">담당자를 선택하세요.</MenuItem>
                                 {members.map(member => (
-                                    <MenuItem key={member.id} value={member.id}>{member.nickname}</MenuItem>
+                                    <MenuItem key={member.id} value={member.id}>
+                                        {member.user?.nickname || "담당자 없음"}
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>

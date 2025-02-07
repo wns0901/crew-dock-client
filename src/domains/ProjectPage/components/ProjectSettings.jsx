@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { LoginContext } from "../../../contexts/LoginContextProvider";
 
 const ProjectSettings = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
+    const { projectRoles } = useContext(LoginContext);
+    
     const [project, setProject] = useState(null);
     const [updatedProject, setUpdatedProject] = useState({
         name: "",
@@ -22,25 +24,26 @@ const ProjectSettings = () => {
     });
     const [captain, setCaptain] = useState(null);
 
-  // 프로젝트 정보 가져오기
+    // 현재 로그인한 사용자가 CAPTAIN인지 확인
+    const isCaptain = projectRoles.some(
+        (role) => Number(role.projectId) === Number(projectId) && role.role.isCaptain
+    );
+
     useEffect(() => {
-       
         axios.get(`http://localhost:8080/projects/${projectId}`)
             .then((response) => {
                 const projectData = response.data;
                 setProject(projectData);
 
-                // 프로젝트 상태 초기화
                 setUpdatedProject({
                     ...projectData,
-                    status: projectData.status || ""  // 상태값 초기화
+                    status: projectData.status || ""
                 });
             })
             .catch((error) => {
                 console.error("프로젝트 정보 조회 실패:", error);
             });
 
-        // 멤버 정보 가져오기
         axios.get(`http://localhost:8080/projects/${projectId}/members`)
             .then((response) => {
                 const members = response.data;
@@ -66,7 +69,6 @@ const ProjectSettings = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const projectWithId = { ...updatedProject, id: projectId };
 
         axios.patch(`http://localhost:8080/projects`, projectWithId)
@@ -105,6 +107,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }} 
                 />
 
                 <TextField
@@ -114,6 +117,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }}
                 />
 
                 <TextField
@@ -123,6 +127,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }}
                 />
 
                 <TextField
@@ -132,6 +137,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }}
                 />
 
                 <TextField
@@ -141,6 +147,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }}
                 />
 
                 <TextField
@@ -150,6 +157,7 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
+                    InputProps={{ readOnly: !isCaptain }}
                 />
 
                 <TextField
@@ -160,12 +168,8 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
-                    InputProps={{
-                        readOnly: true,  // 시작일 필드 readonly 설정
-                    }}
-                    InputLabelProps={{
-                        shrink: true
-                    }}
+                    InputProps={{ readOnly: true }} // 시작일은 항상 수정 불가능
+                    InputLabelProps={{ shrink: true }}
                 />
 
                 <TextField
@@ -176,22 +180,19 @@ const ProjectSettings = () => {
                     onChange={handleUpdate}
                     fullWidth
                     sx={{ marginBottom: 2 }}
-                    InputProps={{
-                        readOnly: true,  
-                    }}
+                    InputProps={{ readOnly: true }} // 기간도 항상 수정 불가능
                 />
-  
-    {captain && (
-                        <TextField
-                            label="프로젝트 CAPTAIN"
-                            value={captain.user.name}
-                            fullWidth
-                            sx={{ marginBottom: 2 }}
-                            InputProps={{
-                                readOnly: true,  
-                            }}
-                        />
-                    )}
+
+                {captain && (
+                    <TextField
+                        label="프로젝트 CAPTAIN"
+                        value={captain.user.name}
+                        fullWidth
+                        sx={{ marginBottom: 2 }}
+                        InputProps={{ readOnly: true }}
+                    />
+                )}
+
                 <FormControl fullWidth sx={{ marginBottom: 2 }}>
                     <InputLabel>상태</InputLabel>
                     <Select
@@ -199,25 +200,27 @@ const ProjectSettings = () => {
                         value={updatedProject.status}
                         onChange={handleUpdate}
                         label="상태"
+                        disabled={!isCaptain} // CAPTAIN이 아니면 변경 불가능
                     >
                         {Object.entries(statusMap).map(([key, label]) => (
                             <MenuItem key={key} value={key}>
-                                {label}  {/* 표시 값은 한글로 */}
+                                {label}
                             </MenuItem>
                         ))}
                     </Select>
-
-                
                 </FormControl>
 
-                <Button 
-                    type="submit" 
-                    variant="contained" 
-                    color="primary"
-                    sx={{ marginTop: 2 }}
-                >
-                    저장
-                </Button>
+                {/* CAPTAIN만 저장 버튼 보이게 */}
+                {isCaptain && (
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        color="primary"
+                        sx={{ marginTop: 2 }}
+                    >
+                        저장
+                    </Button>
+                )}
             </form>
         </Box>
     );

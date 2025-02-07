@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { LoginContext } from "../../../contexts/LoginContextProvider";
 
 const PendingMembers = () => {
   const { projectId } = useParams();
-  console.log("프로젝트 ID:", projectId);
+  const { projectRoles } = useContext(LoginContext); // 로그인 컨텍스트에서 프로젝트 권한 정보 가져오기
+
   const [pendingMembers, setPendingMembers] = useState([]);
 
   useEffect(() => {
@@ -19,9 +21,7 @@ const PendingMembers = () => {
       const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
       console.log("API 응답 데이터:", response.data);
 
-      // status가 "REQUEST"인 유저만 필터링
       const filteredMembers = response.data.filter((member) => member.status === "REQUEST");
-
       setPendingMembers(filteredMembers);
     } catch (error) {
       console.error("가입 신청 유저 조회 실패:", error);
@@ -55,6 +55,11 @@ const PendingMembers = () => {
     }
   };
 
+  // 현재 로그인한 사용자가 이 프로젝트의 캡틴인지 확인
+  const isCaptain = projectRoles.some(
+    (role) => role.projectId === parseInt(projectId) && role.role.isCaptain
+  );
+
   return (
     <Box p={3}>
       <Typography variant="h5" mb={2}>
@@ -68,36 +73,39 @@ const PendingMembers = () => {
               <TableCell>이름</TableCell>
               <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
-              <TableCell>상태</TableCell>
-              <TableCell></TableCell>
+              {isCaptain && <TableCell></TableCell>}
+              {isCaptain && <TableCell></TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {pendingMembers.length > 0 ? (
-              pendingMembers.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>{member.user.name}</TableCell>
-                  <TableCell>{member.user.phoneNumber}</TableCell>
-                  <TableCell>{member.position}</TableCell>
-                  <TableCell>{member.status}</TableCell>
-                  <TableCell>
-                    <Button variant="contained" color="primary" size="small" onClick={() => handleApprove(member.user.id)}>
-                      승인
-                    </Button>
-                    <Button variant="outlined" color="error" size="small" sx={{ ml: 1 }} onClick={() => handleReject(member.user.id)}>
-                      거절
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  가입 신청한 유저가 없습니다.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+  {pendingMembers.length > 0 ? (
+    pendingMembers.map((member) => (
+      <TableRow key={member.id}>
+        <TableCell>{member.user.name}</TableCell>
+        <TableCell>{member.user.phoneNumber}</TableCell>
+        <TableCell>{member.position}</TableCell>
+        {isCaptain && (
+          <TableCell>
+            <Box display="flex" gap={1}> {/* 버튼 사이 간격 조절 */}
+              <Button variant="contained" color="primary" size="small" onClick={() => handleApprove(member.user.id)}>
+                승인
+              </Button>
+              <Button variant="outlined" color="error" size="small" onClick={() => handleReject(member.user.id)}>
+                거절
+              </Button>
+            </Box>
+          </TableCell>
+        )}
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={isCaptain ? 4 : 3} align="center">
+        가입 신청한 유저가 없습니다.
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
         </Table>
       </TableContainer>
     </Box>

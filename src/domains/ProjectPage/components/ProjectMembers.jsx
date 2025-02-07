@@ -1,12 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Modal, TextField } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Modal,
+  TextField,
+} from "@mui/material";
+import { LoginContext } from "../../../contexts/LoginContextProvider";
 
 const ProjectMembers = () => {
   const { projectId } = useParams();
-  console.log("프로젝트 ID:", projectId);
-  const [members, setMembers] = useState([]); 
+  const { userInfo, projectRoles } = useContext(LoginContext); // user → userInfo로 변경
+  const [members, setMembers] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [resignation, setResignation] = useState("");
@@ -19,18 +32,17 @@ const ProjectMembers = () => {
 
   const fetchMembers = async () => {
     try {
-        const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
-        console.log("API 응답 데이터:", response.data); 
-        setMembers(response.data);
+      const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
+      setMembers(response.data);
     } catch (error) {
-        console.error("멤버 조회 실패:", error);
+      console.error("멤버 조회 실패:", error);
     }
-};
+  };
 
   const handleOpenModal = (member) => {
-    if(member.authority === "CAPTAIN"){
-    alert("프로젝트장은 탈퇴할 수 없습니다.");
-    return;
+    if (member.authority === "CAPTAIN") {
+      alert("프로젝트장은 탈퇴할 수 없습니다.");
+      return;
     }
     setSelectedMember(member);
     setOpenModal(true);
@@ -48,6 +60,12 @@ const ProjectMembers = () => {
         userId: userId,
         authority: "CAPTAIN",
       });
+
+      await axios.patch(`http://localhost:8080/projects/${projectId}/members`, {
+        userId: userInfo.id,
+        authority: "CREW",
+      });
+      
       fetchMembers();
     } catch (error) {
       console.error("권한 변경 오류:", error);
@@ -55,16 +73,16 @@ const ProjectMembers = () => {
   };
 
   const handleResignation = async () => {
-    if (!selectedMember){
+    if (!selectedMember) {
       return;
     }
-    try{
+    try {
       await axios.post(
         `http://localhost:8080/projects/${projectId}/resignations/members`,
-        {content: resignation},
+        { content: resignation },
         {
-          params: {userId: selectedMember.user.id},
-        headers: {"Content-Type": "application/json"},
+          params: { userId: selectedMember.user.id },
+          headers: { "Content-Type": "application/json" },
         }
       );
       alert("탈퇴 신청 완료");
@@ -73,6 +91,11 @@ const ProjectMembers = () => {
       console.error("탈퇴 신청 오류:", error);
     }
   };
+
+  // 현재 로그인한 사용자가 CAPTAIN인지 확인
+  const isCaptain = projectRoles.some(
+    (role) => role.projectId === parseInt(projectId) && role.role.isCaptain // 여기 수정
+  );
 
   return (
     <Box p={3}>
@@ -85,43 +108,50 @@ const ProjectMembers = () => {
           <TableHead>
             <TableRow>
               <TableCell>권한</TableCell>
-              <TableCell>이름</TableCell>          
+              <TableCell>이름</TableCell>
               <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Array.isArray(members) && members
-            .filter((member) => member.status === "APPROVE")
-            .map((member) => (
-              <TableRow key={member.id}>
-                <TableCell>{member.authority}</TableCell>
-                <TableCell>{member.user.name}</TableCell>
-              
-                <TableCell>{member.user.phoneNumber}</TableCell>
-                <TableCell>{member.position}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    onClick={() => handleOpenModal(member)}
-                  >
-                    탈퇴
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    sx={{ ml: 1 }}
-                    onClick={() => handleAuthority(member.user.id)}
-                  >
-                    위임
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {Array.isArray(members) &&
+              members
+                .filter((member) => member.status === "APPROVE")
+                .map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>{member.authority}</TableCell>
+                    <TableCell>{member.user.name}</TableCell>
+                    <TableCell>{member.user.phoneNumber}</TableCell>
+                    <TableCell>{member.position}</TableCell>
+                    <TableCell>
+                      {/* 현재 로그인한 유저의 정보일 때만 탈퇴 버튼 표시 */}
+                      {userInfo.id === member.user.id && ( // user → userInfo.id로 변경
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleOpenModal(member)}
+                        >
+                          탈퇴
+                        </Button>
+                      )}
+
+                      {/* 현재 사용자가 CAPTAIN일 때만 위임 버튼 표시 */}
+                      {isCaptain && (
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          sx={{ ml: 1 }}
+                          onClick={() => handleAuthority(member.user.id)}
+                        >
+                          위임
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -138,7 +168,7 @@ const ProjectMembers = () => {
             bgcolor: "background.paper",
             p: 3,
             borderRadius: 2,
-            boxShadow: 24
+            boxShadow: 24,
           }}
         >
           <Typography variant="h6" mb={2}>
@@ -153,9 +183,7 @@ const ProjectMembers = () => {
             onChange={(e) => setResignation(e.target.value)}
           />
           <Box mt={2} display="flex" justifyContent="flex-end">
-            <Button variant="outlined"
-            color='error'
-            onClick={handleCloseModal}>
+            <Button variant="outlined" color="error" onClick={handleCloseModal}>
               취소
             </Button>
             <Button

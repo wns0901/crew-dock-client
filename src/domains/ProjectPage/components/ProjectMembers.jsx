@@ -65,7 +65,7 @@ const ProjectMembers = () => {
         userId: userInfo.id,
         authority: "CREW",
       });
-      
+
       fetchMembers();
     } catch (error) {
       console.error("권한 변경 오류:", error);
@@ -125,31 +125,32 @@ const ProjectMembers = () => {
                     <TableCell>{member.user.phoneNumber}</TableCell>
                     <TableCell>{member.position}</TableCell>
                     <TableCell>
-                      {/* 현재 로그인한 유저의 정보일 때만 탈퇴 버튼 표시 */}
-                      {userInfo.id === member.user.id && ( // user → userInfo.id로 변경
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          onClick={() => handleOpenModal(member)}
-                        >
-                          탈퇴
-                        </Button>
-                      )}
+  <Box display="flex" gap={1}>
+    {/* 현재 로그인한 유저의 정보일 때만 탈퇴 버튼 표시 */}
+    {userInfo.id === member.user.id && (
+      <Button
+        variant="outlined"
+        color="error"
+        size="small"
+        onClick={() => handleOpenModal(member)}
+      >
+        탈퇴
+      </Button>
+    )}
 
-                      {/* 현재 사용자가 CAPTAIN일 때만 위임 버튼 표시 */}
-                      {isCaptain && (
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          sx={{ ml: 1 }}
-                          onClick={() => handleAuthority(member.user.id)}
-                        >
-                          위임
-                        </Button>
-                      )}
-                    </TableCell>
+    {/* 현재 사용자가 CAPTAIN이고, 해당 멤버가 CAPTAIN이 아닐 때만 위임 버튼 표시 */}
+    {isCaptain && member.authority !== "CAPTAIN" && (
+      <Button
+        variant="outlined"
+        color="primary"
+        size="small"
+        onClick={() => handleAuthority(member.user.id)}
+      >
+        위임
+      </Button>
+    )}
+  </Box>
+</TableCell>
                   </TableRow>
                 ))}
           </TableBody>

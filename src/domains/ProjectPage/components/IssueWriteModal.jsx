@@ -8,8 +8,9 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
 
     const [formData, setFormData] = useState({
         issueName: '',
-        managerId: '',
-        writerId: userInfo?.id || '',  // 🛠 안전한 초기화
+        managerId: userInfo?.id || '',
+        managerName: userInfo?.nickname || '',
+        writerId: userInfo?.id || '',
         status: '',
         priority: '',
         startline: '',
@@ -20,7 +21,14 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
 
     useEffect(() => {
         axios.get(`http://localhost:8081/projects/${projectId}/members`)
-            .then(response => setMembers(response.data))
+            .then(response => {
+                // authority가 CREW 또는 CAPTAIN인 멤버만 필터링
+                const filteredMembers = response.data.filter(member => 
+                    member.authority === 'CREW' || member.authority === 'CAPTAIN'
+                );
+                setMembers(filteredMembers);
+                console.log("프로젝트 멤버 목록:", filteredMembers);
+            })
             .catch(error => console.error("멤버 목록을 불러오는 중 오류 발생:", error));
     }, [projectId]);
 
@@ -40,7 +48,8 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
         if (issue) {
             setFormData({
                 issueName: issue.issueName,
-                managerId: issue.user?.id || '',
+                managerId: issue.user?.id || userInfo?.id,
+                managerName: issue.user?.nickname || userInfo?.nickname, 
                 writerId: userInfo?.id || '',
                 status: reverseStatusMap[issue.status] || '',
                 priority: reversePriorityMap[issue.priority] || '',
@@ -48,7 +57,7 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
                 deadline: issue.deadline
             });
         }
-    }, [issue]);
+    }, [issue, userInfo]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -68,10 +77,16 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
 
       const handleSubmit = (e) => {
         e.preventDefault();
+        if (!projectId) {
+            alert("프로젝트 ID가 유효하지 않습니다.");
+            return;
+        }
+
         const requestData = {
             ...formData,
             status: statusMap[formData.status],
-            priority: priorityMap[formData.priority]
+            priority: priorityMap[formData.priority],
+            projectId: projectId
         };
 
         axios.post(`http://localhost:8081/projects/${projectId}/issues`, requestData)
@@ -85,40 +100,82 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
                 <Card sx={{ width: 400, padding: 3 }}>
                     <CardContent>
                         <TextField label="작업명" name="issueName" value={formData.issueName} onChange={handleChange} fullWidth margin="normal" required />
+                        <TextField
+                            label="담당자"
+                            name="managerName"
+                            value= {formData.managerName}
+                            onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            select
+                        >
+                            {/* 기본 값은 작성자의 이름으로 설정 */}
+                            <MenuItem value={userInfo.nickname}>{userInfo.nickname}</MenuItem>
 
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>담당자</InputLabel>
-                            <Select name="managerId" value={formData.managerId} onChange={handleChange}>
-                            <MenuItem value="">담당자를 선택하세요.</MenuItem>
-                                {members.map(member => (
-                                    <MenuItem key={member.id} value={member.id}>
-                                        {member.user?.nickname || "담당자 없음"}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            {/* 선택할 수 있는 멤버 목록 */}
+                            {members.map(member => (
+                                <MenuItem key={member.user.nickname} value={member.user.nickname}>
+                                    {member.user?.nickname || "담당자 없음"}
+                                </MenuItem>
+                            ))}
+                        </TextField>
 
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>상태</InputLabel>
-                            <Select name="status" value={formData.status} onChange={handleChange}>
-                                {Object.keys(statusMap).map(kor => (
-                                    <MenuItem key={kor} value={kor}>{kor}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        <TextField
+                            label="상태"
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            select
+                        >
+                            {Object.keys(statusMap).map(kor => (
+                                <MenuItem key={kor} value={kor}>{kor}</MenuItem>
+                            ))}
+                        </TextField>
 
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>우선순위</InputLabel>
-                            <Select name="priority" value={formData.priority} onChange={handleChange}>
-                                {Object.keys(priorityMap).map(kor => (
-                                    <MenuItem key={kor} value={kor}>{kor}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        <TextField
+                            label="우선순위"
+                            name="priority"
+                            value={formData.priority}
+                            onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            select
+                        >
+                            {Object.keys(priorityMap).map(kor => (
+                                <MenuItem key={kor} value={kor}>{kor}</MenuItem>
+                            ))}
+                        </TextField>
 
-                        <TextField label="시작일" type="date" name="startline" value={formData.startline} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ shrink: true }} required />
-                        <TextField label="마감일" type="date" name="deadline" value={formData.deadline} onChange={handleChange} fullWidth margin="normal" InputLabelProps={{ shrink: true }} required />
 
+                        <TextField 
+                            label="시작일"
+                            type="date"
+                            name="startline"
+                            value={formData.startline}
+                            onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            required
+                            InputLabelProps={{
+                                shrink: true, 
+                            }}
+                        />
+
+                        <TextField
+                            label="마감일"
+                            type="date"
+                            name="deadline"
+                            value={formData.deadline}
+                            onChange={handleChange}
+                            fullWidth
+                            margin="normal"
+                            required
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
                         <ButtonGroup fullWidth sx={{ mt: 2 }}>
                             <Button onClick={onClose} variant="outlined">취소</Button>
                             <Button onClick={handleSubmit} variant="contained" color="primary">저장</Button>

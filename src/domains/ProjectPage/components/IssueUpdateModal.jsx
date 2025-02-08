@@ -1,26 +1,24 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  MenuItem,
-  Button,
-  Stack,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@mui/material";
+import { Button, TextField, MenuItem, Select, FormControl, InputLabel, Container, Box } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 
-const IssueUpdateModal = ({ projectId, issue, onClose }) => {
-  const [issueName, setIssueName] = useState(issue.issueName || "");
-  const [managerId, setManagerId] = useState(issue.manager?.id || "");
-  const [status, setStatus] = useState(issue.status || "");
-  const [priority, setPriority] = useState(issue.priority || "");
-  const [startDate, setStartDate] = useState(issue.startline || "");
-  const [endDate, setEndDate] = useState(issue.deadline || "");
+const IssueUpdateModal = () => {
+  const { projectId } = useParams();
+  const { issueId } = useParams();
+  const navigate = useNavigate();
+
+  const [issue, setIssue] = useState({
+    issueName: "",
+    managerId: "",
+    managerName: "",
+    writerId: "",
+    status: "",
+    priority: "",
+    startDate: "",
+    endDate: "",
+  });
+
   const [managers, setManagers] = useState([]);
 
   // 프로젝트 멤버 목록 가져오기
@@ -29,7 +27,24 @@ const IssueUpdateModal = ({ projectId, issue, onClose }) => {
       .get(`/projects/${projectId}/members`)
       .then((response) => setManagers(response.data))
       .catch((error) => console.error("프로젝트 멤버 불러오기 실패:", error));
-  }, [projectId]);
+
+    // 해당 issue 정보 가져오기
+    axios
+      .get(`/projects/${projectId}/issues/${issueId}`)
+      .then((response) => {
+        setIssue({
+          issueName: response.data.issueName,
+          managerId: response.data.managerId,
+          managerName: response.data.managerName,
+          writerId: response.data.writerId,
+          status: response.data.status,
+          priority: response.data.priority,
+          startDate: response.data.startDate,
+          endDate: response.data.endDate,
+        });
+      })
+      .catch((error) => console.error("이슈 정보 가져오기 실패:", error));
+  }, [issueId]);
 
   // 상태 및 우선순위 변환 매핑
   const priorityMap = {
@@ -56,114 +71,156 @@ const IssueUpdateModal = ({ projectId, issue, onClose }) => {
     "시작안함": "YET",
   };
 
-  const handleSubmit = async () => {
-    if (!issueName || !managerId || !status || !priority || !startDate || !endDate) {
-      alert("모든 필수 항목을 입력하세요!");
-      return;
-    }
+  const changeValue = (e) => {
+    setIssue({ ...issue, [e.target.name]: e.target.value });
+  };
+
+  const submitIssue = (e) => {
+    e.preventDefault();
 
     const updatedIssue = {
-      issueName,
-      managerId,
-      status: reverseStatusMap[status] || status,
-      priority: reversePriorityMap[priority] || priority,
-      startline: startDate,
-      deadline: endDate,
+      issueName: issue.issueName,
+      managerId: issue.managerId,
+      managerName: issue.managerName,
+      writerId: issue.writerId,
+      status: reverseStatusMap[issue.status] || issue.status,
+      priority: reversePriorityMap[issue.priority] || issue.priority,
+      startDate: issue.startDate,
+      endDate: issue.endDate,
     };
 
-    try {
-      const response = await axios.patch(
-        `/projects/${projectId}/issues/${issue.id}`, // 🔹 issue.id를 사용
-        updatedIssue,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if (response.status === 200) {
-        alert("이슈 수정 완료");
-        onClose();
-      }
-    } catch (error) {
-      console.error("이슈 수정 실패:", error);
-      alert("이슈 수정 실패");
-    }
+    axios
+      .put(`/projects/${projectId}/issues/${issueId}`, updatedIssue, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          alert("이슈 수정 성공");
+          navigate(`/projects/${projectId}/issues/${issueId}`);
+        } else {
+          alert("이슈 수정 실패");
+        }
+      })
+      .catch((error) => {
+        console.error("이슈 수정 실패:", error);
+        alert("이슈 수정 실패");
+      });
   };
 
   return (
-    <Card sx={{ maxWidth: 500, margin: "auto", padding: 2 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          이슈 수정
-        </Typography>
-        <Stack spacing={2}>
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Box sx={{ boxShadow: 3, borderRadius: 2, p: 4 }}>
+        <h4>이슈 수정정</h4>
+        <form onSubmit={submitIssue}>
           <TextField
-            fullWidth
             label="작업명"
-            value={issueName}
-            onChange={(e) => setIssueName(e.target.value)}
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            name="issueName"
+            value={issue.issueName}
+            onChange={changeValue}
             required
           />
 
-          <FormControl fullWidth required>
+          <FormControl fullWidth variant="outlined" margin="normal" required>
             <InputLabel>담당자</InputLabel>
-            <Select value={managerId} onChange={(e) => setManagerId(e.target.value)}>
+            <Select
+              label="담당자"
+              name="managerName"
+              value={issue.managerName}
+              onChange={changeValue}
+            >
+              <MenuItem value="">
+                <em>담당자를 선택하세요</em>
+              </MenuItem>
               {managers.map((m) => (
-                <MenuItem key={m.id} value={m.id}>
-                  {m.username}
+                <MenuItem key={m.managerName} value={m.managerName}>
+                  {m.nickname}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <FormControl fullWidth required>
+          <FormControl fullWidth variant="outlined" margin="normal" required>
             <InputLabel>상태</InputLabel>
-            <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-              {Object.values(statusMap).map((key) => (
-                <MenuItem key={key} value={key}>
-                  {key}
+            <Select
+              label="상태"
+              name="status"
+              value={issue.status}
+              onChange={changeValue}
+            >
+              {Object.values(statusMap).map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <FormControl fullWidth required>
+          <FormControl fullWidth variant="outlined" margin="normal" required>
             <InputLabel>우선순위</InputLabel>
-            <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
-              {Object.values(priorityMap).map((key) => (
-                <MenuItem key={key} value={key}>
-                  {key}
+            <Select
+              label="우선순위"
+              name="priority"
+              value={issue.priority}
+              onChange={changeValue}
+            >
+              {Object.values(priorityMap).map((priority) => (
+                <MenuItem key={priority} value={priority}>
+                  {priority}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
 
-          <Stack direction="row" spacing={2}>
-            <TextField
-              fullWidth
-              type="date"
-              label="시작 날짜"
-              InputLabelProps={{ shrink: true }}
-              value={startDate || ""}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
-            <TextField
-              fullWidth
-              type="date"
-              label="마감 날짜"
-              InputLabelProps={{ shrink: true }}
-              value={endDate || ""}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-            />
-          </Stack>
+          <TextField
+            label="시작 날짜"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            type="date"
+            name="startDate"
+            value={issue.startDate}
+            onChange={changeValue}
+            required
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
 
-          <Box textAlign="right">
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              수정 완료
+          <TextField
+            label="마감 날짜"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            type="date"
+            name="endDate"
+            value={issue.endDate}
+            onChange={changeValue}
+            required
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate(`/projectsIssue`)}
+            >
+              취소
+            </Button>
+            <Button variant="contained" color="primary" type="submit">
+              수정완료
             </Button>
           </Box>
-        </Stack>
-      </CardContent>
-    </Card>
+        </form>
+      </Box>
+    </Container>
   );
 };
 

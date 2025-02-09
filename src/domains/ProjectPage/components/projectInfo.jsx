@@ -91,6 +91,7 @@ const ProjectInfo = () => {
                 <Typography variant="body2" color="text.secondary">
     <strong>상태:</strong> {statusMapping[project.status] || "알 수 없음"}
 </Typography>
+
 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1, maxWidth: "300px", overflow: "hidden" }}>
     {project.stacks.slice(0, 5).map((stackItem) => (
         <Box 

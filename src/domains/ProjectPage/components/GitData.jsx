@@ -164,11 +164,13 @@ const GitData = () => {
                         borderRadius: 2,
                       }}
                     >
-                      <Typography>SHA: {commit.sha}</Typography> {/* SHA 추가 */}
-                      <Typography>메시지: {commit.message}</Typography>
-                      <Typography>작성자: {commit.author}</Typography>
-                      <Typography>날짜: {commit.date}</Typography>
-                    </Box>
+                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Typography variant="caption">ID: {commit.sha}</Typography>
+    <Typography variant="body2" color="textSecondary">{commit.date}</Typography>
+  </Box>
+  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>{commit.message}</Typography>
+  <Typography variant="body2">작성자: {commit.author}</Typography>
+</Box>
                   ))}
                 </Box>
               </Box>
@@ -207,11 +209,13 @@ const GitData = () => {
             cursor: "pointer",
           }}
         >
-            <Typography>ID: {pull.id}</Typography>
-          <Typography>제목: {pull.title}</Typography>
-          <Typography>작성자: {pull.author}</Typography> {/* 작성자 추가 */}
-          <Typography>생성 날짜: {pull.date}</Typography>
-        </Box>
+       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Typography variant="caption">ID: {pull.id}</Typography>
+    <Typography variant="body2" color="textSecondary">{pull.date}</Typography>
+  </Box>
+  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>{pull.title}</Typography>
+  <Typography variant="body2">작성자: {pull.author}</Typography>
+</Box>
       ))}
     </Box>
 
@@ -241,11 +245,17 @@ const GitData = () => {
                         cursor: "pointer",
                       }}
                     >
-                      <Typography>ID: {issue.id}</Typography> {/* ID 추가 */}
-                      <Typography>제목: {issue.title}</Typography>
-                      <Typography>작성자: {issue.author}</Typography>
-                      <Typography>생성 날짜: {issue.date}</Typography>
-                    </Box>
+                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Typography variant="caption">ID: {issue.id}</Typography> {/* 작은 글씨 */}
+    <Typography variant="body2" color="textSecondary">{issue.date}</Typography> {/* 우측 정렬 */}
+  </Box>
+
+  {/* 제목 */}
+  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>{issue.title}</Typography>
+
+  {/* 작성자 */}
+  <Typography variant="body2">작성자: {issue.author}</Typography>
+</Box>
                   ))}
                 </Box>
               </Box>

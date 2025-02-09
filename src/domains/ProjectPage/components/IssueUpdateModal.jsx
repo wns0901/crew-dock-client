@@ -1,18 +1,23 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, TextField, MenuItem, Select, FormControl, InputLabel, Container, Box } from "@mui/material";
+import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { useNavigate, useParams } from "react-router-dom";
 
 const IssueUpdateModal = () => {
-  const { projectId } = useParams();
-  const { issueId } = useParams();
+  const projectId = 1;  // 하드코딩된 프로젝트 ID
+  const { userInfo, projectRoles} = useContext(LoginContext);
+  const { issueId } = useParams(); // URL에서 동적으로 issueId를 가져옵니다.
   const navigate = useNavigate();
 
   const [issue, setIssue] = useState({
+    projectId: "",
+    issueId: "",
     issueName: "",
     managerId: "",
     managerName: "",
     writerId: "",
+    writerName: "",
     status: "",
     priority: "",
     startDate: "",
@@ -23,30 +28,39 @@ const IssueUpdateModal = () => {
 
   // 프로젝트 멤버 목록 가져오기
   useEffect(() => {
+    console.log("issueId:", issueId); // issueId 값 확인
+
+    if (!issueId) {
+      console.error("이슈 ID가 유효하지 않습니다.");
+      return; // issueId가 유효하지 않으면 API 호출을 중지합니다.
+    }
+
+    // 프로젝트 멤버 가져오기
     axios
       .get(`/projects/${projectId}/members`)
-      .then((response) => setManagers(response.data))
+      .then((response) => {
+        setManagers(Array.isArray(response.data) ? response.data : []);
+        console.log("프로젝트 멤버 목록", setManagers);
+        console.log("유저 정보", userInfo);
+        console.log("프로젝트 ID:", projectId);
+        console.log("프로젝트 권한: ", projectRoles);
+      })
       .catch((error) => console.error("프로젝트 멤버 불러오기 실패:", error));
 
-    // 해당 issue 정보 가져오기
+    // 이슈 정보 가져오기
     axios
       .get(`/projects/${projectId}/issues/${issueId}`)
       .then((response) => {
-        setIssue({
-          issueName: response.data.issueName,
-          managerId: response.data.managerId,
-          managerName: response.data.managerName,
-          writerId: response.data.writerId,
-          status: response.data.status,
-          priority: response.data.priority,
-          startDate: response.data.startDate,
-          endDate: response.data.endDate,
-        });
+        const { data, status } = response;
+        if (status === 200) {
+          setIssue(data);
+        } else {
+          alert('이슈 정보 가져오기 실패');
+        }
       })
       .catch((error) => console.error("이슈 정보 가져오기 실패:", error));
-  }, [issueId]);
+  }, [projectId, issueId]);
 
-  // 상태 및 우선순위 변환 매핑
   const priorityMap = {
     HIGH: "높음",
     MIDDLE: "중간",
@@ -75,14 +89,25 @@ const IssueUpdateModal = () => {
     setIssue({ ...issue, [e.target.name]: e.target.value });
   };
 
+  const handleManagerChange = (e) => {
+    const selectedManager = managers.find(m => m.managerId === e.target.value);
+    setIssue({
+      ...issue,
+      managerId: selectedManager.managerId, 
+      managerName: selectedManager.nickname
+    });
+  };
+
   const submitIssue = (e) => {
     e.preventDefault();
 
     const updatedIssue = {
+      issueId: issueId, // issueId를 body에 포함
       issueName: issue.issueName,
       managerId: issue.managerId,
       managerName: issue.managerName,
       writerId: issue.writerId,
+      writerName: issue.writerName,
       status: reverseStatusMap[issue.status] || issue.status,
       priority: reversePriorityMap[issue.priority] || issue.priority,
       startDate: issue.startDate,
@@ -90,10 +115,8 @@ const IssueUpdateModal = () => {
     };
 
     axios
-      .put(`/projects/${projectId}/issues/${issueId}`, updatedIssue, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      .patch(`/projects/${projectId}/issues`, updatedIssue, {
+        headers: { "Content-Type": "application/json;charset=utf-8" },
       })
       .then((response) => {
         if (response.status === 200) {
@@ -110,9 +133,9 @@ const IssueUpdateModal = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
+    <Container maxWidth="sm" sx={{ mt: 4 }} value={issue.issueId}>
       <Box sx={{ boxShadow: 3, borderRadius: 2, p: 4 }}>
-        <h4>이슈 수정정</h4>
+        <h4>이슈 수정</h4>
         <form onSubmit={submitIssue}>
           <TextField
             label="작업명"
@@ -130,14 +153,14 @@ const IssueUpdateModal = () => {
             <Select
               label="담당자"
               name="managerName"
-              value={issue.managerName}
-              onChange={changeValue}
+              value={issue.managerId || ""}
+              onChange={handleManagerChange}
             >
               <MenuItem value="">
-                <em>담당자를 선택하세요</em>
+                <em>{issue.managerName || "담당자 선택"}</em>
               </MenuItem>
               {managers.map((m) => (
-                <MenuItem key={m.managerName} value={m.managerName}>
+                <MenuItem key={m.managerId} value={m.managerId}>
                   {m.nickname}
                 </MenuItem>
               ))}
@@ -186,9 +209,7 @@ const IssueUpdateModal = () => {
             value={issue.startDate}
             onChange={changeValue}
             required
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
           />
 
           <TextField
@@ -201,17 +222,11 @@ const IssueUpdateModal = () => {
             value={issue.endDate}
             onChange={changeValue}
             required
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
           />
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => navigate(`/projectsIssue`)}
-            >
+            <Button variant="outlined" color="secondary">
               취소
             </Button>
             <Button variant="contained" color="primary" type="submit">

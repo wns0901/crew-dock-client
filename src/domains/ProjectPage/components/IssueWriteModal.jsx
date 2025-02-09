@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import axios from 'axios';
-import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, TextField, Typography, ButtonGroup, Modal } from '@mui/material';
+import { Box, Button, Card, CardContent, MenuItem, TextField, ButtonGroup, Modal } from '@mui/material';
 
 const IssueWriteModal = ({ projectId, issue, onClose }) => {
     const { userInfo } = useContext(LoginContext);  // 로그인한 사용자 정보 가져오기
 
     const [formData, setFormData] = useState({
         issueName: '',
-        managerId: userInfo?.id || '',
-        managerName: userInfo?.nickname || '',
+        managerId: '',
+        managerName: '',
         writerId: userInfo?.id || '',
+        writerName: userInfo?.nickname || '',
         status: '',
         priority: '',
         startline: '',
@@ -48,9 +49,10 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
         if (issue) {
             setFormData({
                 issueName: issue.issueName,
-                managerId: issue.user?.id || userInfo?.id,
-                managerName: issue.user?.nickname || userInfo?.nickname, 
-                writerId: userInfo?.id || '',
+                managerId: issue.managerId || '', 
+                managerName: issue.managerName || '', 
+                writerId: issue.writerId || '',
+                writerName: issue.writerName || '',
                 status: reverseStatusMap[issue.status] || '',
                 priority: reversePriorityMap[issue.priority] || '',
                 startline: issue.startline,
@@ -60,7 +62,20 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
     }, [issue, userInfo]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    
+        // 담당자를 변경하면 managerId와 managerName을 함께 변경
+        if (name === "managerName") {
+            const selectedMember = members.find(member => member.user.nickname === value);
+            if (selectedMember) {
+                setFormData(prev => ({
+                    ...prev,
+                    managerId: selectedMember.user.id, // 선택한 담당자의 ID로 managerId 변경
+                    managerName: selectedMember.user.nickname // 선택한 담당자의 nickname으로 managerName 변경
+                }));
+            }
+        }
     };
 
     const priorityMap = {
@@ -75,7 +90,7 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
         시작안함: "YET"
     };
 
-      const handleSubmit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (!projectId) {
             alert("프로젝트 ID가 유효하지 않습니다.");
@@ -90,7 +105,10 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
         };
 
         axios.post(`http://localhost:8081/projects/${projectId}/issues`, requestData)
-            .then(() => onClose())
+            .then(() => { 
+                alert("새로운 이슈가 추가되었습니다.");
+                onClose();
+            })
             .catch(error => console.error("이슈 생성 중 오류 발생:", error));
     };
 
@@ -103,18 +121,15 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
                         <TextField
                             label="담당자"
                             name="managerName"
-                            value= {formData.managerName}
+                            value={formData.managerName}
                             onChange={handleChange}
                             fullWidth
                             margin="normal"
                             select
                         >
-                            {/* 기본 값은 작성자의 이름으로 설정 */}
-                            <MenuItem value={userInfo.nickname}>{userInfo.nickname}</MenuItem>
-
-                            {/* 선택할 수 있는 멤버 목록 */}
+                            <MenuItem value={userInfo?.nickname}>{userInfo.nickname}</MenuItem>
                             {members.map(member => (
-                                <MenuItem key={member.user.nickname} value={member.user.nickname}>
+                                <MenuItem key={member.user.id} value={member.user.nickname}>
                                     {member.user?.nickname || "담당자 없음"}
                                 </MenuItem>
                             ))}
@@ -147,7 +162,6 @@ const IssueWriteModal = ({ projectId, issue, onClose }) => {
                                 <MenuItem key={kor} value={kor}>{kor}</MenuItem>
                             ))}
                         </TextField>
-
 
                         <TextField 
                             label="시작일"

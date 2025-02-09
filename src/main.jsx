@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+<<<<<<< HEAD
 // import "./index.css";
 import { BrowserRouter, Routes,Route } from "react-router-dom";
 // import ProjectInfo from "./domains/ProjectPage/components/projectInfo";
@@ -21,5 +22,20 @@ createRoot(document.getElementById("root")).render(
         <Route path="pending" element={<PendingMembers />} />
     </Route>
     </Routes>
+=======
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ChatComponent from "./components/ChatComponent";
+import LoginPage from "./domains/LoginPage/LoginPage";
+import LoginContextProvider from "./contexts/LoginContextProvider";
+
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <LoginContextProvider>
+      <Routes>
+        <Route path="/" element={<ChatComponent />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </LoginContextProvider>
+>>>>>>> develop
   </BrowserRouter>
 );

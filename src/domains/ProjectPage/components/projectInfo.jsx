@@ -152,8 +152,8 @@ const ProjectInfo = () => {
                     value={navValue}
                     onChange={(event, newValue) => {
                         setNavValue(newValue);
-                        if (newValue === 0) navigate(`/projects/${projectId}`);
-                        if (newValue === 1) navigate(`/projects/${projectId}`);
+                        if (newValue === 0) navigate(`/projects/${projectId}/issues`);
+                        if (newValue === 1) navigate(`/projects/${projectId}/Git`);
                         if (newValue === 2) navigate(`/projects/${projectId}/resignations`);
                         if (newValue === 3) navigate(`/projects/${projectId}/settings`);
                     }}

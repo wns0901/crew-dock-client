@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import PostList from "../components/PostList";
-import { Category } from "../constants/Category";
+import { Category } from "../\bconstants/\bCategory";
 
 const PostListContainers = () => {
     const [posts, setPosts] = useState([]);
@@ -44,3 +44,5 @@ const PostListContainers = () => {
         />
     );
 }
+
+export default PostListContainers;

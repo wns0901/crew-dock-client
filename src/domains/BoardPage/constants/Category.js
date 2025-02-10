@@ -1,11 +1,11 @@
 export const Category = {
     NOTICE: 'NOTICE',
-    FREEDOM: 'FREEDOM',
+    NONE: 'NONE',
     FORUM: 'FORUM'
 };
 
 export const CategoryLabel = {
     [Category.NOTICE]: '공지사항',
-    [Category.FREEDOM]: '자유게시판',
+    [Category.NONE]: '자유게시판',
     [Category.FORUM]: 'Q&A'
 };

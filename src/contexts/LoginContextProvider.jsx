@@ -98,7 +98,7 @@ const LoginContextProvider = ({ children }) => {
 
       if (status === 200) {
         Cookies.set("accessToken", accessToken);
-
+        console.log("로그인 성공");
         loginCheck();
 
         navigate("/");

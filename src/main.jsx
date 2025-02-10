@@ -16,6 +16,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/posts/create" element={<PostCreateContainer/>} />
         <Route path="/posts/:postId/edit" element={<PostEditContainer/>} />
         <Route path="/posts/:postId" element={<PostDetailContainer/>} />
+        
       </Routes>
     </LoginContextProvider>
   </BrowserRouter>

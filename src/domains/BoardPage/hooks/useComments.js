@@ -7,13 +7,18 @@ export const useComments = (postId) => {
 
     const fetchComments = async () => {
         try {
-            const response = await fetch(`/posts/${postId}/comments`);
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}/comments`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`댓글 로딩 실패: ${errorText}`);
+            }
             const data = await response.json();
-            setComments(data);
+            setComments(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error('댓글 로딩 실패:', error)
+            console.error('댓글 로딩 실패:', error);
+            setComments([]);
         }
-    }
+    };
 
     useEffect(() => {
         fetchComments();
@@ -22,12 +27,11 @@ export const useComments = (postId) => {
     const onSubmitComment = async (comment, userInfo) => {
         const createCommentData = {
             ...comment,
-            userId: userInfo.userId,
-            createAt: new Date().toISOString(),
+            userId: userInfo.id,
         }
 
         try {
-            await fetch(`/posts/${postId}/comments`, {
+            await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}/comments`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({createCommentData})
@@ -38,9 +42,9 @@ export const useComments = (postId) => {
         }
     };
 
-    const onFixedComment = async (commentId) => {
+    const onFixedComment = async () => {
         try {
-            await fetch(`/posts/${postId}/comments`, {
+            await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}/comments`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({fixed: true})
@@ -53,7 +57,7 @@ export const useComments = (postId) => {
 
     const onDeleteComment = async (commentId) => {
         try {
-            await fetch(`/posts/${postId}/comments/${commentId}`, {
+            await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}/comments/${commentId}`, {
                 method: 'DELETE'
             });
             fetchComments();

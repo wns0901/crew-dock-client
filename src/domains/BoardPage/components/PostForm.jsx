@@ -5,7 +5,7 @@ import { Category, CategoryLabel } from '../constants/Category';
 import '../styles/PostFormStyle.css';
 
 const PostForm = ({
-  initialData = { category: '', title: '', content: '' },
+  initialData = { category: '', title: '', content: '', direction: 'NONE' },
   isEdit = false,
   onSubmit = () => {},
   onCancel = () => {},

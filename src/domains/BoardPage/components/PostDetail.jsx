@@ -1,25 +1,34 @@
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useGetNickname } from '../hooks/useGetNickname';
-import PropTypes from 'prop-types';
 
 const PostDetail = ({
-    post,
-    comments, 
-    onUpdatePost,
-    onDeletePost,
-    onSubmitComment,
-    onFixedComment,
-    onDeleteComment,
+    post = null, 
+    comments = [], 
+    onUpdatePost = () => {}, 
+    onDeletePost = () => {}, 
+    onSubmitComment, 
+    onFixedComment = () => {}, 
+    onDeleteComment = () => {},
     userInfo
 }) => {
-    const getNicknameById = useGetNickname(userInfo);
-    const [comment, setComment] = useState('');
+    if (!userInfo) {
+        return <div>로그인 후 댓글을 작성할 수 있습니다.</div>;
+    }
+
+    const [comment, setComment] = useState({ content: '', userId: userInfo?.id });
+
+    console.log(post);
+    console.log(comments);
+
     const isAuthor = post?.userId === userInfo?.id;
     const isCommentUser = comment.userId === userInfo?.id;
 
     const handleSubmitComment = () => {
+        if (comment.content.trim()) {
         onSubmitComment(comment);
-        setComment('');
+        setComment({ content: '', userId: userInfo?.id });
+        }
     };
 
     return (
@@ -28,7 +37,7 @@ const PostDetail = ({
             <h1>{post?.title}</h1>
             <div className='post-info'>
                 <div>
-                    <span>{getNicknameById(post?.userId)}</span>
+                    <span>{(post?.userNickname)}</span>
                     <span>{post?.createAt}</span>
                 </div>
                 {isAuthor && (
@@ -40,12 +49,12 @@ const PostDetail = ({
             </div>
             {/* line */}
             <div className='post-content'>{post?.content}</div>
-            <div className='comment-count'>댓글 수: {comment.count}</div>
+            <div className='comment-count'>댓글 수: {comments.length}</div>
             {/* line */}
             <input
                 type='text'
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={comment.content}
+                onChange={(e) => setComment({...comment, content: e.target.value})}
                 placeholder='댓글을 입력하세요'
             />
             <button type='button' onClick={handleSubmitComment}>댓글작성</button>
@@ -54,12 +63,12 @@ const PostDetail = ({
             <div className='comment-list'>
                 {comments.map(comment => (
                     <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    isAuthor={isAuthor}
-                    isCommentUser={isCommentUser}
-                    onFixedComment={onFixedComment}
-                    onDeleteComment={onDeleteComment}
+                        key={comment.id}
+                        comment={comment}
+                        isAuthor={isAuthor}
+                        isCommentUser={isCommentUser}
+                        onFixedComment={onFixedComment}
+                        onDeleteComment={onDeleteComment}
                     />
                 ))}
             </div>
@@ -94,15 +103,14 @@ const CommentItem = ({
  );
 
  PostDetail.propTypes = {
-    post: PropTypes.object.isRequired,
+    post: PropTypes.object,
     comments: PropTypes.array, 
-    comment: PropTypes.object, 
     onUpdatePost: PropTypes.func,
     onDeletePost: PropTypes.func,
     onSubmitComment: PropTypes.func.isRequired,
     onFixedComment: PropTypes.func,
     onDeleteComment: PropTypes.func,
-    userInfo: PropTypes.array.isRequired
+    userInfo: PropTypes.object.isRequired
  };
 
  CommentItem.propTypes = {
@@ -114,3 +122,4 @@ const CommentItem = ({
  };
 
 export default PostDetail;
+export { CommentItem };

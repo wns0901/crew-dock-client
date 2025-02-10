@@ -4,20 +4,29 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
 import AddSchedule from './AddSchedule';
+import UpdateSchedule from './UpdateSchedule';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
-import { Divider, Box, List, ListItem, Card, CardContent, ListItemText } from '@mui/material';
+import { Divider, Box, List, ListItem, Card, CardContent, ListItemText, Checkbox } from '@mui/material';
 
 const MyCalendar = ({}) => {
   const [events, setEvents] = useState([]);
   const [holidays, setHolidays] = useState([]); // 공휴일 데이터를 저장할 상태
   const [todays, setTodayEvents] = useState([]); // 오늘의 일정 데이터 저장할 상태
+  const [completedEvents, setCompletedEvents] = useState(new Set()); // 체크된 일정 ID 저장
   const {userInfo, projectRoles} = useContext(LoginContext);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // 일정 추가 모달 상태
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태
+  const [selectedEvent, setSelectedEvent] = useState(null); // 수정할 이벤트 상태
   const [anchorEl, setAnchorEl] = useState();
+  const [userId, setUserId] = useState(null);
 
   // 로그인한 유저 ID
-  const userId = userInfo?.id;
+  useEffect(() => {
+    if (userInfo?.id) {
+      setUserId(userInfo.id);
+    }
+  }, [userInfo]);
 
   // 본인이 속한 프로젝트 ids
   console.log("userInfo: ", userInfo);
@@ -28,7 +37,6 @@ const MyCalendar = ({}) => {
   : []; // projectRoles가 배열이 아닐 경우 빈 배열로 처리
 
   console.log("추출한 projectIds: ", projectIds);
-
 
   // 모든 일정 가져오기
   useEffect(() => {
@@ -41,7 +49,7 @@ const MyCalendar = ({}) => {
   
         if (Array.isArray(response.data)) {
           const formattedEvents = response.data.map(event => {
-            // startTime과 endTime이 있다면, 이를 start와 end에 추가
+            
             const startDate = new Date(event.startDate);
             const endDate = new Date(event.endDate);
             
@@ -61,28 +69,35 @@ const MyCalendar = ({}) => {
               title: event.content,
               start: event.startDate,
               end: event.endDate,
+              sTime: event.startTime,
+              eTime: event.endTime,
               projectId: event.projectId,
-              isHoliday: event.isHoliday || false,
+              isHoliday: event.isHoliday || false
             };
           });
   
           // 오늘의 일정 필터링
           const today = new Date();
-          const todaysEvents = formattedEvents.filter(event => {
-            const eventStartDate = new Date(event.start);
-            const eventEndDate = new Date(event.end);
-  
-            // 오늘이 포함된 일정만 필터링
-            return (
-              eventStartDate.toDateString() === today.toDateString() ||
-              (eventStartDate <= today && eventEndDate >= today)
-            );
-          });
+          const todaysEvents = formattedEvents
+            .filter(event => {
+              const eventStartDate = new Date(event.start);
+              const eventEndDate = new Date(event.end);
+              return (
+                eventStartDate.toDateString() === today.toDateString() ||
+                (eventStartDate <= today && eventEndDate >= today)
+              );
+            })
+            .sort((a, b) => {
+              // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+              if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+              return a.sTime.localeCompare(b.sTime);
+            });
   
           setEvents(formattedEvents);  // 전체 일정
           setTodayEvents(todaysEvents); // 오늘 일정만 따로 저장
   
           console.log("오늘의 일정: ", todaysEvents);
+          console.log("Formatted Event:", formattedEvents);
         } else {
           console.error('유효한 JSON 데이터가 아닙니다.');
         }
@@ -98,31 +113,40 @@ const MyCalendar = ({}) => {
     setSelectedDate(info.startStr);
     console.log("Select Date: ", info.startStr);
     setAnchorEl(info.jsEvent.target);
-    setIsModalOpen(true);
+    setIsAddModalOpen(true); // 날짜 클릭 시 일정 추가 모달 열기
   };
 
-   // 일정 추가 후, 상태 업데이트 함수
-   const handleAddEvent = (newEvent) => {
-    setEvents((prevEvents) => [...prevEvents, newEvent]); // 동적으로 이벤트 추가
-    console.log("새로 추가한 일정: ", setEvents);
-  };
-
-
-  // 해당 일정 클릭 시, AddSchedule.jsx가 열리는 클릭 이벤트 함수
-  const openModal = (info) => {
-    // 클릭한 이벤트 정보가 담긴 `info`에서 필요한 데이터를 추출
+  const handleEventClick = (info) => {
+    console.log("info:", info);
+    // 클릭한 일정의 정보를 선택하여 수정 모달을 열기
     const selectedEvent = {
       id: info.event.id,
-      title: info.event.content, // 일정 내용
-      start: info.event.startStr, // 시작 날짜
-      end: info.event.endStr, // 종료 날짜
+      title: info.event.title,
+      start: info.event.startStr,
+      end: info.event.endStr,
+      sTime: info.event.extendedProps.sTime || '', // startTime이 없으면 빈 문자열로 설정
+      eTime: info.event.extendedProps.eTime || ''    // endTime이 없으면 빈 문자열로 설정
     };
-  
-    // `selectedDate`를 클릭한 일정의 시작 날짜로 설정
-    setSelectedDate(info.event.startStr);
-  
-    // `AddSchedule` 모달을 열기 위해 상태를 업데이트
-    setIsModalOpen(true);
+    setSelectedEvent(selectedEvent);
+    console.log("선택한 일정: ", selectedEvent);
+    setIsUpdateModalOpen(true); // 수정 모달 열기
+  };
+
+  const handleAddEvent = (newEvent) => {
+    setEvents((prevEvents) => {
+      const updatedEvents = [...prevEvents, newEvent];  // 새로 추가된 이벤트 추가
+      console.log("새로 추가한 일정: ", newEvent);  // 추가된 일정 출력
+      return updatedEvents;
+    });
+  };
+
+  const handleUpdateEvent = (updatedEvent) => {
+    setEvents((prevEvents) => 
+      prevEvents.map(event => 
+        event.id === updatedEvent.id ? updatedEvent : event
+      )
+    );
+    console.log("수정된 일정: ", updatedEvent);
   };
 
   const formatTime = (time, start, end) => {
@@ -143,6 +167,26 @@ const MyCalendar = ({}) => {
       hour12: true,  // 12시간 형식 (오전/오후 표시)
     });
   }
+
+   // 체크박스 클릭 시 완료 상태 토글
+   const handleCheckboxToggle = (eventId) => {
+    setCompletedEvents((prev) => {
+      if (prev.has(eventId)) {
+        prev.delete(eventId); // 체크 해제
+      } else {
+        prev.add(eventId); // 체크 완료
+      }
+      return new Set(prev);
+    });
+  };
+
+   // 일정 색상 설정 함수
+   const getEventColor = (projectId) => {
+    if (!projectId) return "#ccdcf4"; // 개인 일정은 노란색
+    const hash = Array.from(projectId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colors = [ "#ff8469", "#6f8afe", "#ff81c9", "#f5fc7c", "#ffa865", "#b67eff", "#88f8b9"];
+    return colors[hash % colors.length]; // 같은 projectId는 같은 색 유지
+  };
   return (
     <div style={{ display: 'flex' }}>
     {/* Today's events section */}
@@ -162,12 +206,20 @@ const MyCalendar = ({}) => {
         {todays.length > 0 ? (
           todays.map((event) => (
             <ListItem key={event.id}>
+              <Checkbox
+                  checked={completedEvents.has(event.id)}
+                  onChange={() => handleCheckboxToggle(event.id)}
+                  color="primary"
+                />
               <Card sx={{ width: '100%', marginBottom: 1 }}>
                 <CardContent>
                   <ListItemText
                     primary={event.title}
-                    secondary={`${formatTime(event.startTime)} ~ ${formatTime(event.endTime)}`
-                    }
+                    secondary={`${formatTime(event.sTime)} ~ ${formatTime(event.eTime)}`}
+                    sx={{
+                      textDecoration: completedEvents.has(event.id) ? "line-through" : "none",
+                      color: "#000000",
+                    }}
                   />
                 </CardContent>
               </Card>
@@ -183,30 +235,41 @@ const MyCalendar = ({}) => {
 
     {/* FullCalendar section */}
     <div style={{ flex: 3 }}>
-      <h4>{userId ? `${userId}님의 캘린더` : "로그인 정보 없음"}</h4>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         selectable={true}
         select={handleDateSelect}
-        events={events}
+        events={events.map(event => ({
+          ...event,
+          color: getEventColor(event.projectId),
+          textColor: "#000000", // 글자 색상 통일
+          borderColor: getEventColor(event.projectId), // 테두리 제거
+        }))}
         timeZone="Asia/Seoul"
         firstDay={0}
         weekends={true}
-        eventColor="#ccdcf4"
         eventTextColor="#000000"
-        eventBackgroundColor="#ccdcf4"
-        eventClick={openModal}
+        eventClick={handleEventClick}
       />
-      {isModalOpen && (
+      {isAddModalOpen && (
         <AddSchedule
           userId={userId}
           selectedDate={selectedDate}
           anchorEl={anchorEl}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsAddModalOpen(false)}
           onAddEvent={handleAddEvent}
         />
       )}
+
+      {isUpdateModalOpen && selectedEvent && (
+        <UpdateSchedule
+          calendarId={selectedEvent.id}
+          selectedEvent={selectedEvent}
+          onClose={() => setIsUpdateModalOpen(false)}
+          onUpdateEvent={handleUpdateEvent}
+        />
+        )}
     </div>
   </div>
 );

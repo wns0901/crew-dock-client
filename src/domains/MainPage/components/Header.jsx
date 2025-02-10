@@ -45,8 +45,11 @@ const Header = () => {
                     {isLogin ? (
                         <>
                             <Button color="inherit" onClick={handleMenuOpen}>
-                                {userInfo.nickname}
-                            </Button>
+                                <Typography variant="body1" sx={{ fontSize: "1.3rem" }}>
+                                    {userInfo.nickname}
+                                </Typography>
+                            </Button>님 환영합니다.
+    
                             <Menu
                                 anchorEl={anchorEl}
                                 open={Boolean(anchorEl)}

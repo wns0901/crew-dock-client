@@ -7,34 +7,82 @@ import AddSchedule from './AddSchedule';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { Divider, Box, List, ListItem, Card, CardContent, ListItemText } from '@mui/material';
 
-const MyCalendar = ({ projectId }) => {
+const MyCalendar = ({}) => {
   const [events, setEvents] = useState([]);
   const [holidays, setHolidays] = useState([]); // 공휴일 데이터를 저장할 상태
   const [todays, setTodayEvents] = useState([]); // 오늘의 일정 데이터 저장할 상태
-  const { userInfo } = useContext(LoginContext);
-  const userId = userInfo?.id;
+  const {userInfo, projectRoles} = useContext(LoginContext);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState();
 
+  // 로그인한 유저 ID
+  const userId = userInfo?.id;
+
+  // 본인이 속한 프로젝트 ids
+  console.log("userInfo: ", userInfo);
+  console.log("로그인한 userId: ", userId);
+
+  const projectIds = Array.isArray(projectRoles)
+  ? projectRoles.map(role => role.projectId)
+  : []; // projectRoles가 배열이 아닐 경우 빈 배열로 처리
+
+  console.log("추출한 projectIds: ", projectIds);
+
+
+  // 모든 일정 가져오기
   useEffect(() => {
     if (!userId) return;
-
+  
     const fetchCalendarData = async () => {
       try {
         const response = await axios.get(`http://localhost:8081/calendars?userId=${userId}`);
         console.log("캘린더 API 응답:", response.data); // 응답 데이터 확인
-
-        // 응답 데이터가 JSON 형식인 경우에만 처리
+  
         if (Array.isArray(response.data)) {
-          const formattedEvents = response.data.map(event => ({
-            id: event.id,
-            title: event.content,
-            start: event.startDate,
-            end: event.endDate,
-            isHoliday: event.isHoliday || false, 
-          }));
-          setEvents(formattedEvents);
+          const formattedEvents = response.data.map(event => {
+            // startTime과 endTime이 있다면, 이를 start와 end에 추가
+            const startDate = new Date(event.startDate);
+            const endDate = new Date(event.endDate);
+            
+            // 시간 설정: startTime과 endTime이 있다면 날짜에 시간을 더해줍니다.
+            if (event.startTime) {
+              const [startHour, startMinute] = event.startTime.split(":");
+              startDate.setHours(startHour, startMinute);
+            }
+  
+            if (event.endTime) {
+              const [endHour, endMinute] = event.endTime.split(":");
+              endDate.setHours(endHour, endMinute);
+            }
+  
+            return {
+              id: event.id,
+              title: event.content,
+              start: event.startDate,
+              end: event.endDate,
+              projectId: event.projectId,
+              isHoliday: event.isHoliday || false,
+            };
+          });
+  
+          // 오늘의 일정 필터링
+          const today = new Date();
+          const todaysEvents = formattedEvents.filter(event => {
+            const eventStartDate = new Date(event.start);
+            const eventEndDate = new Date(event.end);
+  
+            // 오늘이 포함된 일정만 필터링
+            return (
+              eventStartDate.toDateString() === today.toDateString() ||
+              (eventStartDate <= today && eventEndDate >= today)
+            );
+          });
+  
+          setEvents(formattedEvents);  // 전체 일정
+          setTodayEvents(todaysEvents); // 오늘 일정만 따로 저장
+  
+          console.log("오늘의 일정: ", todaysEvents);
         } else {
           console.error('유효한 JSON 데이터가 아닙니다.');
         }
@@ -42,40 +90,8 @@ const MyCalendar = ({ projectId }) => {
         console.error("Failed to fetch calendar events", error);
       }
     };
-
+  
     fetchCalendarData();
-  }, [userId]);
-
-   // 오늘 일정 데이터를 가져오는 함수
-   useEffect(() => {
-    if (!userId) return;
-
-    const fetchTodayEvents = async () => {
-      const today = new Date().toISOString().split('T')[0]; // 오늘 날짜 (YYYY-MM-DD) 형식으로 변환
-      console.log("오늘 날짜: ",  today);
-      try {
-        const response = await axios.get(`http://localhost:8081/calendars/today?date=${today}`);
-        console.log("오늘 일정 API 응답:", response.data);
-
-        if (Array.isArray(response.data)) {
-          const formattedTodayEvents = response.data.map(event => ({
-            id: event.id,
-            content: event.content,
-            startDate: event.startDate,
-            endDate: event.endDate,
-            startTime: event.startTime,
-            endTime: event.endTime
-          }));
-          setTodayEvents(formattedTodayEvents);
-        } else {
-          console.error('유효한 JSON 데이터가 아닙니다.');
-        }
-      } catch (error) {
-        console.error("Failed to fetch today's calendar events", error);
-      }
-    };
-
-    fetchTodayEvents();
   }, [userId]);
 
   const handleDateSelect = (info) => {
@@ -88,6 +104,7 @@ const MyCalendar = ({ projectId }) => {
    // 일정 추가 후, 상태 업데이트 함수
    const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => [...prevEvents, newEvent]); // 동적으로 이벤트 추가
+    console.log("새로 추가한 일정: ", setEvents);
   };
 
 
@@ -96,9 +113,9 @@ const MyCalendar = ({ projectId }) => {
     // 클릭한 이벤트 정보가 담긴 `info`에서 필요한 데이터를 추출
     const selectedEvent = {
       id: info.event.id,
-      content: info.event.title, // 제목
-      startDate: info.event.startStr, // 시작 날짜
-      endDate: info.event.endStr, // 종료 날짜
+      title: info.event.content, // 일정 내용
+      start: info.event.startStr, // 시작 날짜
+      end: info.event.endStr, // 종료 날짜
     };
   
     // `selectedDate`를 클릭한 일정의 시작 날짜로 설정
@@ -108,19 +125,24 @@ const MyCalendar = ({ projectId }) => {
     setIsModalOpen(true);
   };
 
-  const formatTime = (time) => {
+  const formatTime = (time, start, end) => {
+    if (!time) {
+      return ''; // time이 유효하지 않으면 빈 문자열 반환
+    }
+
     // LocalTime 객체를 Date 객체로 변환
-    const date = new Date();
     const [hours, minutes] = time.split(":").map((val) => parseInt(val, 10));
-    date.setHours(hours, minutes, 0);
+    const date = new Date();
   
-    return date.toLocaleTimeString('ko-KR', {
+    // hours가 24 이상이면 날짜를 초과한 시간일 수 있으므로, 24시간 포맷을 처리
+    date.setHours(hours % 24, minutes, 0);
+  
+    return date.toLocaleTimeString('en', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: true,  // 12시간 형식 (오전/오후 표시)
     });
   }
-
   return (
     <div style={{ display: 'flex' }}>
     {/* Today's events section */}
@@ -143,8 +165,9 @@ const MyCalendar = ({ projectId }) => {
               <Card sx={{ width: '100%', marginBottom: 1 }}>
                 <CardContent>
                   <ListItemText
-                    primary={event.content}
-                    secondary={`${formatTime(event.startTime)} ~ ${formatTime(event.endTime)}`}
+                    primary={event.title}
+                    secondary={`${formatTime(event.startTime)} ~ ${formatTime(event.endTime)}`
+                    }
                   />
                 </CardContent>
               </Card>

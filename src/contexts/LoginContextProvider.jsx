@@ -39,20 +39,20 @@ const LoginContextProvider = ({children}) => {
 
     api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-    try {
-      response = await auth.userInfo();
-    } catch (error) {
-      return;
-    }
+    // try {
+    //   response = await auth.userInfo();
+    // } catch (error) {
+    //   return;
+    // }
 
-    if (!response) return;
+    // if (!response) return;
 
-    data = response.data;
+    // data = response.data;
 
-    if (data === "UNAUTHORIZED" || response.status === 401) {
-      navigate("/login")
-      return;
-    }
+    // if (data === "UNAUTHORIZED" || response.status === 401) {
+    //   navigate("/login")
+    //   return;
+    // }
 
     loginSetting(accessToken);
   };
@@ -72,7 +72,7 @@ const LoginContextProvider = ({children}) => {
 
       if (status === 200) {
         Cookies.set("accessToken", accessToken);
-
+        console.log("로그인 성공");
         loginCheck();
 
         navigate("/");
@@ -133,7 +133,7 @@ const LoginContextProvider = ({children}) => {
     localStorage.setItem('userInfo', JSON.stringify(updateUserInfo));
     localStorage.setItem('roles', JSON.stringify(updatedRoles));
     localStorage.setItem('projectRoles', JSON.stringify(projectRoles));
-
+    console.log(localStorage);
   };
 
   const logoutSetting = () => {

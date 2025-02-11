@@ -6,88 +6,111 @@ import IssueWriteModal from "./IssueWriteModal";
 import IssueUpdateModal from "./IssueUpdateModal";
 import axios from "axios";
 import dayjs from "dayjs";
+import api from "../../../apis/baseApi";
 
 const IssueTable = () => {
   const projectId = 1;
   // const projectId = useParams();
-  const [issues, setIssues] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState(null);
-  const [openWriteModal, setOpenWriteModal] = useState(false);
-  const [checkItems, setCheckItems] = useState([])
-  const [allChecked, setAllChecked] = useState(false);
+  const [issues, setIssues] = useState([]); // 추가된 이슈
+  const [openUpdateModal, setopenUpdateModal] = useState(false);  
+  const [selectedIssue, setSelectedIssue] = useState(null); // 선택된 이슈
+  const [openWriteModal, setOpenWriteModal] = useState(false); // 작성 모달
+  const [checkItems, setCheckItems] = useState([]) // 이슈 체크 상태
+  const [allChecked, setAllChecked] = useState(false); // 전체 선택 상태
   const { userInfo } = useContext(LoginContext);
   
-
+// 상태에 따른 색상
   const statusColors = {
     INPROGRESS: "warning",
     YET: "info",
     COMPLETE: "success",
   };
 
+  // 우선순위에 따른 색상
   const priorityColors = {
     HIGH: "error",
     MIDDLE: "primary",
     LOW: "success",
   };
 
-  const fetchIssues = () => {
-    axios.get(`http://localhost:8081/projects/${projectId}/issues`)
-      .then(response => {
-        setIssues(response.data);
-        console.log("이슈 목록:", response.data);
-        console.log("프로젝트 ID:", projectId);
-        console.log("현재 로그인한 유저 정보:", userInfo);
-      })
-      .catch(error => console.error("이슈 목록 불러오기 실패:", error));
-  };
+  // 모든 이슈 불러오기
+useEffect(() => {
+  if(!projectId) return;
+  console.log("projectId:", projectId);
 
-  useEffect(() => {
-    fetchIssues();
-  }, [projectId]);
+  const fetchIssueData = async () => {
+    try {
+      const response = await api.get(`/projects/${projectId}/issues`);
+      console.log(response.data);
+     // 데이터 구조가 일치하는지 확인
+      const issues = response.data.map(issue => ({
+        writerId: issue.writerId,
+        writerName: issue.writerName,
+        managerId: issue.managerId,
+        managerName: issue.managerName,
+        projectId: issue.projectId,
+        issueId: issue.issueId,
+        issueName: issue.issueName,
+        priority: issue.priority,
+        status: issue.status,
+        deadline: dayjs(issue.deadline).format("YYYY-MM-DD"),
+        startline: dayjs(issue.startline).format("YYYY-MM-DD"),
+        createAt: dayjs(issue.createAt).format("YYYY-MM-DD HH:mm")
+      }));
+      setIssues(issues);
 
-   // 타임라인, 상태 색상 결정 함수
-   const getTimelineColor = (startline, deadline, status) => {
-    const currentDate = dayjs();
-    const startDate = dayjs(startline);
-    const endDate = dayjs(deadline);
-
-    // 타임라인 마감일이 지났고, 상태가 완료가 아닌 경우 빨간색
-    if (currentDate.isAfter(endDate) && status !== 'COMPLETE') {
-      return 'error'; // 빨간색
+      setIssues(response.data); // 가져온 데이터를 상태에 설정
+    } catch (error) {
+      console.error("프로젝트 이슈를 가져오는데 실패했습니다.", error);
+      // 사용자에게 친절한 메시지 제공
+      alert("이슈 데이터를 가져오는 데 실패했습니다. 서버 상태를 확인해 주세요.");
     }
+  }
+  fetchIssueData();
+},[projectId]);
 
-    // 타임라인 마감일이 지나지 않았고, 상태가 완료인 경우 초록색
-    if (currentDate.isBefore(endDate) && status === 'COMPLETE') {
-      return 'success'; // 초록색
-    }
+ // 타임라인, 상태 색상 결정 함수
+ const getTimelineColor = (startline, deadline, status) => {
+  const currentDate = dayjs();
+  const startDate = dayjs(startline);
+  const endDate = dayjs(deadline);
+  // 타임라인 마감일이 지났고, 상태가 완료가 아닌 경우 빨간색
+  if (currentDate.isAfter(endDate) && status !== 'COMPLETE') {
+    return 'error'; // 빨간색
+  }
+  // 타임라인 마감일이 지나지 않았고, 상태가 완료인 경우 초록색
+  if (currentDate.isBefore(endDate) && status === 'COMPLETE') {
+    return 'success'; // 초록색
+  }
+  // 타임라인 시작일이 오늘 날짜 전일 경우 회색 (default)
+  if (startDate.isBefore(currentDate)) {
+    return 'default'; // 회색
+  }
+  return 'default'; // 기본값은 회색
+};
 
-    // 타임라인 시작일이 오늘 날짜 전일 경우 회색 (default)
-    if (startDate.isBefore(currentDate)) {
-      return 'default'; // 회색
-    }
+// 수정 모달 열기
+const handleOpenUpdateModal = (issue) => {
+  setSelectedIssue(issue);
+  setopenUpdateModal(true);
+};
 
-    return 'default'; // 기본값은 회색
-  };
-
-  const handleOpenModal = (issue) => {
-    setSelectedIssue(issue);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
+// 수정 모달 닫기
+  const handleCloseUpdateModal = () => {
+    setopenUpdateModal(false);
     setSelectedIssue(null);
-    fetchIssues();
+    fetchIssueData();
   };
 
+// 작성 모달 열기
   const handleOpenWriteModal = () => {
     setOpenWriteModal(true);
   };
 
+  // 작성 모달 닫기
   const handleCloseWriteModal = () => {
     setOpenWriteModal(false);
-    fetchIssues();
+    fetchIssueData();
   };
 
 
@@ -102,6 +125,7 @@ const checkItemHandler = (issueId, isChecked) => {
   });
 };
 
+// 전체 선택 처리
 const allCheckedHandler = (e) => {
   const isChecked = e.target.checked;
   setAllChecked(isChecked);
@@ -120,6 +144,7 @@ const allCheckedHandler = (e) => {
     }
   }, [checkItems, issues.length]);
 
+  // 삭제 핸들러
   const handleDelete = () => {
     if (checkItems.length === 0) {
       alert("삭제할 이슈를 선택하세요.");
@@ -139,7 +164,7 @@ const allCheckedHandler = (e) => {
         const urlWithParams = `${deleteUrl}?issueIds=${checkItems.join("&issueIds=")}`;
         axios.delete(urlWithParams)
           .then(() => {
-            fetchIssues();
+            fetchIssueData();
             alert("삭제되었습니다.");
           })
           .catch((error) => console.error("이슈 삭제 실패:", error));
@@ -150,7 +175,7 @@ const allCheckedHandler = (e) => {
         const issueId = checkItems[0]; // 개별 이슈 ID 가져오기
         axios.delete(`http://localhost:8081/projects/${projectId}/issues/${issueId}`)
           .then(() => {
-            fetchIssues();
+            fetchIssueData();
             alert("삭제되었습니다.");
           })
           .catch((error) => console.error("이슈 삭제 실패:", error));
@@ -195,7 +220,7 @@ const allCheckedHandler = (e) => {
                       }
                   />
                 </TableCell>
-                <TableCell sx={{ textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} onClick={() => handleOpenModal(issue)}>
+                <TableCell sx={{ textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} onClick={() => handleOpenUpdateModal(issue)}>
                   {issue.issueName}
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>{issue.managerName || '닉네임 정보 없음'}</TableCell>
@@ -223,11 +248,11 @@ const allCheckedHandler = (e) => {
         </Box>
       </Modal>
 
-      <Modal open={openModal} onClose={handleCloseModal}>
+      <Modal open={openUpdateModal} onClose={handleCloseUpdateModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
           {selectedIssue && (
-            <IssueUpdateModal projectId={projectId} issue={selectedIssue} onClose={handleCloseModal} />
-          )}
+            <IssueUpdateModal projectId={projectId} issue={selectedIssue} onClose={handleCloseUpdateModal} />
+          )}I
         </Box>
       </Modal>
     </div>

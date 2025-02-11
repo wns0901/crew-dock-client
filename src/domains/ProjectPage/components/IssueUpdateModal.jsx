@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Button, TextField, MenuItem, Select, FormControl, InputLabel, Container, Box } from "@mui/material";
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { useNavigate, useParams } from "react-router-dom";
+// import api from "../../../baseApi.js";
 
 const IssueUpdateModal = () => {
   const projectId = 1;  // 하드코딩된 프로젝트 ID
@@ -37,7 +38,7 @@ const IssueUpdateModal = () => {
 
     // 프로젝트 멤버 가져오기
     axios
-      .get(`/projects/${projectId}/members`)
+    .get(`/projects/${projectId}/members`)
       .then((response) => {
         setManagers(Array.isArray(response.data) ? response.data : []);
         console.log("프로젝트 멤버 목록", setManagers);

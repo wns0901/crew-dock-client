@@ -2,12 +2,15 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { LoginContext } from "./contexts/LoginContextProvider"; 
-import { makeChatRoom } from "./containers/userSocketStatusSlice"; 
+import { LoginContext } from "./contexts/LoginContextProvider";
+import { makeChatRoom } from "./containers/userSocketStatusSlice";
+import MDEditor from "@uiw/react-md-editor";
+import { customCommands } from "./utils/mdEditorCustomImgIcon";
 
 const SampleIndex = () => {
   const navigte = useNavigate();
   const [inviteId, setInviteId] = useState("");
+  const [text, setText] = useState("");
 
   const { userInfo, isLogin, roles, projectRoles, logout, loginCheck } =
     useContext(LoginContext);
@@ -21,6 +24,10 @@ const SampleIndex = () => {
   useEffect(() => {
     loginCheck();
   }, []);
+
+  const changeEvent = (e) => {    
+    setText(e);
+  };
 
   return (
     <div>
@@ -58,6 +65,8 @@ const SampleIndex = () => {
       )}
       <button onClick={logout}>로그아웃</button>
       <button onClick={() => navigte("/login")}>로그인</button>
+
+      <MDEditor value={text} onChange={changeEvent} commands={customCommands}/>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import PostDetail from "../components/PostDetail";
 import { useComments } from "../hooks/useComments";
+import api from "../../../apis/baseApi";
 
 const PostDetailContainer = () => {
     const {postId} = useParams();
@@ -22,28 +23,19 @@ const PostDetailContainer = () => {
 
     const fetchPost = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}`);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`게시글 로딩 실패: ${errorText}`);
-            }
-        
-            const originalData = await response.json();
-        
-            const processedData = {
-                id: originalData.id,
-                createdAt: originalData.createdAt,
-                title: originalData.title,
-                content: originalData.content,
-                category: originalData.category,
-                direction: originalData.direction,
-                userId: originalData.userId,
-                nickname: originalData.user?.nickname || null,
-                attachments: originalData.attachments || []
-            };
-          
-            setPost(processedData);
+            const response = await api.get(`/posts/${postId}`);
+            setPost({
+                id: response.data.id,
+                createdAt: response.data.createdAt,
+                title: response.data.title,
+                content: response.data.content,
+                category: response.data.category,
+                direction: response.data.direction,
+                userId: response.data.userId,
+                userNickname: response.data.userNickname || null,
+                attachments: response.data.attachments || [],
+            });
+            console.log(response.data.userNickname);
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
         }
@@ -51,16 +43,14 @@ const PostDetailContainer = () => {
 
     const onUpdatePost = async () => {
         if(window.confirm('게시글을 수정하시겠습니까?')) {
-            navigate(`/posts/${postId}`)
+            navigate(`/posts/edit`)
         }
     };
 
     const onDeletePost = async () => {
         if(window.confirm('게시글을 삭제하시겠습니까?')) {
             try {
-                await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${postId}`, {
-                    method: 'DELETE'
-                });
+                await api.delete(`/posts/${postId}`);
                 navigate('/posts', {
                     search: `?page=1&category=${post.category}`
                 });

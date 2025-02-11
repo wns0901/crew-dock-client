@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Category, CategoryLabel } from '../constants/Category';
 import '../styles/PostFormStyle.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const PostForm = ({
   initialData = { category: '', title: '', content: '', direction: 'NONE' },
@@ -45,7 +47,7 @@ const PostForm = ({
                         </option>
                         ))}
                     </select>
-                    <span className='dropdown-icon'></span>
+                    <FontAwesomeIcon className='dropdown-icon' icon={faCaretDown}/>
                 </div>
             </div>
 
@@ -67,7 +69,7 @@ const PostForm = ({
                     <MDEditor
                         value={content}
                         onChange={setContent}
-                        onImageUpload={onImageUpload}
+                        
                         preview="live"
                         data-color-mode="light"
                         height={400}

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import PostForm from "../components/PostForm";
 import { usePostForm } from "../hooks/usePostForm";
+import api from "../../../apis/baseApi";
 
 const PostCreateContainer = () => {
   const {userInfo} = useContext(LoginContext);
@@ -17,11 +18,7 @@ const PostCreateContainer = () => {
       userId: userInfo.id
     };
 
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts`, {
-      method: 'POST',
-      headers: {'Content-type': 'application/json',},
-      body: JSON.stringify(createPostData)
-    });
+    const response = api.post('/posts', createPostData);
 
     if (!response.ok) {
       const errorText = await response.text();

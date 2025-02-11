@@ -37,12 +37,12 @@ createRoot(document.getElementById("root")).render(
                 <Route path="create" element={<ProjectPostCreate />} />
             </Route>
           </Route>
-          
+
           <Route path="/posts">
             <Route index element={<PostListContainers />} />
             <Route path="create" element={<PostCreateContainer />} />
             <Route path=":postId" element={<PostDetailContainer />} />
-            <Route path="edit" element={<PostEditContainer />} />
+            <Route path=":postId/edit" element={<PostEditContainer />} />
           </Route>
         </Route>
       </Routes>

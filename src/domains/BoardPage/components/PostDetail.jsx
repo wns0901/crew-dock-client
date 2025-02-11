@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { useGetNickname } from '../hooks/useGetNickname';
+import MarkdownRenderer from './MarkdownRederer';
+import { CategoryLabel } from '../\bconstants/\bCategory';
+import '../styles/PostDetailStyle.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 
 const PostDetail = ({
     post = null, 
@@ -12,15 +16,7 @@ const PostDetail = ({
     onDeleteComment = () => {},
     userInfo
 }) => {
-    if (!userInfo) {
-        return <div>로그인 후 댓글을 작성할 수 있습니다.</div>;
-    }
-
     const [comment, setComment] = useState({ content: '', userId: userInfo?.id });
-
-    console.log(post);
-    console.log(comments);
-
     const isAuthor = post?.userId === userInfo?.id;
     const isCommentUser = comment.userId === userInfo?.id;
 
@@ -31,25 +27,35 @@ const PostDetail = ({
         }
     };
 
+    if (!userInfo) {
+        return <div>로그인 후 댓글을 작성할 수 있습니다.</div>;
+    }
+
     return (
         <div className='post-detail'>
-            <div className='post-category'>{post?.category}</div>
+            <div className='post-category'>{CategoryLabel[post?.category]}</div>
             <h1>{post?.title}</h1>
             <div className='post-info'>
                 <div>
                     <span>{(post?.userNickname)}</span>
-                    <span>{post?.createAt}</span>
+                    <span>{post?.createdAt}</span>
                 </div>
                 {isAuthor && (
                     <div>
-                        <button type='button' onClick={onUpdatePost}></button>
-                        <button type='button' onClick={onDeletePost}></button>
+                        <button type='button' onClick={onUpdatePost}>
+                            <FontAwesomeIcon icon={faPenToSquare} />
+                        </button>
+                        <button type='button' onClick={onDeletePost}>
+                            <FontAwesomeIcon icon={faTrashCan} />
+                        </button>
                     </div>
                 )}
             </div>
             {/* line */}
-            <div className='post-content'>{post?.content}</div>
-            <div className='comment-count'>댓글 수: {comments.length}</div>
+            <div className='post-content'>
+                <MarkdownRenderer content={post?.content} />
+                <div className='comment-count'>댓글 수: {comments.length}</div>
+            </div>
             {/* line */}
             <input
                 type='text'
@@ -61,7 +67,8 @@ const PostDetail = ({
             {/* line */}
             <h3>댓글</h3>
             <div className='comment-list'>
-                {comments.map(comment => (
+                {comments.lengh > 0 ? (
+                comments.map(comment => (
                     <CommentItem
                         key={comment.id}
                         comment={comment}
@@ -70,7 +77,10 @@ const PostDetail = ({
                         onFixedComment={onFixedComment}
                         onDeleteComment={onDeleteComment}
                     />
-                ))}
+                ))
+                ) : (
+                    <div className='no-comments'>댓글이 아직 없습니다.</div>
+                )}
             </div>
         </div>
     );

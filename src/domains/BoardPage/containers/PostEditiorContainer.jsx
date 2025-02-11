@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PostForm from "../components/PostForm";
 import { usePostForm } from "../hooks/usePostForm";
+import api from "../../../apis/baseApi";
 
 const PostEditContainer = () => {
     const {postId} = useParams();
@@ -9,33 +10,35 @@ const PostEditContainer = () => {
     const [initialData, setInitialData] = useState(null);
 
     useEffect(() => {
-        const fetchPost = async () => {
+        const fetchPost = async (postId) => {
             try {
-                const response = await fetch(`/posts/${postId}`);
-                if (!response.ok) throw new Error ('게시글을 불러올 수 없습니다.');
-                const data = await response.json();
-                setInitialData(data);
+                const response = await api.get(`/posts/${postId}`);
+                setInitialData({
+                    id: response.data.id,
+                    createdAt: response.data.createdAt,
+                    title: response.data.title,
+                    content: response.data.content,
+                    category: response.data.category,
+                    direction: response.data.direction,
+                    userId: response.data.userId,
+                    userNickname: response.data.userNickname || null,
+                    attachments: response.data.attachments || [],
+                });
+                console.log(response.data.userNickname);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('게시글 로딩 실패:', error);
                 alert(error.message);
                 navigate(-1);
             }
         };
         fetchPost();
-    }, [postId]);
+    }, [postId, navigate]);
 
     const onSubmit = async (postData) => {
         try {
             if(!validatePost(postData)) return;
 
-            const response = await fetch(`/posts`, {
-                method: 'PATCH',
-                headers: {'Content-type': 'application/json',},
-                body: JSON.stringify({
-                    id: postId,
-                    ...postData
-                })
-            });
+            const response = await api.patch(`/posts`, {id: postId,...postData});
 
             if (!response.ok) throw new Error('게시물 수정 중 오류가 발생했습니다.');
 

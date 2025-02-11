@@ -112,13 +112,31 @@ const MyCalendar = ({}) => {
 
   // 일정 수정 모달창
   const handleUpdateEvent = (event) => {
-    console.log(event);
-    setSelectedEvent(event.event._def.publicId);
-    // setAnchorEl(true)
-    setIsUpdateModalOpen(true);
-    console.log(selectedEvent && isUpdateModalOpen);
-    console.log(isUpdateModalOpen);
+    console.log("Clicked Event: ", event);
+    const eventId2 = event.event.id;  // 캘린더 이벤트 ID
+    setSelectedEvent(eventId2);
+    setCalendarId(eventId2);  // 캘린더 ID 설정
+
+    // selectedEvent가 설정된 후 모달을 열도록 setTimeout 사용 (setState 비동기 해결)
+    setTimeout(() => {
+      setIsUpdateModalOpen(true);
+    }, 0);
+
+    console.log("Updated selectedEvent:", eventId2);
+    console.log("Modal Open:", isUpdateModalOpen);
   }
+
+  // 수정 데이터 전달
+  const handleUpdateEventData = (updateEvent) => {
+    setEvents((events) => 
+      events.map((event) => (event.id === updateEvent.id ? updateEvent : event))
+    )
+  }
+
+  // 삭제된 일정 제거
+  const handleDeleteEvent = (calendarId) => {
+    setEvents((prevEvents) => prevEvents.filter((event) => event.id !== calendarId));
+  };
 
 
   const formatTime = (time) => {
@@ -252,7 +270,6 @@ const MyCalendar = ({}) => {
         <AddSchedule
           userId={userId}
           selectedDate={selectedDate}
-          // anchorEl={anchorEl}
           onClose={() => setIsAddModalOpen(false)}
           events={events}
           setEvents={setEvents}
@@ -266,7 +283,9 @@ const MyCalendar = ({}) => {
           userId={userId}
           calendarId={calendarId}
           selectedEvent={selectedEvent}
-          // anchorEl={anchorEl}
+          onUpdateEvent={handleUpdateEventData}
+          onDeleteEvent={handleDeleteEvent}
+          anchorEl={anchorEl}
           onClose={() => setIsUpdateModalOpen(false)}
           events={events}
           setEvents={setEvents}
@@ -274,16 +293,6 @@ const MyCalendar = ({}) => {
           setTodays={setTodayEvents}
         />
         )}
-      {/* <UpdateSchedule
-          calendarId={calendarId}
-          selectedEvent={selectedEvent}
-          // anchorEl={anchorEl}
-          onClose={() => setIsUpdateModalOpen(false)}
-          events={events}
-          setEvents={setEvents}
-          todays={todays}
-          setTodays={setTodayEvents}
-        /> */}
     </div>
   </div>
 );

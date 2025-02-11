@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { Check, Close, Delete } from "@mui/icons-material";
 import api from "../../../apis/baseApi";
 
-const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUpdateEvent, onDeleteEvent }) => {
+const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUpdateEvent, onDeleteEvent, setEvents, events, todays, setTodays }) => {
   const [formData, setFormData] = useState({
     content: "",
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
@@ -16,6 +16,14 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
     endDate: dayjs(),
     project: projectId || null, // 프로젝트 ID 선택사항
   });
+
+  // 입력 필드 변경 핸들러
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   // 수정할 일정 데이터 가져오기
   useEffect(() => {
@@ -47,21 +55,13 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
     }
   }, [calendarId]);
 
-  // 입력 필드 변경 핸들러
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   // 일정 수정 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       // 서버 API에 맞게 요청 URL 변경 (PATCH)
-      const response = await axios.patch(
-        api + `/calendars/${calendarId}`,
+      const response = await api.patch(`/calendars/${calendarId}`,
         {
           content: formData.content,
           startDate: formData.startDate.format("YYYY-MM-DD"),
@@ -73,14 +73,48 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
       );
 
       // 서버에서 받은 수정된 일정 정보로 이벤트 업데이트
-      onUpdateEvent({
+      // onUpdateEvent({
+      //   id: response.data.id,
+      //   content: response.data.content,
+      //   startDate: dayjs(response.data.startDate).format("YYYY-MM-DD"),
+      //   endDate: dayjs(response.data.endDate).format("YYYY-MM-DD"),
+      //   startTime: dayjs(response.data.startTime, "HH:mm:ss").format("HH:mm"),
+      //   endTime: dayjs(response.data.endTime, "HH:mm:ss").format("HH:mm"),
+      // });
+
+      const eventData = {
         id: response.data.id,
         title: response.data.content,
         start: response.data.startDate,
         end: response.data.endDate,
-        sTime: response.data.startTime,
-        eTime: response.data.endTime
-      });
+      }
+
+      console.log("응답데이터", response.data);
+      setEvents([... events, eventData])
+      console.log("eventData", eventData);
+
+      // 오늘 일정 필터링
+      const today = new Date();
+      if (Array.isArray(response.data)) {
+        const filteredEvents = response.data
+          .filter((event) => {
+            const eventStartDate = new Date(event.start);
+            const eventEndDate = new Date(event.end);
+            return (
+              eventStartDate.toDateString() === today.toDateString() ||
+              (eventStartDate <= today && eventEndDate >= today)
+            );
+          })
+          .sort((a, b) => {
+            // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+            if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+            return a.sTime.localeCompare(b.sTime);
+          });
+  
+        setTodays(filteredEvents); // 필터링된 일정만 업데이트
+        setTodays([... todays, eventData])
+      }
+
       onClose(); // 모달 닫기
 
       alert("일정 수정이 완료되었습니다.");
@@ -94,11 +128,47 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
   const handleDelete = async () => {
     if (window.confirm("해당 일정을 삭제하시겠습니까?")) {
       try {
-        await axios.delete( api + `/calendars`, {
+        const response = await api.delete( `/calendars`, {
           params: { userId, calendarId },
         });
+
+        const eventData = {
+          id: response.data.id,
+          title: response.data.content,
+          start: response.data.startDate,
+          end: response.data.endDate,
+        }
+
+        console.log("응답데이터", response.data);
+        setEvents([... events, eventData])
+        console.log("eventData", eventData);
+
+        // 오늘 일정 필터링
+        const today = new Date();
+        if (Array.isArray(response.data)) {
+          const filteredEvents = response.data
+            .filter((event) => {
+              const eventStartDate = new Date(event.start);
+              const eventEndDate = new Date(event.end);
+              return (
+                eventStartDate.toDateString() === today.toDateString() ||
+                (eventStartDate <= today && eventEndDate >= today)
+              );
+            })
+            .sort((a, b) => {
+              // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+              if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+              return a.sTime.localeCompare(b.sTime);
+            });
+    
+          setTodays(filteredEvents); // 필터링된 일정만 업데이트
+          setTodays([... todays, eventData])
+          console.log("오늘의 일정: ", filteredEvents);
+        }
+
         onClose(); // 모달 닫기
         onDeleteEvent(calendarId); // 삭제된 이벤트 반영
+
         alert("일정이 삭제되었습니다.");
       } catch (error) {
         console.error("Failed to delete schedule", error);
@@ -109,8 +179,8 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
 
   return (
     <Dialog
+      anchorEl={true}
       open={open}
-      onClick={onClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -155,7 +225,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                 value={formData.content}
                 onChange={(e) => handleChange("content", e.target.value)}
                 required
-                sx={{ borderRadius: "0.5rem", marginBottom: "2rem" }} // 추가된 마진
+                sx={{ borderRadius: "0.5rem", marginBottom: "2rem" }} 
               />
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -164,7 +234,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                               value={formData.startDate}
                               onChange={(newValue) => handleChange("startDate", newValue)}
                               renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-                              sx={{ marginBottom: "1.5rem", marginRight: "2rem"}} // 추가된 마진
+                              sx={{ marginBottom: "1.5rem", marginRight: "2rem"}}
                             />
               
                             <TimePicker
@@ -172,7 +242,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                               value={formData.startTime}
                               onChange={(newValue) => handleChange("startTime", newValue)}
                               renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-                              sx={{ marginBottom: "1rem"}} // 추가된 마진
+                              sx={{ marginBottom: "1rem"}} 
                             />
               
                             <DatePicker
@@ -180,7 +250,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                               value={formData.endDate}
                               onChange={(newValue) => handleChange("endDate", newValue)}
                               renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-                              sx={{ marginBottom: "1.5rem", marginRight: "2rem"}} // 추가된 마진
+                              sx={{ marginBottom: "1.5rem", marginRight: "2rem"}} 
                             />
               
                             <TimePicker

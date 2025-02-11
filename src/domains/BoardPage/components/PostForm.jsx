@@ -5,13 +5,13 @@ import { Category, CategoryLabel } from '../constants/Category';
 import '../styles/PostFormStyle.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 
 const PostForm = ({
   initialData = { category: '', title: '', content: '', direction: 'NONE' },
   isEdit = false,
   onSubmit = () => {},
   onCancel = () => {},
-  onImageUpload = () => {},
   categoryOptions = []
 }) => {
   const [category, setCategory] = useState(initialData.category);
@@ -69,7 +69,7 @@ const PostForm = ({
                     <MDEditor
                         value={content}
                         onChange={setContent}
-                        
+                        commands={customCommands}
                         preview="live"
                         data-color-mode="light"
                         height={400}

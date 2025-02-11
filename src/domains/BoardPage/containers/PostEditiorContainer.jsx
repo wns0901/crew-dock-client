@@ -6,7 +6,7 @@ import api from "../../../apis/baseApi";
 
 const PostEditContainer = () => {
     const {postId} = useParams();
-    const { categoryOptions, onImageUpload, handleAttachments, validatePost, navigate, onCancel } = usePostForm();
+    const { categoryOptions, validatePost, navigate, onCancel } = usePostForm();
     const [initialData, setInitialData] = useState(null);
 
     useEffect(() => {
@@ -24,25 +24,37 @@ const PostEditContainer = () => {
                     userNickname: response.data.userNickname || null,
                     attachments: response.data.attachments || [],
                 });
-                console.log(response.data.userNickname);
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
                 alert(error.message);
                 navigate(-1);
             }
         };
-        fetchPost();
+        fetchPost(postId);
     }, [postId, navigate]);
 
     const onSubmit = async (postData) => {
         try {
             if(!validatePost(postData)) return;
 
-            const response = await api.patch(`/posts`, {id: postId,...postData});
+            const updateData = {
+                id: initialData.id,
+                title: postData.title.trim(),
+                content: postData.content.trim(),
+                category: postData.category,
+                direction: 'NONE',
+                userId: initialData.userId,
+                userNickname: initialData.userNickname,
+                projectId: null
+            };
 
-            if (!response.ok) throw new Error('게시물 수정 중 오류가 발생했습니다.');
-
-            await handleAttachments(postId, postData.content);
+            const response = await api.patch('/posts', updateData);
+        
+            if (response.status === 500) {
+                console.error('Server error details:', response.data);
+                throw new Error(response.data.message || '서버 오류가 발생했습니다.');
+            }
+            
             navigate(`/posts/${postId}`);
         } catch (error) {
             console.error('Error:', error);
@@ -58,7 +70,6 @@ const PostEditContainer = () => {
             isEdit={true}
             onSubmit={onSubmit}
             onCancel={onCancel}
-            onImageUpload={onImageUpload}
             categoryOptions={categoryOptions}
         />
     );

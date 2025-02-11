@@ -3,61 +3,63 @@ import { useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import ProjectPostForm from "../components/ProjectPostForm";
 import { useProjectPostForm } from "../hooks/useProjectPostForm";
+import api from "../../../apis/baseApi";
 
 const ProjectPostCreate = () => {
-  const {projectId} = useParams();
-  const {userInfo} = useContext(LoginContext);
-  const {directionOptions, onImageUpload, handleAttachments, validatePost, navigate, onCancel} = useProjectPostForm();
+  const { projectId } = useParams();
+  const { userInfo } = useContext(LoginContext);
+  const { directionOptions, validatePost, navigate, onCancel } = useProjectPostForm();
 
   const onSubmit = async (postData) => {
-  try {
-    if (!validatePost(postData)) return;
-
-    const createPostData = {
-      ...postData,
-      category: 'NONE',
-      userId: userInfo.id
-    };
-
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/projects/${projectId}/posts`, {
-      method: 'POST',
-      headers: {'Content-type': 'application/json',},
-      body: JSON.stringify(createPostData)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error('게시물 작성 중 오류가 발생했습니다.', errorText);
-    }
-
-    const responseText = await response.text();
-    let postId;
-
     try {
-      const idMatch = responseText.match(/"id":(\d+)/);
-      postId = idMatch ? parseInt(idMatch[1]) : null;
-    } catch (parseError) {
-      console.error('ID 추출 오류:', parseError);
-      throw new Error('게시물 ID를 찾을 수 없습니다.');
-    }
-      await handleAttachments(postId, postData.content);
-      navigate(`/projects/${projectId}/posts/${postId}`);
+      if (!validatePost(postData)) return;
+
+      const createPostData = {
+        title: postData.title.trim(),
+        content: postData.content.trim(),
+        category: postData.category,
+        direction: 'NONE',
+        userNickname: userInfo.nickname,
+        userId: userInfo.id,
+        projectId: postData.projectId
+      };
+
+      const response = await api.post(`/projects/${projectId}/posts`, createPostData);
+
+      if (response.status === 500) {
+        console.error('Server error details:', response.data);
+        throw new Error(response.data.message || '서버 오류가 발생했습니다.');
+      }
+
+      const postId = response.data.id;
+
+
+      // const imageUrls = extractImageUrls(postData.content);
+
+      // for (const url of imageUrls) {
+      //   if(url.startsWith('data:image')) {
+      //     const file = base64ToFile(url);
+      //     await createImgUrl(file);
+      //   } else {
+      //     await saveExternalImageUrl(postId, url);
+      //   }
+      // }
+      navigate(`/posts/${postId}`);
     } catch (error) {
       console.error('Error:', error);
       alert(error.message);
-  }
-};
+    }
+  };
 
-return (
+  return (
     <ProjectPostForm
-        onSubmit={onSubmit}
-        onCancel={onCancel}
-        onImageUpload={onImageUpload}
-        directionOptions={directionOptions}
-        initialData={{ category: 'NONE', title: '', content: '' , direction: ''}}
-        isEdit={false}
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      directionOptions={directionOptions}
+      initialData={{ category: 'NONE', title: '', content: '', direction: '' }}
+      isEdit={false}
     />
   );
 };
 
-  export default ProjectPostCreate;
+export default ProjectPostCreate;

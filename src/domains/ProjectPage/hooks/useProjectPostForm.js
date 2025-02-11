@@ -18,49 +18,6 @@ export const useProjectPostForm = (projectId) => {
             direction === Direction.FORUM
     });
 
-    const extractImageUrls = (markdownContent) => {
-        const urlRegex =  /!\[.*?\]\((.*?)\)/g;
-        const urls = [];
-        let match;
-        while ((match = urlRegex.exec(markdownContent)) !== null) {
-            urls.push(match[1]);
-        }
-        return urls;
-    };
-
-    const onImageUpload = async (postId, file) => {
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            const response = await fetch(`projects/${projectId}/posts/${postId}/attachments`, { 
-                method: "POST",
-                body: formData
-            });
-            if (!response.ok) {
-                throw new Error('이미지 업로드 중 오류가 발생했습니다.');
-            }
-            const {fileURL} = await response.json();
-            return fileURL;
-        } catch (error) {
-            console.error('Image upload error:', error);
-            alert(error.message);
-            return null;
-        }
-    };
-
-    const handleAttachments = async (postId, content) => {
-        if (content?.includes('![')) {
-            const imageUrls = extractImageUrls(content);
-            await Promise.all(imageUrls.map(url =>
-                fetch(`/projects/${projectId}/posts/${postId}/attachments`, {
-                    method: 'POST',
-                    headers: {'Content-type': 'application/json'},
-                    body: JSON.stringify({url})
-                })
-            ));
-        }
-    };
-
     const validatePost = (postData) => {
         if(!postData.title.trim()) {
             alert('제목을 입력해주세요.');
@@ -79,8 +36,6 @@ export const useProjectPostForm = (projectId) => {
 
     return {
         directionOptions,
-        onImageUpload,
-        handleAttachments,
         validatePost,
         navigate,
         onCancel

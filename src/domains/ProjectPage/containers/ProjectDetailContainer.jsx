@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import PostDetail from "../components/PostDetail";
 import { useComments } from "../hooks/useComments";
 import api from "../../../apis/baseApi";
+import ProjectPostDetail from "../components/ProjectPostDetail";
 
-const PostDetailContainer = () => {
-    const {postId} = useParams();
+const ProjectPostDetailContainer = () => {
+    const {postId, projectId} = useParams();
     const [post, setPost] = useState(null);
     const {userInfo} = useContext(LoginContext);
     const navigate = useNavigate();
@@ -19,11 +19,11 @@ const PostDetailContainer = () => {
 
     useEffect(() => {
         fetchPost();
-    }, [postId]);
+    }, [postId, projectId]);
 
     const fetchPost = async () => {
         try {
-            const response = await api.get(`/posts/${postId}`);
+            const response = await api.get(`/projects/${projectId}/posts/${postId}`);
             setPost({
                 id: response.data.id,
                 createdAt: response.data.createdAt,
@@ -43,16 +43,16 @@ const PostDetailContainer = () => {
 
     const onUpdatePost = async () => {
         if(window.confirm('게시글을 수정하시겠습니까?')) {
-            navigate(`/posts/${postId}/edit`)
+            navigate(`/projects/${projectId}/posts/${postId}/edit`)
         }
     };
 
     const onDeletePost = async () => {
         if(window.confirm('게시글을 삭제하시겠습니까?')) {
             try {
-                await api.delete(`/posts/${postId}`);
+                await api.delete(`/projects/${projectId}/posts/${postId}`);
                 navigate('/posts', {
-                    search: `?page=1&category=${post.category}`
+                    search: `?page=1&direction=${post.direction}`
                 });
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);
@@ -66,7 +66,7 @@ const PostDetailContainer = () => {
     
 
     return (
-        <PostDetail
+        <ProjectPostDetail
             post={post}
             comments={comments}
             userInfo={userInfo}
@@ -79,4 +79,4 @@ const PostDetailContainer = () => {
     );
 };
 
-export default PostDetailContainer;
+export default ProjectPostDetailContainer;

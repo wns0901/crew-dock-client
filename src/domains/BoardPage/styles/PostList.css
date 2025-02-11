@@ -1,0 +1,246 @@
+.post-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Write button styling */
+.write-button {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #b7d5f3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    margin-left: auto;
+}
+
+.write-button:hover {
+    opacity: 0.9;
+}
+
+.write-icon {
+    font-size: 16px;
+}
+
+/* Control section styling */
+.control-section {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Category buttons styling */
+.category-buttons {
+    grid-column: 1 / 5;
+    display: flex;
+    gap: 10px;
+}
+
+.category-button {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.category-button.primary {
+    background-color: #7dd1d3;
+    color: white;
+}
+
+.category-button.secondary {
+    background-color: #b7d5f3;
+    color: white;
+}
+
+.category-button:hover {
+    opacity: 0.9;
+}
+
+.category-button.active {
+    opacity: 0.85;
+}
+
+/* Search section styling */
+.search-section {
+    grid-column: 5 / -1;
+    justify-self: end;
+}
+
+.search-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-type {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+.search-input {
+    width: 300px;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f5f5f5;
+}
+
+.search-button {
+    padding: 8px 15px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #666;
+}
+
+.search-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Post list styling */
+.post-list {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.post-item {
+    background-color: white;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 15px;
+    align-items: center;
+}
+
+.post-item:hover {
+    background-color: #fafafa;
+}
+
+.notice-badge {
+    padding: 4px 8px;
+    background-color: #ffd700;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #555;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.post-title {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+    font-weight: normal;
+}
+
+.post-info {
+    display: flex;
+    gap: 20px;
+    color: #666;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.user-nickname, .created-at {
+    color: #888;
+}
+
+/* Bottom section styling */
+.bottom-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Pagination styling */
+.pagination-simple {
+    display: flex;
+    gap: 5px;
+}
+
+.page-number {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: #b7d5f3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.page-number:hover {
+    opacity: 0.9;
+}
+
+.page-number.active {
+    background-color: #7dd1d3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .control-section {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .category-buttons,
+    .search-section {
+        grid-column: span 12;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .write-button {
+        width: 100%;
+        margin: 0 0 20px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .post-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .post-info {
+        justify-content: flex-start;
+    }
+    
+    .write-button {
+        width: 100%;
+    }
+}

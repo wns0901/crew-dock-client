@@ -8,12 +8,12 @@ const PostListContainers = () => {
     const [notices, setNotices] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(Category.NONE);
     const [loading, setLoading] = useState(false);
-    const [pagination, setPagination] = useState({
-        totalPages: 0,
-        totalElements: 0,
-        currentPage: 1,
-        pageSize: 10
-      });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchParams, setSearchParams] = useState({
+        type: 'title',
+        query: ''
+    });
+    const PAGE_SIZE = 10;
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -24,24 +24,11 @@ const PostListContainers = () => {
                     api.get(`/posts`, { params: { category: selectedCategory } })
                 ]);
 
-                console.log("공지사항 응답:", noticeResponse.data);
-                console.log("게시글 응답:", postsResponse.data);
-
                 const noticesPosts = noticeResponse.data.posts?.post || [];
                 const categoryPosts = postsResponse.data.posts?.post || [];
 
-                console.log("공지사항 목록:", noticesPosts);
-                console.log("카테고리 게시글 목록:", categoryPosts);
-
                 setNotices(noticesPosts);
                 setPosts(categoryPosts);
-
-                setPagination({
-                    totalPages: postsResponse.data.totalPages,
-                    totalElements: postsResponse.data.totalElements,
-                    currentPage: postsResponse.data.currentPage,
-                    pageSize: postsResponse.data.pageSize
-                });
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
             } finally {
@@ -51,17 +38,56 @@ const PostListContainers = () => {
         fetchPosts();
     }, [selectedCategory]);
 
-    const combinedPosts = useMemo(() => {
-        return [...notices, ...posts];
-    }, [notices, posts]);
+    const filteredPosts = useMemo(() => {
+        const combined = [...notices, ...posts];
+        if (!searchParams.query) return combined;
+
+        return combined.filter(post => {
+            if (searchParams.type === 'title') {
+                return post.title.toLowerCase().includes(searchParams.query.toLowerCase());
+            } else if (searchParams.type === 'userNickname') {
+                return post.userNickname?.toLowerCase().includes(searchParams.query.toLowerCase());
+            }
+            return true;
+        });
+    }, [notices, posts, searchParams]);
+
+    const paginatedData = useMemo(() => {
+        const startIndex = (currentPage - 1) * PAGE_SIZE;
+        const endIndex = startIndex + PAGE_SIZE;
+        const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(filteredPosts.length / PAGE_SIZE);
+
+        return {
+            paginatedPosts,
+            pagination: {
+                totalPages,
+                totalElements: filteredPosts.length,
+                currentPage,
+                pageSize: PAGE_SIZE
+            }
+        };
+    }, [filteredPosts, currentPage]);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const handleSearch = (searchData) => {
+        setSearchParams(searchData);
+        setCurrentPage(1);
+    };
+    
 
     return (
         <PostList
-            posts={combinedPosts}
+            posts={paginatedData.paginatedPosts}
             loading={loading}
             selectedCategory={selectedCategory} 
             setSelectedCategory={setSelectedCategory}
-            pagination={pagination}
+            pagination={paginatedData.pagination}
+            onPageChange={handlePageChange}
+            onSearch={handleSearch}
         />
     );
 }

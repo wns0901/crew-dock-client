@@ -1,70 +1,127 @@
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
-import { Category, CategoryLabel } from '../constants/Category';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CategoryLabel } from '../constants/Category';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
+import '../styles/PostList.css';
 
 const PostList = ({
     posts,
     loading,
     selectedCategory,
     setSelectedCategory,
-    pagination
+    pagination,
+    onPageChange,
+    onSearch
 }) => {
-    const {roles} = useContext(LoginContext);
+    const { roles } = useContext(LoginContext);
+    const navigate = useNavigate();
+    const [searchType, setSearchType] = useState('title');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    console.log("전체 Posts:", posts);
-    console.log("선택된 카테고리:", selectedCategory);
+    // const categoryOptions = Object.values(Category).filter(category => {
+    //     const isAdmin = roles?.isAdmin ?? false;
+    //     if (isAdmin) {
+    //         return true;
+    //     }
+    //     return category === Category.NONE || category === Category.FORUM;
+    // });
 
-    const categoryOptions = Object.values(Category).filter(category => {
-        const isAdmin = roles?.isAdmin ?? false;
-        if (isAdmin) {
-            return true;
-        }
-       return category === Category.NONE || category === Category.FORUM;
-    }); 
-    
-    if(loading) return <div>로딩 중...</div>
+    const handleSearch = (e) => {
+        e.preventDefault();
+        onSearch({type: searchType, query: searchQuery});
+    }
 
-    const filteredPosts = selectedCategory
-        ? posts.filter(post => {
-            console.log(`Post Category Check - Post ID: ${post.id}, Category: ${post.category}, Selected: ${selectedCategory}`);
-            return post.category === selectedCategory; })
-        : posts;
-    console.log("filteredPosts", filteredPosts);
-    
+    const handleCreateClick = () => {
+        navigate('/posts/create');
+    };
+
+    const handlePostClick = (postId) => {
+        navigate(`/posts/${postId}`);
+    };
+
+    if (loading) {
+        return <div className="loading-spinner">로딩 중...</div>;
+    }
+
     return (
-        <div>
-            <div className='category-buttons'>
-            {categoryOptions.map(category => (
-                <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={selectedCategory === category ? 'active' : ''}
-                >
-                    {CategoryLabel[category]}
-                </button>
-                ))}
+        <div className='post-container'>
+            <button className="write-button" onClick={handleCreateClick}>
+                    <span className="write-icon">✎</span> 글쓰기
+            </button>
+
+            <div className="control-section">
+                <div className='category-buttons'>
+                    <button
+                        className={`category-button primary ${selectedCategory === 'NONE' ? 'active' : ''}`}
+                        onClick={() => setSelectedCategory('NONE')}
+                    >
+                        {CategoryLabel.NONE}
+                    </button>
+                    <button
+                        className={`category-button secondary ${selectedCategory === 'FORUM' ? 'active' : ''}`}
+                        onClick={() => setSelectedCategory('FORUM')}
+                    >
+                        {CategoryLabel.FORUM}
+                    </button>
+                </div>
+                <div className='search-section'>
+                    <form onSubmit={handleSearch} className='search-form'>
+                        <select
+                            value={searchType}
+                            onChange={(e) => setSearchType(e.target.value)}
+                            className='search-type'
+                        >
+                            <option value="title">제목</option>
+                            <option value="userNickname">닉네임</option>
+                        </select>
+                        <input
+                            type='text'
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder='검색어를 입력하세요'
+                            className='search-input'
+                        />
+                        <button type='submit' className='search-button'>
+                            <FontAwesomeIcon icon={faMagnifyingGlass} />
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div className='post-list'>
-                {filteredPosts.map(post => (
-                    <div key={post.id} className='post-item'>
-                        <span className='notice-badge'>{CategoryLabel[post.category]}</span>
-                        <h3>{post.title}</h3>
+                {posts.map(post => (
+                    <div 
+                        key={post.id} 
+                        className='post-item'
+                        onClick={() => handlePostClick(post.id)}
+                    >
+                        <span className="notice-badge">{CategoryLabel[post.category]}</span>
+                        <h3 className="post-title">{post.title}</h3>
                         <div className='post-info'>
-                            <span>{post?.userNickname}</span>
-                            <span>{post?.createdAt}</span>
+                            <span className="user-nickname">{post?.userNickname}</span>
+                            <span className="created-at">{post?.createdAt}</span>
                         </div>
                     </div>
                 ))}
             </div>
-            {pagination && (
-                <div className='pagination'>
-                <p>총 게시물 수: {pagination.totalElements}</p>
-                <p>현재 페이지: {pagination.currentPage}</p>
-                <p>총 페이지 수: {pagination.totalPages}</p>
+           
+            <div className="bottom-section">
+                <div className="pagination-simple">
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+                        <button
+                            key={page}
+                            onClick={() => onPageChange(page)}
+                            className={`page-number ${pagination.currentPage === page ? 'active' : ''}`}
+                        >
+                            {page}
+                        </button>
+                    ))}
                 </div>
-            )}
+            
+            </div>
         </div>
     );
 };
@@ -75,10 +132,10 @@ PostList.propTypes = {
         title: PropTypes.string.isRequired,
         category: PropTypes.string,
         user: PropTypes.shape({
-          nickname: PropTypes.string
+            nickname: PropTypes.string
         }),
         createAt: PropTypes.string
-      })).isRequired,
+    })).isRequired,
     loading: PropTypes.bool.isRequired,
     selectedCategory: PropTypes.string.isRequired,
     setSelectedCategory: PropTypes.func.isRequired,
@@ -87,7 +144,9 @@ PostList.propTypes = {
         totalElements: PropTypes.number,
         currentPage: PropTypes.number,
         pageSize: PropTypes.number
-    })
+    }),
+    onPageChange: PropTypes.func.isRequired,
+    onSearch: PropTypes.func.isRequired
 };
 
 export default PostList;

@@ -9,11 +9,12 @@ const MarkdownRenderer = ({ content = '' }) => {
           if (line.match(/!\[.*?\]\(.*?\)/)) {
             const url = line.match(/\((.*?)\)/)[1];
             return (
-              <div key={index}>
-                <img 
-                  src="/api/placeholder/640/360"
-                  alt={url}
-                />
+              <div key={index} className="markdown-image">
+                  <img
+                      src={url}  // 실제 URL 사용
+                      alt="content"
+                      style={{ maxWidth: '100%' }}
+                  />
               </div>
             );
           }

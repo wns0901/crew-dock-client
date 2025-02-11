@@ -2,14 +2,16 @@ import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import '../styles/ProjectPostForm.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 import { Direction, DirectionLabel } from '../constants/Direction';
 
-const ProjectPostForm = ({
+const PostForm = ({
   initialData = { category: 'NONE', title: '', content: '', direction: '' },
   isEdit = false,
   onSubmit = () => {},
   onCancel = () => {},
-  onImageUpload = () => {},
   directionOptions = []
 }) => {
   const [direction, setDirection] = useState(initialData.direction);
@@ -45,7 +47,7 @@ const ProjectPostForm = ({
                         </option>
                         ))}
                     </select>
-                    <span className='dropdown-icon'></span>
+                    <FontAwesomeIcon className='dropdown-icon' icon={faCaretDown}/>
                 </div>
             </div>
 
@@ -67,7 +69,7 @@ const ProjectPostForm = ({
                     <MDEditor
                         value={content}
                         onChange={setContent}
-                        onImageUpload={onImageUpload}
+                        commands={customCommands}
                         preview="live"
                         data-color-mode="light"
                         height={400}
@@ -84,9 +86,9 @@ const ProjectPostForm = ({
   );
 };
 
-ProjectPostForm.propTypes = {
+PostForm.propTypes = {
     initialData: PropTypes.shape({
-        direction: PropTypes.string,
+        category: PropTypes.string,
         title: PropTypes.string,
         content: PropTypes.string
     }),
@@ -99,4 +101,4 @@ ProjectPostForm.propTypes = {
     )
 };
 
-export default ProjectPostForm;
+export default PostForm;

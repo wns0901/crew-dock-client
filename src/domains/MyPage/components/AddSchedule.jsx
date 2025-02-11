@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Popover, TextField, Button, Box, Typography } from "@mui/material";
+import { TextField, Button, Box, Typography, Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider, DatePicker, TimePicker } from "@mui/x-date-pickers";
+import { Add, Cancel, Close } from "@mui/icons-material";
 import dayjs from "dayjs";
+import api from "../../../apis/baseApi";
 
-const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, onAddEvent }) => {
+const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, events, setEvents, todays, setTodays }) => {
   const [formData, setFormData] = useState({
     content: "",
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
@@ -28,8 +30,8 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, onAdd
     e.preventDefault();
     try {
       // 서버 API에 맞게 요청 URL 변경
-      const response = await axios.post(
-        `http://localhost:8081/calendars?userId=${userId}`, 
+      const response = await api.post(
+          `/calendars?userId=${userId}`, 
         {
           content: formData.content,
           startDate: formData.startDate.format("YYYY-MM-DD"),
@@ -38,17 +40,45 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, onAdd
           endTime: formData.endTime.format("HH:mm"),
           project: formData.project, // 프로젝트 ID가 있을 경우 포함
         }
+
       );
 
-      // 서버에서 받은 일정 정보로 새 이벤트 추가
-      onAddEvent({
+      const eventData = {
         id: response.data.id,
         title: response.data.content,
         start: response.data.startDate,
         end: response.data.endDate,
-      });
+      }
+      console.log("응답데이터", response.data);
+      setEvents([... events, eventData])
+      console.log("eventData", eventData);
+      
+      // 오늘 일정 필터링
+      const today = new Date();
+      if (Array.isArray(response.data)) {
+        const filteredEvents = response.data
+          .filter((event) => {
+            const eventStartDate = new Date(event.start);
+            const eventEndDate = new Date(event.end);
+            return (
+              eventStartDate.toDateString() === today.toDateString() ||
+              (eventStartDate <= today && eventEndDate >= today)
+            );
+          })
+          .sort((a, b) => {
+            // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+            if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+            return a.sTime.localeCompare(b.sTime);
+          });
+  
+        setTodays(filteredEvents); // 필터링된 일정만 업데이트
+        setTodays([... todays, eventData])
+        console.log("오늘의 일정: ", filteredEvents);
+      }
 
       onClose(); // 모달 닫기
+
+      alert("일정이 추가되었습니다.");
 
     } catch (error) {
       console.error("Failed to add schedule", error);
@@ -67,66 +97,109 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, onAdd
 
 
   return (
-    <Popover
-    open={Boolean(anchorEl)}
-    anchorEl={anchorEl}
-    onClose={onClose}
-    anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-    transformOrigin={{ vertical: "top", horizontal: "center" }}
-  >
-    <Box sx={{ p: 2, width: 300 }}>
-      <Typography variant="h6">일정 추가</Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="일정"
-          fullWidth
-          margin="normal"
-          value={formData.content}
-          onChange={(e) => handleChange("content", e.target.value)}
-          required
-        />
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: "1.5rem",
+          p: 2,
+          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
+          position: "absolute",  // 이 부분을 추가하여 날짜 근처로 위치시킬 수 있음
+        },
+      }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: "transparent",  // 배경을 투명하게 설정
+        }
+      }}
+    >
+      <IconButton
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          color: "grey.500",
+        }}
+      >
+        <Close />
+      </IconButton>
 
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label="시작 날짜"
-            value={formData.startDate}
-            onChange={(newValue) => handleChange("startDate", newValue)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-          />
+      <DialogTitle>
+        <Typography variant="h4" className="font-bold text-center">
+          일정 추가
+        </Typography>
+      </DialogTitle>
 
-          <TimePicker
-            label="시작 시간"
-            value={formData.startTime}
-            onChange={(newValue) => handleChange("startTime", newValue)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-          />
+      <DialogContent>
+        <Box className="space-y-4">
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="일정"
+              fullWidth
+              margin="normal"
+              value={formData.content}
+              onChange={(e) => handleChange("content", e.target.value)}
+              required
+              sx={{ borderRadius: "0.5rem", marginBottom: "2rem" }} // 추가된 마진
+            />
 
-          <DatePicker
-            label="종료 날짜"
-            value={formData.endDate}
-            onChange={(newValue) => handleChange("endDate", newValue)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-          />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="시작 날짜"
+                value={formData.startDate}
+                onChange={(newValue) => handleChange("startDate", newValue)}
+                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+                sx={{ marginBottom: "1.5rem", marginRight: "2rem"}} // 추가된 마진
+              />
 
-          <TimePicker
-            label="종료 시간"
-            value={formData.endTime}
-            onChange={(newValue) => handleChange("endTime", newValue)}
-            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
-          />
-        {/* 하루종일 버튼 -> 시작 날짜 00:00 ~ 23:59 까지로 자동 선택됨 */}
-        </LocalizationProvider>
+              <TimePicker
+                label="시작 시간"
+                value={formData.startTime}
+                onChange={(newValue) => handleChange("startTime", newValue)}
+                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+                sx={{ marginBottom: "1rem"}} // 추가된 마진
+              />
 
-        <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-          {/* 취소 버튼에 onClick 추가 */}
-          <Button onClick={handleCancelClick} variant="outlined">취소</Button>
-          {/* 추가 버튼에 onClick 추가 */}
-          <Button type="submit" variant="contained" color="primary" onClick={handleAddClick}>추가</Button>
+              <DatePicker
+                label="종료 날짜"
+                value={formData.endDate}
+                onChange={(newValue) => handleChange("endDate", newValue)}
+                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+                sx={{ marginBottom: "1.5rem", marginRight: "2rem"}} // 추가된 마진
+              />
+
+              <TimePicker
+                label="종료 시간"
+                value={formData.endTime}
+                onChange={(newValue) => handleChange("endTime", newValue)}
+                renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+              />
+            </LocalizationProvider>
+
+            <Box sx={{
+                  mt: 0.5,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                startIcon={<Add />}
+                className="rounded-lg"
+              >
+                추가
+              </Button>
+            </Box>
+          </form>
         </Box>
-      </form>
-    </Box>
-  </Popover>
-);
-};
+      </DialogContent>
+    </Dialog>
+    );
+  };
 
 export default AddSchedule;

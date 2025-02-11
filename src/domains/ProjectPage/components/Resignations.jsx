@@ -93,7 +93,7 @@ const Resignations = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>이름</TableCell>
+              <TableCell>닉네임</TableCell>
               <TableCell>사유</TableCell>
             </TableRow>
           </TableHead>
@@ -104,7 +104,7 @@ const Resignations = () => {
                 onClick={() => handleOpenModal(resignation.id)}
                 style={{ cursor: "pointer" }}
               >
-                <TableCell>{resignation.member?.user?.name || "알 수 없음"}</TableCell>
+                <TableCell>{resignation.member?.user?.nickname || "알 수 없음"}</TableCell>
                 <TableCell>
                   {(() => {
                     try {
@@ -139,7 +139,7 @@ const Resignations = () => {
           }}
         >
           <Typography variant="h6">
-            {selectedResignation?.member?.user?.name || "알 수 없음"}님의 탈퇴 사유
+            {selectedResignation?.member?.user?.nickname || "알 수 없음"}님의 탈퇴 사유
           </Typography>
           <Typography mb={3}>
             {(() => {

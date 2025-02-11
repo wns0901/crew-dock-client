@@ -1,5 +1,5 @@
 const ScrapsPage = () => {
-    return <div>포트폴리오 페이지</div>;
+    return <div>스크랩 페이지</div>;
 };
 
 export default ScrapsPage; // ✅ export default 추가!

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-
+import { Link } from "react-router-dom";
 const PendingMembers = () => {
   const { projectId } = useParams();
   const { projectRoles } = useContext(LoginContext); // 로그인 컨텍스트에서 프로젝트 권한 정보 가져오기
@@ -70,7 +70,7 @@ const PendingMembers = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>이름</TableCell>
+              <TableCell>닉네임</TableCell>
               <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
               {isCaptain && <TableCell></TableCell>}
@@ -81,7 +81,13 @@ const PendingMembers = () => {
   {pendingMembers.length > 0 ? (
     pendingMembers.map((member) => (
       <TableRow key={member.id}>
-        <TableCell>{member.user.name}</TableCell>
+        <TableCell>
+        <Link
+    to={`/mypage/${member.id}`}
+    style={{ textDecoration: "none", color: "inherit", fontWeight: "bold" }}  >
+          {member.user.nickname}
+          </Link>
+          </TableCell>
         <TableCell>{member.user.phoneNumber}</TableCell>
         <TableCell>{member.position}</TableCell>
         {isCaptain && (

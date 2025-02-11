@@ -4,6 +4,7 @@ import { Box, Typography, CircularProgress, IconButton } from "@mui/material";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
+import AnchorIcon from "@mui/icons-material/Anchor"
 
 const API_BASE_URL = "http://localhost:8080/projects";
 
@@ -82,8 +83,9 @@ const ProjectInfo = () => {
                         }}
                     />
                 </Box>
+               
                 <Typography variant="h5" component="div" gutterBottom>
-                    {project.name}
+                <AnchorIcon sx={{ fontSize: 25, color: "red", }} /> {project.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     <strong>기간:</strong> {project.startDate} ~ {formattedEndDate}
@@ -97,8 +99,8 @@ const ProjectInfo = () => {
         <Box 
             key={stackItem.id} 
             sx={{ 
-                backgroundColor: "#d0d0d0", 
-                color: "#333", 
+                backgroundColor: "#70a7ff", 
+                color: "#ffffff", 
                 px: 1.5, 
                 py: 0.5, 
                 borderRadius: "8px", 
@@ -152,9 +154,9 @@ const ProjectInfo = () => {
                     value={navValue}
                     onChange={(event, newValue) => {
                         setNavValue(newValue);
-                        if (newValue === 0) navigate(`/projects/${projectId}`);
-                        if (newValue === 1) navigate(`/projects/${projectId}`);
-                        if (newValue === 2) navigate(`/projects/${projectId}/resignations`);
+                        if (newValue === 0) navigate(`/projects/${projectId}/issues`);
+                        if (newValue === 1) navigate(`/projects/${projectId}/Git`);
+                        if (newValue === 2) navigate(`/projects/${projectId}/posts`);
                         if (newValue === 3) navigate(`/projects/${projectId}/settings`);
                     }}
                 >

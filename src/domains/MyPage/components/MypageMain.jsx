@@ -127,7 +127,7 @@ const MypageMain = () => {
                             <Grid item xs={4} key={project.id || index}>
                                 <Box sx={{ border: "1px solid #ddd", padding: 3, borderRadius: 2, height: "140px", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left", mb: 2 }}>
                                     <Typography variant="subtitle1" fontWeight="bold" sx={{ ml: 1, mt: 3 }}>
-                                        {project.name}
+                                        "{project.name}"
                                     </Typography>
                                     
                                     <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 1, flexWrap: "wrap", mt: "auto", pb: 1, ml: 1 }}>

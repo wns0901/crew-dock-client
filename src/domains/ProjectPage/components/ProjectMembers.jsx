@@ -15,6 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
+import { Link } from "react-router-dom";
 
 const ProjectMembers = () => {
   const { projectId } = useParams();
@@ -108,7 +109,7 @@ const ProjectMembers = () => {
           <TableHead>
             <TableRow>
               <TableCell>권한</TableCell>
-              <TableCell>이름</TableCell>
+              <TableCell>닉네임</TableCell>
               <TableCell>연락처</TableCell>
               <TableCell>포지션</TableCell>
               <TableCell></TableCell>
@@ -121,7 +122,14 @@ const ProjectMembers = () => {
                 .map((member) => (
                   <TableRow key={member.id}>
                     <TableCell>{member.authority}</TableCell>
-                    <TableCell>{member.user.name}</TableCell>
+                    <TableCell>
+                    <Link
+    to={`/mypage/${member.id}`}
+    style={{ textDecoration: "none", color: "inherit", fontWeight: "bold" }}
+  >
+                      {member.user.nickname}
+                      </Link>
+                      </TableCell>
                     <TableCell>{member.user.phoneNumber}</TableCell>
                     <TableCell>{member.position}</TableCell>
                     <TableCell>

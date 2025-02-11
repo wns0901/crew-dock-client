@@ -1,12 +1,15 @@
 import React, { useContext, useState, useEffect } from "react";
 import { 
     Box, Button, TextField, Typography, MenuItem, Select, 
-    InputLabel, FormControl, Autocomplete, Chip 
+    InputLabel, FormControl, Autocomplete, Chip, Input 
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
+
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const ProjectSettings = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
@@ -27,7 +30,8 @@ const ProjectSettings = () => {
     });
     const [captain, setCaptain] = useState(null);
     const [availableStacks, setAvailableStacks] = useState([]); // 서버에서 가져올 기술 스택 리스트
-
+    const [file, setFile] = useState(null); // 파일 상태 추가
+    const [previewUrl, setPreviewUrl] = useState(""); // 이미지 미리보기 URL
     // 현재 로그인한 사용자가 CAPTAIN인지 확인
     const isCaptain = projectRoles.some(
         (role) => Number(role.projectId) === Number(projectId) && role.role.isCaptain
@@ -47,6 +51,9 @@ const ProjectSettings = () => {
                     stacks: formattedStacks, 
                     status: projectData.status || ""
                 });
+                if (projectData.imgUrl) {
+                    setPreviewUrl(projectData.imgUrl);
+                }
             })
             .catch((error) => {
                 console.error("프로젝트 정보 조회 실패:", error);
@@ -96,28 +103,57 @@ const ProjectSettings = () => {
             stacks: newValue.map(stack => stack.id) // id 값만 저장
         });
     };
-    
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const projectWithId = {
-            ...updatedProject,
-            id: projectId,
-            stackIds: updatedProject.stacks
-        };
-    
-        axios.patch(`${BASE_URL}/projects`, projectWithId)
-            .then(() => {
-                alert("프로젝트 정보가 수정되었습니다.");
-                navigate(`/projects/${projectId}`);
-            })
-            .catch((error) => {
-                console.error("프로젝트 정보 수정 실패:", error);
-            });
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile); // 이미지 파일 상태 업데이트
+
+        if (selectedFile){
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                setPreviewUrl(fileReader.result);
+            };
+            fileReader.readAsDataURL(selectedFile);
+        }
     };
 
-    if (!project || !availableStacks.length) {
-        return null;
-    }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    
+        const formData = new FormData();
+
+        const data ={
+            id: projectId,
+            name: updatedProject.name,
+            period: updatedProject.period,
+            startDate: updatedProject.startDate,
+            status: updatedProject.status,
+            githubUrl1: updatedProject.githubUrl1,
+            githubUrl2: updatedProject.githubUrl2,
+            designUrl: updatedProject.designUrl,
+            introduction: updatedProject.introduction,
+            stackIds: [updatedProject.stacks],
+        };
+
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
+
+        if (file) {
+            formData.append("file", file);
+        }
+    
+        // Content-Type은 자동으로 'multipart/form-data'로 설정됨
+     axios.patch(`${BASE_URL}/projects`, formData)
+    .then(() => {
+        alert("프로젝트 정보가 수정되었습니다.");
+        navigate(`/projects/${projectId}`);
+    })
+    .catch((error) => {
+        console.error("프로젝트 정보 수정 실패:", error);
+    });
+    };
+    
 
     const statusMap = {
         BOARDING: "승선중",
@@ -134,15 +170,57 @@ const ProjectSettings = () => {
 
             <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "600px" }}>
 
-                <TextField
-                    label="이미지 URL"
-                    name="imgUrl"
-                    value={updatedProject.imgUrl}
-                    onChange={handleUpdate}
-                    fullWidth
-                    sx={{ marginBottom: 2 }}
-                    InputProps={{ readOnly: !isCaptain }} 
-                />
+            <Box 
+    sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        gap: 2, // 간격 조정
+        marginBottom: 2 
+    }}
+>
+    {/* 원형 이미지 미리보기 */}
+    <Box 
+        sx={{ 
+            width: 120, 
+            height: 120, 
+            borderRadius: "50%", 
+            overflow: "hidden", 
+            border: "2px solid #ddd",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+        }}
+    >
+      {previewUrl || setPreviewUrl ? (
+        <img 
+            src={previewUrl || setPreviewUrl} 
+            alt="미리보기" 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+        />
+    ) : (
+        <Typography variant="body2">이미지 없음</Typography>
+    )}
+    </Box>
+
+   
+</Box>
+<Box 
+    sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        gap: 2, // 간격 조정
+        marginBottom: 2 
+    }}
+>
+<Input
+        type="file"
+        onChange={handleFileChange}
+        disabled={!isCaptain}
+    />
+
+</Box>
 
                 <TextField
                     label="프로젝트 이름"
@@ -246,28 +324,28 @@ const ProjectSettings = () => {
 
                 {/* 기술 스택 선택 */}
                 <Autocomplete
-    multiple
-    options={availableStacks}
-    value={updatedProject.stacks.map(stackId => 
-        availableStacks.find(stack => stack.id === stackId)
-    )}
-    onChange={handleStackChange}
-    getOptionLabel={(option) => option.name} // name만 표시
-    renderTags={(value, getTagProps) =>
-        value.map((option, index) => (
-            <Chip 
-                label={option.name} // name 표시
-                {...getTagProps({ index })} 
-                key={option.id}  // id 사용
-            />
-        ))
-    }
-    renderInput={(params) => (
-        <TextField {...params} label="기술 스택" placeholder="스택 추가" />
-    )}
-    disabled={!isCaptain}
-    sx={{ marginBottom: 2 }}
-/>
+                    multiple
+                    options={availableStacks}
+                    value={updatedProject.stacks.map(stackId => 
+                        availableStacks.find(stack => stack.id === stackId)
+                    )}
+                    onChange={handleStackChange}
+                    getOptionLabel={(option) => option.name} // name만 표시
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            <Chip 
+                                label={option.name} // name 표시
+                                {...getTagProps({ index })} 
+                                key={option.id}  // id 사용
+                            />
+                        ))
+                    }
+                    renderInput={(params) => (
+                        <TextField {...params} label="기술 스택" placeholder="스택 추가" />
+                    )}
+                    disabled={!isCaptain}
+                    sx={{ marginBottom: 2 }}
+                />
 
                 {isCaptain && (
                     <Button 

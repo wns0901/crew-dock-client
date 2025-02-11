@@ -7,6 +7,8 @@ const SettingsSidebar = () => {
     const { projectId } = useParams();
     const [navValue, setNavValue] = React.useState(0);
 
+    
+
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#f4f4f4", padding: 2 }}>
             {/* 🔹 상단 프로젝트로 돌아가기 버튼 */}
@@ -35,12 +37,12 @@ const SettingsSidebar = () => {
                 value={navValue}
                 onChange={(event, newValue) => {
                     setNavValue(newValue);
-                    if (newValue === 0) navigate(`/projects/${projectId}/settings/access`);
+                    if (newValue === 0) navigate(`/projects/${projectId}/settings`);
                     if (newValue === 1) navigate(`/projects/${projectId}/manage`);
                     if (newValue === 2) navigate(`/projects/${projectId}/pending`);
                 }}
             >
-                <BottomNavigationAction label="엑신청 명단세스" />
+                <BottomNavigationAction label="세부 사항" />
                 <BottomNavigationAction label="엑세스" />
                 <BottomNavigationAction label="신청 관리" />
             </BottomNavigation>

@@ -87,7 +87,7 @@ const Resignations = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5">탈퇴 신청 리스트</Typography>
+      <Typography variant="h5">탈퇴 요청</Typography>
      
       <TableContainer component={Paper}>
         <Table>

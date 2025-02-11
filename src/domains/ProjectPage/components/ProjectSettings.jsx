@@ -6,7 +6,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const ProjectSettings = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
@@ -35,7 +35,7 @@ const ProjectSettings = () => {
 
     useEffect(() => {
         // 프로젝트 정보 가져오기
-        axios.get(`http://localhost:8080/projects/${projectId}`)
+        axios.get(`${BASE_URL}/projects/${projectId}`)
             .then((response) => {
                 const projectData = response.data;
                 
@@ -53,7 +53,7 @@ const ProjectSettings = () => {
             });
 
         // 프로젝트 멤버 조회
-        axios.get(`http://localhost:8080/projects/${projectId}/members`)
+        axios.get(`${BASE_URL}/projects/${projectId}/members`)
             .then((response) => {
                 const members = response.data;
                 const captainMember = members.find(member => member.authority === "CAPTAIN");
@@ -68,7 +68,7 @@ const ProjectSettings = () => {
             });
 
         // 사용 가능한 스택 리스트 가져오기
-        axios.get("http://localhost:8080/stacks")
+        axios.get(`${BASE_URL}/stacks`)
             .then((response) => {
                 const stacks = response.data.map((stack) => ({
                     id: stack.id,
@@ -105,7 +105,7 @@ const ProjectSettings = () => {
             stackIds: updatedProject.stacks
         };
     
-        axios.patch(`http://localhost:8080/projects`, projectWithId)
+        axios.patch(`${BASE_URL}/projects`, projectWithId)
             .then(() => {
                 alert("프로젝트 정보가 수정되었습니다.");
                 navigate(`/projects/${projectId}`);

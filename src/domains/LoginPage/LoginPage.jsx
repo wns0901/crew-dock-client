@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, TextField, Button, Typography } from "@mui/material";
 import { LoginContext } from "../../contexts/LoginContextProvider";
 import { GoogleLoginButton } from "react-social-login-buttons";
@@ -7,6 +8,8 @@ import DividerWithText from "./components/DividerWithText";
 
 const LoginPage = () => {
   const { login } = useContext(LoginContext);
+
+  const navigate = useNavigate();
 
   const [logintForm, setLoginForm] = useState({
     username: "",
@@ -39,13 +42,13 @@ const LoginPage = () => {
   };
 
   const onGithubLogin = (e) => {
-    console.log("github login");
-
-    window.location.href = `${
-      import.meta.env.VITE_BASE_URL
-    }/import DividerWithText from './components/DividerWithText';
-oauth2/authorization/github`;
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/oauth2/authorization/github`;
   };
+
+  const onRegister = (e) => {
+    navigate("/register");
+  };
+
   return (
     <>
       <Container maxWidth="sm" sx={containerStyle}>
@@ -89,7 +92,7 @@ oauth2/authorization/github`;
             Login
           </Button>
           <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <span>회원가입</span> | <span>비밀번호 찾기</span> <br />
+            <span onClick={onRegister} style={{ cursor: 'pointer' }}>회원가입</span> | <span style={{ cursor: 'pointer' }}>비밀번호 찾기</span> <br />
             <DividerWithText content={"소셜 로그인"} />
           </div>
           <GoogleLoginButton onClick={onGoogleLogin} />

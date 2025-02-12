@@ -25,6 +25,7 @@ import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Provider store={myStore}>

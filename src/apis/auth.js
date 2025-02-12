@@ -16,3 +16,5 @@ export const verifyNickname = (nickname) => api.get(`user/check/nickname?nicknam
 export const verifyUsername = (email) => api.get(`user/check/email?email=${email}`);
 
 export const verifyEmailCode = (code, email) => api.get(`user/check/authNum?email=${email}&authNum=${code}`);
+
+export const socialRegister = (data) => api.post('user/register/social', data);

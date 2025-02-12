@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Container, TextField, Button, Typography } from '@mui/material';
 import { LoginContext } from '../../contexts/LoginContextProvider';
+import GoogleLoginBtn from './components/GoogleLoginBtn';
 
 const LoginPage = () => {
 
@@ -60,6 +61,7 @@ const LoginPage = () => {
           >
             Login
           </Button>
+          <GoogleLoginBtn />
         </form>
       </Container>
     </>

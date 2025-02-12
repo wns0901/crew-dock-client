@@ -18,12 +18,10 @@ const SampleIndex = () => {
   const dispath = useDispatch();
 
   const makeChatRoomEvent = () => {
+    console.log(1);
+    
     dispath(makeChatRoom({ senderId: userInfo.id, receiverId: inviteId }));
   };
-
-  useEffect(() => {
-    loginCheck();
-  }, []);
 
   const changeEvent = (e) => {    
     setText(e);

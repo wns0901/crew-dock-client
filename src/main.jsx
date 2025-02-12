@@ -1,8 +1,11 @@
+import { Provider } from "react-redux";
+import { myStore } from "./containers/store";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ChatComponent from "./components/ChatComponent";
 import LoginPage from "./domains/LoginPage/LoginPage";
+import ChatComponent from "./components/chat/ChatComponent";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginContextProvider from "./contexts/LoginContextProvider";
+import SampleIndex from "./SampleIndex";
 import GitData from "./domains/ProjectPage/components/gitData";
 import ProjectMembers from "./domains/ProjectPage/components/ProjectMembers";
 import Resignations from "./domains/ProjectPage/components/Resignations";
@@ -22,32 +25,36 @@ import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <LoginContextProvider>
-      <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<ChatComponent />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/projects/:projectId" element={<ProjectMain />}>
-          <Route index element={<GitData />} />
-          <Route path="Git" element={<GitData />} />
-          <Route path="members" element={<ProjectMembers />} />
-          <Route path="resignations" element={<Resignations />} />
-          <Route path="settings" element={<ProjectSettings />} />
-          <Route path="manage" element={<ProjectManagement />} />
-          <Route path="pending" element={<PendingMembers />} />
-        
-        </Route>
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="admin/user" element={<AdminUser />} />
-        <Route path="admin/project" element={<AdminProject />} />
-        <Route path="admin/stack" element={<AdminStack />} />
-        <Route path="admin/recruitment" element={<AdminRecruitmentPost />} />
-        <Route path="admin/posts" element={<AdminPosts />} />
-        <Route path="admin/banners" element={<AdminBanner />} />
-        <Route path="admin/stackusage" element={<AdminStackUsage />} />
-        <Route path="admin/hopeposition" element={<AdminHopePositionUsage />} />
-        </Route>
-      </Routes>
-    </LoginContextProvider>
+    <Provider store={myStore}>
+      <LoginContextProvider>
+        <ChatComponent />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<SampleIndex />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/projects/:projectId" element={<ProjectMain />}>
+              <Route index element={<GitData />} />
+              <Route path="Git" element={<GitData />} />
+              <Route path="members" element={<ProjectMembers />} />
+              <Route path="resignations" element={<Resignations />} />
+              <Route path="settings" element={<ProjectSettings />} />
+              <Route path="manage" element={<ProjectManagement />} />
+              <Route path="pending" element={<PendingMembers />} />
+            </Route>
+
+            <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/user" element={<AdminUser />} />
+            <Route path="admin/project" element={<AdminProject />} />
+            <Route path="admin/stack" element={<AdminStack />} />
+            <Route path="admin/recruitment" element={<AdminRecruitmentPost />} />
+            <Route path="admin/posts" element={<AdminPosts />} />
+            <Route path="admin/banners" element={<AdminBanner />} />
+            <Route path="admin/stackusage" element={<AdminStackUsage />} />
+            <Route path="admin/hopeposition" element={<AdminHopePositionUsage />} />
+          </Route>
+
+        </Routes>
+      </LoginContextProvider>
+    </Provider>
   </BrowserRouter>
 );

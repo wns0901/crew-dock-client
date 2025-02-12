@@ -6,7 +6,7 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import AnchorIcon from "@mui/icons-material/Anchor"
 
-const API_BASE_URL = "http://localhost:8080/projects";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const ProjectInfo = () => {
     const { projectId } = useParams();
@@ -19,7 +19,7 @@ const ProjectInfo = () => {
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/${projectId}`);
+                const response = await fetch(`${BASE_URL}/projects/${projectId}`);
                 if (!response.ok) throw new Error("프로젝트 정보를 가져오는데 실패했습니다.");
                 const data = await response.json();
                 setProject(data);

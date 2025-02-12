@@ -14,7 +14,7 @@ import {
   Modal,
   Paper,
 } from "@mui/material";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const Resignations = () => {
   const [resignations, setResignations] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -31,7 +31,7 @@ const Resignations = () => {
     try {
       console.log("Fetching resignations for projectId:", projectId);
       const response = await axios.get(
-        `http://localhost:8080/projects/${projectId}/resignations`
+        `${BASE_URL}/projects/${projectId}/resignations`
       );
       setResignations(response.data.filter((resignation) => resignation.member.status === "APPROVE"));
     } catch (error) {
@@ -43,7 +43,7 @@ const Resignations = () => {
     try {
       console.log("Fetching resignation details:", resignationId);
       const response = await axios.get(
-        `http://localhost:8080/projects/${projectId}/resignations/${resignationId}`
+        `${BASE_URL}/projects/${projectId}/resignations/${resignationId}`
       );
       setSelectedResignation(response.data);
       setOpenModal(true);
@@ -55,7 +55,7 @@ const Resignations = () => {
   const handleAcceptResignation = async (resignationId, userId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/projects/${projectId}/members/${userId}`
+        `${BASE_URL}/projects/${projectId}/members/${userId}`
       );
       alert("탈퇴 처리 완료.");
       handleCloseModal();
@@ -69,7 +69,7 @@ const Resignations = () => {
   const handleRejectResignation = async (resignationId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/projects/${projectId}/resignations/${resignationId}`
+        `${BASE_URL}/projects/${projectId}/resignations/${resignationId}`
       );
       alert("탈퇴 신청 거절 완료");
       handleCloseModal();

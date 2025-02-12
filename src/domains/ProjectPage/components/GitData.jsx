@@ -3,7 +3,7 @@ import { Box, Typography, Card, CardContent, Divider, Select, MenuItem, FormCont
 import { useParams } from "react-router-dom";
 import FlagIcon from "@mui/icons-material/Flag";
 
-const API_BASE_URL = "http://localhost:8080/projects";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const GitData = () => {
   const { projectId } = useParams();
@@ -15,7 +15,7 @@ const GitData = () => {
   useEffect(() => {
     const fetchProjectInfo = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/${projectId}`);
+        const response = await fetch(`${BASE_URL}/projects/${projectId}`);
         if (!response.ok) throw new Error("프로젝트 정보를 가져오는데 실패했습니다.");
         const data = await response.json();
 
@@ -36,7 +36,7 @@ const GitData = () => {
 
     const fetchGitData = async () => {
       try {
-        const url = `${API_BASE_URL}/${projectId}/githubs?gitURL=${gitUrls.join("&gitURL=")}`;
+        const url = `${BASE_URL}/projects/${projectId}/githubs?gitURL=${gitUrls.join("&gitURL=")}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error("깃허브 데이터를 가져오는데 실패했습니다.");
         const data = await response.json();

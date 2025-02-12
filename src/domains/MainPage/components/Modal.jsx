@@ -1,7 +1,6 @@
 import React from 'react';
 
-const sample = () => {
-
+const Modal = () => {
     return (
         <div>
             
@@ -9,4 +8,4 @@ const sample = () => {
     );
 };
 
-export default sample;
+export default Modal;

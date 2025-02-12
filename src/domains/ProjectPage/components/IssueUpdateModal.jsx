@@ -5,7 +5,7 @@ import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../apis/baseApi";
 
-const IssueUpdateModal = ({selectIssue, onClose, projectId}) => {
+const IssueUpdateModal = ({selectIssue, onClose, projectId, onUpdateIssue}) => {
   const { userInfo, projectRoles} = useContext(LoginContext);
   const navigate = useNavigate();
   const [managers, setManagers] = useState([]);
@@ -142,7 +142,8 @@ const reversePriorityMap = {
       .then((response) => {
         if (response.status === 200) {
           alert("수정되었습니다.");
-          setIssue(updatedIssue);
+          // setIssue(updatedIssue);
+          onUpdateIssue(updatedIssue);
           onClose();
         } else {
           alert("수정 실패했습니다.");
@@ -155,7 +156,7 @@ const reversePriorityMap = {
   };
 
   return (
-      <Box value={issueId}>
+      <Box value={issueId} sx={{backgroundColor: 'transparent'}}>
         <h3>이슈 수정</h3>
         <form onSubmit={submitIssue}>
           <TextField

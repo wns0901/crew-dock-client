@@ -118,6 +118,7 @@ const handleOpenUpdateModal = (issue) => {
 
 // 작성 모달 열기
   const handleOpenWriteModal = () => {
+    console.log("작업 추가 버튼 클릭됨");
     setOpenWriteModal(true);
   };
 
@@ -149,13 +150,13 @@ const allCheckedHandler = (e) => {
   }
 };
 
-  useEffect(() => {
-    if (checkItems.length === issues.length) {
-      setAllChecked(true);
-    } else {
-      setAllChecked(false);
-    }
-  }, [checkItems, issues.length]);
+useEffect(() => {
+  if (issues.length === 0) {
+    setAllChecked(false);
+  } else {
+    setAllChecked(checkItems.length === issues.length);
+  }
+}, [checkItems, issues.length]);
 
   // 삭제 핸들러
   const handleDelete = () => {
@@ -191,10 +192,14 @@ const allCheckedHandler = (e) => {
         api.delete(`/projects/${projectId}/issues/${issueId}`)
           .then(() => {
             alert("삭제되었습니다.");
+            setIssues(prevIssues => prevIssues.filter(issue => !checkItems.includes(issue.issueId)));
             setCheckItems([]);
           })
-          .catch((error) => console.error("이슈 삭제 실패:", error));
-          alert("이슈 삭제에 실패했습니다.")
+          .catch((error) => {
+            console.error("이슈 삭제 실패:", error)
+            alert("이슈 삭제에 실패했습니다.")
+          });
+          
       }
     }
   };
@@ -210,6 +215,17 @@ const allCheckedHandler = (e) => {
       LOW: "낮음"
   };
   
+  // 이슈 추가 후 상태 업데이트 함수
+  const handleAddIssue = (newIssue) => {
+    setIssues(prevIssues => [newIssue, ...prevIssues]); // 새 이슈를 맨 앞에 추가
+  };
+
+  // 이슈 수정 후 상태 업데이트 함수
+  const handleUpdateIssue = (update) => {
+    setIssues(prevIssues => prevIssues.map(issue =>
+      issue.issueId === update.issueId ? update : issue
+    ));
+  }
 
   return (
     <div>
@@ -264,21 +280,21 @@ const allCheckedHandler = (e) => {
             ))}
           </TableBody>
         </Table>
-        <Button variant="contained" open={open} onClick={handleOpenWriteModal} sx={{ margin: "10px" }}>
+        <Button variant="contained" onClick={handleOpenWriteModal} sx={{ margin: "10px" }}>
           + 작업 추가
         </Button>
       </TableContainer>
 
       <Modal open={openWriteModal} onClose={handleCloseWriteModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
-          <IssueAddModal projectId={projectId} onClose={handleCloseWriteModal} />
+          <IssueAddModal projectId={projectId} onClose={handleCloseWriteModal} onAddIssue={handleAddIssue} />
         </Box>
       </Modal>
 
       <Modal open={openUpdateModal} onClose={handleCloseUpdateModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
           {selectedIssue && (
-            <IssueUpdateModal projectId={projectId} selectIssue={selectedIssue} onClose={handleCloseUpdateModal} />
+            <IssueUpdateModal projectId={projectId} onUpdateIssue={handleUpdateIssue} selectIssue={selectedIssue} onClose={handleCloseUpdateModal} />
           )}
         </Box>
       </Modal>

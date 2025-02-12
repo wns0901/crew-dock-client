@@ -7,7 +7,7 @@ import { Add, Cancel, Close } from "@mui/icons-material";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 
-const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, events, setEvents, todays, setTodays }) => {
+const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, events, setEvents, todays, setTodays, onAddSchedule }) => {
   const [formData, setFormData] = useState({
     content: "",
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
@@ -36,8 +36,8 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
           content: formData.content,
           startDate: formData.startDate.format("YYYY-MM-DD"),
           endDate: formData.endDate.format("YYYY-MM-DD"),
-          startTime: formData.startTime.format("HH:mm"),
-          endTime: formData.endTime.format("HH:mm"),
+          startTime: formData.startTime.format("HH:mm:ss"),
+          endTime: formData.endTime.format("HH:mm:ss"),
           project: formData.project, // 프로젝트 ID가 있을 경우 포함
         }
 
@@ -49,10 +49,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
         start: response.data.startDate,
         end: response.data.endDate,
       }
-      console.log("응답데이터", response.data);
-      setEvents([... events, eventData])
-      console.log("eventData", eventData);
-      
+
       // 오늘 일정 필터링
       const today = new Date();
       if (Array.isArray(response.data)) {
@@ -77,7 +74,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
       }
 
       onClose(); // 모달 닫기
-
+      onAddSchedule(response.data);
       alert("일정이 추가되었습니다.");
 
     } catch (error) {
@@ -116,7 +113,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
       }}
     >
       <IconButton
-        onClick={onClose}
+        onClick={handleCancelClick}
         sx={{
           position: "absolute",
           top: 10,
@@ -135,7 +132,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
 
       <DialogContent>
         <Box className="space-y-4">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleAddClick}>
             <TextField
               label="일정"
               fullWidth

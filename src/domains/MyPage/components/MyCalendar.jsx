@@ -126,7 +126,7 @@ const MyCalendar = ({}) => {
     console.log("Modal Open:", isUpdateModalOpen);
   }
 
-  // 수정 데이터 전달
+  // 일정 수정 후 상태 업데이트
   const handleUpdateEventData = (updateEvent) => {
     setEvents((events) => 
       events.map((event) => (event.id === updateEvent.id ? updateEvent : event))
@@ -137,6 +137,12 @@ const MyCalendar = ({}) => {
   const handleDeleteEvent = (calendarId) => {
     setEvents((prevEvents) => prevEvents.filter((event) => event.id !== calendarId));
   };
+
+  // 일정 추가 후 상태 업데이트 
+  const onAddSchedule = (data) => {
+    setEvents(prev => [data, ...prev]);
+  }
+
 
 
   const formatTime = (time) => {
@@ -275,6 +281,7 @@ const MyCalendar = ({}) => {
           setEvents={setEvents}
           todays={todays}
           setTodays={setTodayEvents}
+          onAddSchedule={onAddSchedule}
         />
       )}
 

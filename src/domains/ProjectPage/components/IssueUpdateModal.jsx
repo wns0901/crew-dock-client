@@ -3,16 +3,17 @@ import React, { useState, useEffect, useContext } from "react";
 import { Button, TextField, MenuItem, Select, FormControl, InputLabel, Container, Box } from "@mui/material";
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { useNavigate, useParams } from "react-router-dom";
-// import api from "../../../baseApi.js";
+import api from "../../../apis/baseApi";
 
-const IssueUpdateModal = () => {
-  const projectId = 1;  // 하드코딩된 프로젝트 ID
+const IssueUpdateModal = ({selectIssue, onClose, projectId}) => {
   const { userInfo, projectRoles} = useContext(LoginContext);
-  const { issueId } = useParams(); // URL에서 동적으로 issueId를 가져옵니다.
   const navigate = useNavigate();
+  const [managers, setManagers] = useState([]);
+  const { issueId } = selectIssue;
+
+  console.log("전달받은 issue: ", selectIssue);
 
   const [issue, setIssue] = useState({
-    projectId: "",
     issueId: "",
     issueName: "",
     managerId: "",
@@ -21,89 +22,106 @@ const IssueUpdateModal = () => {
     writerName: "",
     status: "",
     priority: "",
-    startDate: "",
-    endDate: "",
+    startline: "",
+    deadline: "",
   });
 
-  const [managers, setManagers] = useState([]);
+  useEffect(() => {
+    if (selectIssue) {
+      setIssue({
+        ...selectIssue
+      }
+    );
+  }
+  }, [selectIssue]);
 
   // 프로젝트 멤버 목록 가져오기
   useEffect(() => {
-    console.log("issueId:", issueId); // issueId 값 확인
+    if (!projectId) return;
+    console.log("projectId: ", projectId); 
+    console.log("issueId:", issueId);
 
     if (!issueId) {
       console.error("이슈 ID가 유효하지 않습니다.");
-      return; // issueId가 유효하지 않으면 API 호출을 중지합니다.
+      return;
     }
 
     // 프로젝트 멤버 가져오기
-    axios
+    api
     .get(`/projects/${projectId}/members`)
       .then((response) => {
-        setManagers(Array.isArray(response.data) ? response.data : []);
-        console.log("프로젝트 멤버 목록", setManagers);
-        console.log("유저 정보", userInfo);
-        console.log("프로젝트 ID:", projectId);
-        console.log("프로젝트 권한: ", projectRoles);
+        const filteredManagers = response.data.filter(
+          (member) => member.authority === "CREW" || member.authority === "CAPTAIN"
+        );
+        console.log(filteredManagers);
+        
+        setManagers(filteredManagers);
+        console.log("프로젝트 멤버 목록:", managers);
+        
       })
       .catch((error) => console.error("프로젝트 멤버 불러오기 실패:", error));
 
-    // 이슈 정보 가져오기
-    axios
-      .get(`/projects/${projectId}/issues/${issueId}`)
-      .then((response) => {
-        const { data, status } = response;
-        if (status === 200) {
-          setIssue(data);
-        } else {
-          alert('이슈 정보 가져오기 실패');
-        }
-      })
-      .catch((error) => console.error("이슈 정보 가져오기 실패:", error));
+    // 해당 이슈 정보 가져오기
+    if (issueId) {
+      api
+        .get(`/projects/${projectId}/issues/${issueId}`)
+        .then((response) => {
+          const { data, status } = response;
+          if (status === 200) {
+            setIssue(data);
+          } else {
+            alert('이슈 정보 가져오기 실패');
+          }
+        })
+        .catch((error) => console.error("이슈 정보 가져오기 실패:", error));
+      }
   }, [projectId, issueId]);
 
-  const priorityMap = {
-    HIGH: "높음",
-    MIDDLE: "중간",
-    LOW: "낮음",
-  };
+ // 상태 및 우선순위 맵핑
+ const statusMap = {
+  INPROGRESS: "진행중",
+  COMPLETE: "완료",
+  YET: "시작안함",
+};
 
-  const reversePriorityMap = {
-    "높음": "HIGH",
-    "중간": "MIDDLE",
-    "낮음": "LOW",
-  };
+const reverseStatusMap = {
+  "진행중": "INPROGRESS",
+  "완료": "COMPLETE",
+  "시작안함": "YET",
+};
 
-  const statusMap = {
-    INPROGRESS: "진행중",
-    COMPLETE: "완료",
-    YET: "시작안함",
-  };
+const priorityMap = {
+  HIGH: "높음",
+  MIDDLE: "중간",
+  LOW: "낮음",
+};
 
-  const reverseStatusMap = {
-    "진행중": "INPROGRESS",
-    "완료": "COMPLETE",
-    "시작안함": "YET",
-  };
+const reversePriorityMap = {
+  "높음": "HIGH",
+  "중간": "MIDDLE",
+  "낮음": "LOW",
+};
 
   const changeValue = (e) => {
     setIssue({ ...issue, [e.target.name]: e.target.value });
   };
 
   const handleManagerChange = (e) => {
-    const selectedManager = managers.find(m => m.managerId === e.target.value);
-    setIssue({
-      ...issue,
-      managerId: selectedManager.managerId, 
-      managerName: selectedManager.nickname
-    });
+    const selectedManager = managers.find(m => m.id === e.target.value);
+    if (selectedManager) {
+      setIssue({
+        ...issue,
+        managerId: selectedManager.id, 
+        managerName: selectedManager.user.nickname || "", // 담당자 이름 설정
+      });
+    }
   };
 
   const submitIssue = (e) => {
     e.preventDefault();
 
     const updatedIssue = {
-      issueId: issueId, // issueId를 body에 포함
+      issueId: issueId,
       issueName: issue.issueName,
       managerId: issue.managerId,
       managerName: issue.managerName,
@@ -111,32 +129,34 @@ const IssueUpdateModal = () => {
       writerName: issue.writerName,
       status: reverseStatusMap[issue.status] || issue.status,
       priority: reversePriorityMap[issue.priority] || issue.priority,
-      startDate: issue.startDate,
-      endDate: issue.endDate,
+      startline: issue.startline,
+      deadline: issue.deadline,
     };
 
-    axios
-      .patch(`/projects/${projectId}/issues`, updatedIssue, {
+    console.log("업데이트된 이슈: ", updatedIssue);
+    
+    api
+      .patch(`/projects/${projectId}/issues/${issueId}`, updatedIssue, {
         headers: { "Content-Type": "application/json;charset=utf-8" },
       })
       .then((response) => {
         if (response.status === 200) {
-          alert("이슈 수정 성공");
-          navigate(`/projects/${projectId}/issues/${issueId}`);
+          alert("수정되었습니다.");
+          setIssue(updatedIssue);
+          onClose();
         } else {
-          alert("이슈 수정 실패");
+          alert("수정 실패했습니다.");
         }
       })
       .catch((error) => {
         console.error("이슈 수정 실패:", error);
-        alert("이슈 수정 실패");
+        alert("수정 실패했습니다.");
       });
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }} value={issue.issueId}>
-      <Box sx={{ boxShadow: 3, borderRadius: 2, p: 4 }}>
-        <h4>이슈 수정</h4>
+      <Box value={issueId}>
+        <h3>이슈 수정</h3>
         <form onSubmit={submitIssue}>
           <TextField
             label="작업명"
@@ -153,16 +173,16 @@ const IssueUpdateModal = () => {
             <InputLabel>담당자</InputLabel>
             <Select
               label="담당자"
-              name="managerName"
+              name="managerId"
               value={issue.managerId || ""}
               onChange={handleManagerChange}
             >
               <MenuItem value="">
-                <em>{issue.managerName || "담당자 선택"}</em>
+                <em>{issue.managerName || ""}</em>
               </MenuItem>
               {managers.map((m) => (
-                <MenuItem key={m.managerId} value={m.managerId}>
-                  {m.nickname}
+                <MenuItem key={m.id} value={m.id}>
+                  {m.user.nickname}
                 </MenuItem>
               ))}
             </Select>
@@ -173,8 +193,16 @@ const IssueUpdateModal = () => {
             <Select
               label="상태"
               name="status"
-              value={issue.status}
-              onChange={changeValue}
+              value={statusMap[issue.status] || ""}
+              onChange={(e) => {
+                const selectedStatus = e.target.value;
+                changeValue({
+                  target: {
+                    name: "status",
+                    value: reverseStatusMap[selectedStatus] || selectedStatus,
+                  },
+                });
+              }}
             >
               {Object.values(statusMap).map((status) => (
                 <MenuItem key={status} value={status}>
@@ -189,8 +217,16 @@ const IssueUpdateModal = () => {
             <Select
               label="우선순위"
               name="priority"
-              value={issue.priority}
-              onChange={changeValue}
+              value={priorityMap[issue.priority] || ""}
+              onChange={(e) => {
+                const selectedPriority = e.target.value;
+                changeValue({
+                  target: {
+                    name: "priority",
+                    value: reversePriorityMap[selectedPriority] || selectedPriority, // reverseMap을 사용해 원래 값으로 변환
+                  },
+                });
+              }}
             >
               {Object.values(priorityMap).map((priority) => (
                 <MenuItem key={priority} value={priority}>
@@ -206,8 +242,8 @@ const IssueUpdateModal = () => {
             variant="outlined"
             margin="normal"
             type="date"
-            name="startDate"
-            value={issue.startDate}
+            name="startline"
+            value={issue.startline}
             onChange={changeValue}
             required
             InputLabelProps={{ shrink: true }}
@@ -219,15 +255,15 @@ const IssueUpdateModal = () => {
             variant="outlined"
             margin="normal"
             type="date"
-            name="endDate"
-            value={issue.endDate}
+            name="deadline"
+            value={issue.deadline}
             onChange={changeValue}
             required
             InputLabelProps={{ shrink: true }}
           />
 
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-            <Button variant="outlined" color="secondary">
+            <Button variant="outlined" color="secondary" onClick={onClose}>
               취소
             </Button>
             <Button variant="contained" color="primary" type="submit">
@@ -236,7 +272,6 @@ const IssueUpdateModal = () => {
           </Box>
         </form>
       </Box>
-    </Container>
   );
 };
 

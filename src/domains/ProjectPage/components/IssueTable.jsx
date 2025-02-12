@@ -2,22 +2,23 @@ import React, { useState, useEffect, useContext, useNavigate } from "react";
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { Table, TableHead, TableRow, TableCell, TableBody, Button, Modal, Box, TableContainer, Checkbox, Chip, IconButton } from "@mui/material";
 import { Delete } from '@mui/icons-material';
-import IssueWriteModal from "./IssueWriteModal";
+import IssueAddModal from "./IssueAddModal";
 import IssueUpdateModal from "./IssueUpdateModal";
 import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
+import qs from 'qs';
 
 const IssueTable = () => {
   const projectId = 1;
   // const projectId = useParams();
-  const [issues, setIssues] = useState([]); // 추가된 이슈
-  const [openUpdateModal, setopenUpdateModal] = useState(false);  
+  const [issues, setIssues] = useState([]); // 이슈 상태 관리 =
+  const [openUpdateModal, setopenUpdateModal] = useState(false);  // 수정 모달 상태
   const [selectedIssue, setSelectedIssue] = useState(null); // 선택된 이슈
-  const [openWriteModal, setOpenWriteModal] = useState(false); // 작성 모달
+  const [openWriteModal, setOpenWriteModal] = useState(false); // 작성 모달 상태
   const [checkItems, setCheckItems] = useState([]) // 이슈 체크 상태
   const [allChecked, setAllChecked] = useState(false); // 전체 선택 상태
-  const { userInfo } = useContext(LoginContext);
+  const { userInfo, isLogin } = useContext(LoginContext); // 로그인한 유저
   
 // 상태에 따른 색상
   const statusColors = {
@@ -49,7 +50,7 @@ useEffect(() => {
         managerId: issue.managerId,
         managerName: issue.managerName,
         projectId: issue.projectId,
-        issueId: issue.issueId,
+        issueId: issue.id,
         issueName: issue.issueName,
         priority: issue.priority,
         status: issue.status,
@@ -59,7 +60,6 @@ useEffect(() => {
       }));
       setIssues(issues);
 
-      setIssues(response.data); // 가져온 데이터를 상태에 설정
     } catch (error) {
       console.error("프로젝트 이슈를 가져오는데 실패했습니다.", error);
       // 사용자에게 친절한 메시지 제공
@@ -74,32 +74,46 @@ useEffect(() => {
   const currentDate = dayjs();
   const startDate = dayjs(startline);
   const endDate = dayjs(deadline);
+  const threeDaysBeforeEnd = endDate.subtract(3, 'day'); // 마감일 3일 전
+
+  // 상태가 완료되면
+  if(status === 'COMPLETE') {
+    return 'default';
+  }
+
   // 타임라인 마감일이 지났고, 상태가 완료가 아닌 경우 빨간색
   if (currentDate.isAfter(endDate) && status !== 'COMPLETE') {
     return 'error'; // 빨간색
   }
+
+  // 마감일이 오늘 날짜에서 3일 전이고, 상태가 완료가 아닌 경우 주황색
+  if (currentDate.isAfter(threeDaysBeforeEnd) && currentDate.isBefore(endDate) && status !== 'COMPLETE') {
+    return 'warning'; // 주황색
+  }
+
   // 타임라인 마감일이 지나지 않았고, 상태가 완료인 경우 초록색
   if (currentDate.isBefore(endDate) && status === 'COMPLETE') {
     return 'success'; // 초록색
   }
+  
   // 타임라인 시작일이 오늘 날짜 전일 경우 회색 (default)
   if (startDate.isBefore(currentDate)) {
     return 'default'; // 회색
   }
+  
   return 'default'; // 기본값은 회색
 };
 
 // 수정 모달 열기
 const handleOpenUpdateModal = (issue) => {
   setSelectedIssue(issue);
+  console.log("seletecIssue:", issue);
   setopenUpdateModal(true);
 };
 
 // 수정 모달 닫기
   const handleCloseUpdateModal = () => {
     setopenUpdateModal(false);
-    setSelectedIssue(null);
-    fetchIssueData();
   };
 
 // 작성 모달 열기
@@ -110,7 +124,6 @@ const handleOpenUpdateModal = (issue) => {
   // 작성 모달 닫기
   const handleCloseWriteModal = () => {
     setOpenWriteModal(false);
-    fetchIssueData();
   };
 
 
@@ -158,29 +171,43 @@ const allCheckedHandler = (e) => {
     if (checkItems.length > 1) {
       // 다중 삭제
       if (window.confirm(confirmMessage)) {
-        const deleteUrl = `http://localhost:8081/projects/${projectId}/issues`;
         
+        const issueIds = checkItems;
         // 쿼리 파라미터로 전달
-        const urlWithParams = `${deleteUrl}?issueIds=${checkItems.join("&issueIds=")}`;
-        axios.delete(urlWithParams)
+        api.delete(`/projects/${projectId}/issues`, {
+          params: { issueIds },
+          paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })  // 배열을 repeat 형식으로 변환
+        })
           .then(() => {
-            fetchIssueData();
             alert("삭제되었습니다.");
+            setIssues(prevIssues => prevIssues.filter(issue => !checkItems.includes(issue.issueId)));
+            setCheckItems([]);
           })
-          .catch((error) => console.error("이슈 삭제 실패:", error));
       }
     } else {
       // 개별 삭제
       if (window.confirm(confirmMessage)) {
         const issueId = checkItems[0]; // 개별 이슈 ID 가져오기
-        axios.delete(`http://localhost:8081/projects/${projectId}/issues/${issueId}`)
+        api.delete(`/projects/${projectId}/issues/${issueId}`)
           .then(() => {
-            fetchIssueData();
             alert("삭제되었습니다.");
+            setCheckItems([]);
           })
           .catch((error) => console.error("이슈 삭제 실패:", error));
+          alert("이슈 삭제에 실패했습니다.")
       }
     }
+  };
+  const reverseStatusMap = {
+    INPROGRESS: "진행중",
+    COMPLETE: "완료",
+    YET: "시작안함"
+  };    
+
+  const reversePriorityMap = {
+      HIGH: "높음",
+      MIDDLE: "중간",
+      LOW: "낮음"
   };
   
 
@@ -225,10 +252,10 @@ const allCheckedHandler = (e) => {
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>{issue.managerName || '닉네임 정보 없음'}</TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>
-                  <Chip label={issue.status} color={statusColors[issue.status] || "default"} />
+                  <Chip label={reverseStatusMap[issue.status] || issue.status} color={statusColors[issue.status] || "default"} />
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>
-                  <Chip label={issue.priority} color={priorityColors[issue.priority] || "default"} />
+                  <Chip label={reversePriorityMap[issue.priority] || issue.priority} color={priorityColors[issue.priority] || "default"} />
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>
                   <Chip label={`${issue.startline} ~ ${issue.deadline}`} color={getTimelineColor(issue.startline, issue.deadline, issue.status)} />
@@ -237,22 +264,22 @@ const allCheckedHandler = (e) => {
             ))}
           </TableBody>
         </Table>
-        <Button variant="contained" onClick={handleOpenWriteModal} sx={{ margin: "10px" }}>
+        <Button variant="contained" open={open} onClick={handleOpenWriteModal} sx={{ margin: "10px" }}>
           + 작업 추가
         </Button>
       </TableContainer>
 
       <Modal open={openWriteModal} onClose={handleCloseWriteModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
-          <IssueWriteModal projectId={projectId} onClose={handleCloseWriteModal} />
+          <IssueAddModal projectId={projectId} onClose={handleCloseWriteModal} />
         </Box>
       </Modal>
 
       <Modal open={openUpdateModal} onClose={handleCloseUpdateModal}>
         <Box sx={{ width: 600, margin: "auto", mt: 5, p: 3, bgcolor: "white", borderRadius: 2 }}>
           {selectedIssue && (
-            <IssueUpdateModal projectId={projectId} issue={selectedIssue} onClose={handleCloseUpdateModal} />
-          )}I
+            <IssueUpdateModal projectId={projectId} selectIssue={selectedIssue} onClose={handleCloseUpdateModal} />
+          )}
         </Box>
       </Modal>
     </div>

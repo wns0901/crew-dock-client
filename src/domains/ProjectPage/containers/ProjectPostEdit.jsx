@@ -5,14 +5,14 @@ import { useProjectPostForm } from "../hooks/useProjectPostForm";
 import api from "../../../apis/baseApi";
 
 const ProjectPostEdit = () => {
-    const {postId} = useParams();
+    const {postId, projectId} = useParams();
     const { categoryOptions, validatePost, navigate, onCancel } = useProjectPostForm();
     const [initialData, setInitialData] = useState(null);
 
     useEffect(() => {
         const fetchPost = async (postId) => {
             try {
-                const response = await api.get(`/posts/${postId}`);
+                const response = await api.get(`/projects/${projectId}/posts/${postId}`);
                 setInitialData({
                     id: response.data.id,
                     createdAt: response.data.createdAt,
@@ -31,7 +31,7 @@ const ProjectPostEdit = () => {
             }
         };
         fetchPost(postId);
-    }, [postId, navigate]);
+    }, [postId, navigate, projectId]);
 
     const onSubmit = async (postData) => {
         try {
@@ -41,21 +41,21 @@ const ProjectPostEdit = () => {
                 id: initialData.id,
                 title: postData.title.trim(),
                 content: postData.content.trim(),
-                category: postData.category,
-                direction: 'NONE',
+                category: 'NONE',
+                direction: postData.direction,
                 userId: initialData.userId,
                 userNickname: initialData.userNickname,
-                projectId: null
+                projectId: projectId
             };
 
-            const response = await api.patch('/posts', updateData);
+            const response = await api.patch(`/projects/${projectId}/posts`, updateData);
         
             if (response.status === 500) {
                 console.error('Server error details:', response.data);
                 throw new Error(response.data.message || '서버 오류가 발생했습니다.');
             }
             
-            navigate(`/posts/${postId}`);
+            navigate(`/projects/${projectId}/posts/${postId}`);
         } catch (error) {
             console.error('Error:', error);
             alert(error.message);

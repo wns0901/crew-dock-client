@@ -3,8 +3,10 @@ import api from "../../../apis/baseApi";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import ProjectPostForm from "../components/ProjectPostForm";
 import { useProjectPostForm } from "../hooks/useProjectPostForm";
+import { useParams } from "react-router-dom";
 
 const PostCreateContainer = () => {
+  const { projectId } = useParams(); 
   const {userInfo} = useContext(LoginContext);
   const {directionOptions, validatePost, navigate, onCancel} = useProjectPostForm();
 
@@ -17,14 +19,14 @@ const PostCreateContainer = () => {
       const createPostData = {
         title: postData.title.trim(),
         content: postData.content.trim(),
-        category: postData.category,
-        direction: 'NONE',
+        category: 'NONE',
+        direction: postData.direction,
         userNickname: userInfo.nickname,
         userId: userInfo.id,
-        projectId: null
+        projectId: projectId
       };
 
-      const response = await api.post('/posts', createPostData);
+      const response = await api.post(`/projects/${projectId}/posts`, createPostData);
 
       if (response.status === 500) {
         console.error('Server error details:', response.data);
@@ -33,7 +35,7 @@ const PostCreateContainer = () => {
 
       const postId = response.data.id;
 
-      navigate(`/posts/${postId}`);
+      navigate(`/projects/${projectId}/posts/${postId}`);
     } catch (error) {
       console.error('Error:', error);
       alert(error.message);
@@ -45,7 +47,7 @@ return (
     onSubmit={onSubmit}
     onCancel={onCancel}
     directionOptions={directionOptions}
-    initialData={{ category: '', title: '', content: '' , direction: 'NONE'}}
+    initialData={{ category: 'NONE', title: '', content: '' , direction: ''}}
     isEdit={false}
     />
   );

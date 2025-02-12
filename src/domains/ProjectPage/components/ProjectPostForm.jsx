@@ -23,19 +23,19 @@ const ProjectPostForm = ({
   onCancel = () => {},
   directionOptions = []
 }) => {
-  const [category, setCategory] = useState(initialData.category);
+  const [direction, setDirection] = useState(initialData.direction);
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
 
   useEffect(() => {
-    setCategory(initialData.category);
+    setDirection(initialData.direction);
     setTitle(initialData.title);
     setContent(initialData.content);
 }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({category, title, content});
+    onSubmit({direction, title, content});
   }
 
   return (
@@ -47,9 +47,9 @@ const ProjectPostForm = ({
               <InputLabel id="category-label">카테고리</InputLabel>
               <Select
                 labelId="category-label"
-                value={category}
+                value={direction}
                 label="카테고리"
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setDirection(e.target.value)}
                 required
               >
                 <MenuItem value="">
@@ -107,7 +107,7 @@ const ProjectPostForm = ({
 
 ProjectPostForm.propTypes = {
     initialData: PropTypes.shape({
-        category: PropTypes.string,
+        direction: PropTypes.string,
         title: PropTypes.string,
         content: PropTypes.string
     }),

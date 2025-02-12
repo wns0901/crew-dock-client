@@ -24,7 +24,7 @@ const PostDetailContainer = () => {
 
     const fetchPost = async () => {
         try {
-            const response = await api.get(`/posts/${postId}`);
+            const response = await api.get(`/projects/${projectId}/posts/${postId}`);
             setPost({
                 id: response.data.id,
                 createdAt: response.data.createdAt,
@@ -45,16 +45,16 @@ const PostDetailContainer = () => {
 
     const onUpdatePost = async () => {
         if(window.confirm('게시글을 수정하시겠습니까?')) {
-            navigate(`/posts/${postId}/edit`)
+            navigate(`/projects/${projectId}/posts/${postId}/edit`)
         }
     };
 
     const onDeletePost = async () => {
         if(window.confirm('게시글을 삭제하시겠습니까?')) {
             try {
-                await api.delete(`/posts/${postId}`);
+                await api.delete(`/projects/${projectId}/posts/${postId}`);
                 navigate('/posts', {
-                    search: `?page=1&category=${post.category}`
+                    search: `?page=1&direction=${post.direction}`
                 });
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);

@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { Container, TextField, Button, Typography } from '@mui/material';
 import { LoginContext } from '../../contexts/LoginContextProvider';
-import GoogleLoginBtn from './components/GoogleLoginBtn';
+import { GoogleLoginButton } from 'react-social-login-buttons';
+import { GithubLoginButton } from 'react-social-login-buttons';
 
 const LoginPage = () => {
 
@@ -24,6 +25,15 @@ const LoginPage = () => {
     login(logintForm.username, logintForm.password);
   };
 
+  const onGoogleLogin = (e) => {
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/oauth2/authorization/google`;
+  }
+
+  const onGithubLogin = (e) => {
+    console.log('github login');
+    
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/oauth2/authorization/github`;
+  }
   return (
     <>
       <Container maxWidth="sm">
@@ -61,7 +71,8 @@ const LoginPage = () => {
           >
             Login
           </Button>
-          <GoogleLoginBtn />
+          <GoogleLoginButton onClick={onGoogleLogin}/>
+          <GithubLoginButton onClick={onGithubLogin}/>
         </form>
       </Container>
     </>

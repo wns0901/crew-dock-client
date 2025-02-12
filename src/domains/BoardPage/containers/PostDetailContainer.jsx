@@ -11,7 +11,8 @@ const PostDetailContainer = () => {
     const {userInfo} = useContext(LoginContext);
     const navigate = useNavigate();
     const { 
-        comments, 
+        comments,
+        fixedComment, 
         onSubmitComment, 
         onFixedComment, 
         onDeleteComment 
@@ -19,7 +20,7 @@ const PostDetailContainer = () => {
 
     useEffect(() => {
         fetchPost();
-    }, [postId]);
+    }, []);
 
     const fetchPost = async () => {
         try {
@@ -31,11 +32,12 @@ const PostDetailContainer = () => {
                 content: response.data.content,
                 category: response.data.category,
                 direction: response.data.direction,
-                userId: response.data.userId,
+                userId: response.data.user?.id || response.data.userId,
                 userNickname: response.data.userNickname || null,
                 attachments: response.data.attachments || [],
             });
-            console.log(response.data.userNickname);
+
+
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
         }
@@ -69,6 +71,7 @@ const PostDetailContainer = () => {
         <PostDetail
             post={post}
             comments={comments}
+            fixedComment={fixedComment}
             userInfo={userInfo}
             onUpdatePost={onUpdatePost}
             onDeletePost={onDeletePost}

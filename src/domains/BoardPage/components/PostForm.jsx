@@ -2,9 +2,19 @@ import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Category, CategoryLabel } from '../constants/Category';
-import '../styles/PostFormStyle.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+// import '../styles/PostFormStyle.css';
+import { 
+    Box, 
+    Stack,
+    TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Button,
+    Typography,
+    Container
+  } from '@mui/material';
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 
 const PostForm = ({
@@ -30,59 +40,69 @@ const PostForm = ({
   }
 
   return (
-    <div className='post-form-container'>
-        <form onSubmit={handleSubmit} className='grid-container'>
-            <div className='category-section'>
-                <div className="category-select-container">
-                    <select
-                        className='category-select'
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        required
-                    >
-                        <option value="">카테고리</option>
-                        {categoryOptions.map(category => (
-                        <option key={category} value={category}>
-                            {CategoryLabel[category]}
-                        </option>
-                        ))}
-                    </select>
-                    <FontAwesomeIcon className='dropdown-icon' icon={faCaretDown}/>
-                </div>
-            </div>
+    <Container maxWidth="lg">
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4 }}>
+        <Stack spacing={3}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel id="category-label">카테고리</InputLabel>
+              <Select
+                labelId="category-label"
+                value={category}
+                label="카테고리"
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                <MenuItem value="">
+                  <em>카테고리</em>
+                </MenuItem>
+                {categoryOptions.map(cat => (
+                  <MenuItem key={cat} value={cat}>
+                    {CategoryLabel[cat]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
-            <div className='title-section'>
-                <h3>제목</h3>
-                <div className='title-input-container'>
-                    <input
-                        className='title-input'
-                        type='text'
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder='제목을 입력하세요'
-                    />
-                </div>
-            </div>
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              제목
+            </Typography>
+            <TextField
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목을 입력하세요"
+              variant="outlined"
+            />
+          </Box>
 
-            <div className='content-section'>
-                <div className='content-editor-contaienr'>
-                    <MDEditor
-                        value={content}
-                        onChange={setContent}
-                        commands={customCommands}
-                        preview="live"
-                        data-color-mode="light"
-                        height={400}
-                    />
-                </div>
-            </div>
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              내용
+            </Typography>
+            <MDEditor
+              value={content}
+              onChange={setContent}
+              commands={customCommands}
+              preview="live"
+              data-color-mode="light"
+              height={400}
+            />
+          </Box>
 
-            <div className='button-section'>
-                <button className='cancel-button' type='button' onClick={onCancel}>취소</button>
-                <button className='submit-button' type='submit'>{isEdit ? '수정완료' : '작성완료'}</button>
-            </div>
-        </form>
-    </div>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button variant="outlined" onClick={onCancel}>
+              취소
+            </Button>
+            <Button variant="contained" type="submit">
+              {isEdit ? '수정완료' : '작성완료'}
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    </Container>
   );
 };
 

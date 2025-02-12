@@ -5,7 +5,24 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CategoryLabel } from '../constants/Category';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
-import '../styles/PostList.css';
+import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
+import { 
+    Box, 
+    Stack,
+    Button, 
+    Container, 
+    Typography, 
+    TextField, 
+    Select, 
+    MenuItem, 
+    Card, 
+    CardContent, 
+    Chip,
+    CircularProgress,
+    InputAdornment,
+    IconButton
+  } from '@mui/material';
 
 const PostList = ({
     posts,
@@ -21,14 +38,6 @@ const PostList = ({
     const [searchType, setSearchType] = useState('title');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // const categoryOptions = Object.values(Category).filter(category => {
-    //     const isAdmin = roles?.isAdmin ?? false;
-    //     if (isAdmin) {
-    //         return true;
-    //     }
-    //     return category === Category.NONE || category === Category.FORUM;
-    // });
-
     const handleSearch = (e) => {
         e.preventDefault();
         onSearch({type: searchType, query: searchQuery});
@@ -43,86 +52,100 @@ const PostList = ({
     };
 
     if (loading) {
-        return <div className="loading-spinner">로딩 중...</div>;
+        return (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+            <CircularProgress />
+          </Box>
+        );
     }
 
     return (
-        <div className='post-container'>
-            <button className="write-button" onClick={handleCreateClick}>
-                    <span className="write-icon">✎</span> 글쓰기
-            </button>
+        <Container maxWidth="lg">
+            <Stack spacing={3} my={4}>
+                <Box display="flex" justifyContent="flex-end">
+                    <Button 
+                        variant="contained" 
+                        startIcon={<EditIcon />} 
+                        onClick={handleCreateClick}
+                    >
+                        글쓰기
+                    </Button>
+                </Box>
 
-            <div className="control-section">
-                <div className='category-buttons'>
-                    <button
-                        className={`category-button primary ${selectedCategory === 'NONE' ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory('NONE')}
-                    >
-                        {CategoryLabel.NONE}
-                    </button>
-                    <button
-                        className={`category-button secondary ${selectedCategory === 'FORUM' ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory('FORUM')}
-                    >
-                        {CategoryLabel.FORUM}
-                    </button>
-                </div>
-                <div className='search-section'>
-                    <form onSubmit={handleSearch} className='search-form'>
-                        <select
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between">
+                    <Box display="flex" gap={1}>
+                        <Button
+                            variant={selectedCategory === 'NONE' ? 'contained' : 'outlined'}
+                            onClick={() => setSelectedCategory('NONE')}
+                        >
+                            {CategoryLabel.NONE}
+                        </Button>
+                        <Button
+                            variant={selectedCategory === 'FORUM' ? 'contained' : 'outlined'}
+                            onClick={() => setSelectedCategory('FORUM')}
+                        >
+                            {CategoryLabel.FORUM}
+                        </Button>
+                    </Box>
+
+                    <Box component="form" onSubmit={handleSearch} display="flex" gap={1} flexGrow={1}>
+                        <Select
                             value={searchType}
                             onChange={(e) => setSearchType(e.target.value)}
-                            className='search-type'
+                            size="small"
                         >
-                            <option value="title">제목</option>
-                            <option value="userNickname">닉네임</option>
-                        </select>
-                        <input
-                            type='text'
+                            <MenuItem value="title">제목</MenuItem>
+                            <MenuItem value="userNickname">닉네임</MenuItem>
+                        </Select>
+                        <TextField
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder='검색어를 입력하세요'
-                            className='search-input'
+                            size="small"
+                            fullWidth
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton type="submit">
+                                            <SearchIcon />
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
-                        <button type='submit' className='search-button'>
-                            <FontAwesomeIcon icon={faMagnifyingGlass} />
-                        </button>
-                    </form>
-                </div>
-            </div>
+                    </Box>
+                </Stack>
 
-            <div className='post-list'>
-                {posts.map(post => (
-                    <div 
-                        key={post.id} 
-                        className='post-item'
-                        onClick={() => handlePostClick(post.id)}
-                    >
-                        <span className="notice-badge">{CategoryLabel[post.category]}</span>
-                        <h3 className="post-title">{post.title}</h3>
-                        <div className='post-info'>
-                            <span className="user-nickname">{post?.userNickname}</span>
-                            <span className="created-at">{post?.createdAt}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-           
-            <div className="bottom-section">
-                <div className="pagination-simple">
+                <Stack spacing={2}>
+                    {posts.map(post => (
+                        <Card key={post.id} onClick={() => handlePostClick(post.id)}>
+                            <CardContent>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                    <Chip label={CategoryLabel[post.category]} color="primary" size="small" />
+                                    <Typography variant="caption">{post?.createdAt}</Typography>
+                                </Box>
+                                <Typography variant="h6" gutterBottom>{post.title}</Typography>
+                                <Typography variant="body2" color="text.secondary">{post?.userNickname}</Typography>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Stack>
+
+                <Box display="flex" justifyContent="center" mt={2}>
                     {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
-                        <button
+                        <Button
                             key={page}
                             onClick={() => onPageChange(page)}
-                            className={`page-number ${pagination.currentPage === page ? 'active' : ''}`}
+                            variant={pagination.currentPage === page ? 'contained' : 'outlined'}
+                            size="small"
+                            sx={{ mx: 0.5 }}
                         >
                             {page}
-                        </button>
+                        </Button>
                     ))}
-                </div>
-            
-            </div>
-        </div>
+                </Box>
+            </Stack>
+        </Container>
     );
 };
 

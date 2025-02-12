@@ -1,18 +1,18 @@
 import React, { useContext } from "react";
-import { useParams } from "react-router-dom";
+import api from "../../../apis/baseApi";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import ProjectPostForm from "../components/ProjectPostForm";
 import { useProjectPostForm } from "../hooks/useProjectPostForm";
-import api from "../../../apis/baseApi";
 
-const ProjectPostCreate = () => {
-  const { projectId } = useParams();
-  const { userInfo } = useContext(LoginContext);
-  const { directionOptions, validatePost, navigate, onCancel } = useProjectPostForm();
+const PostCreateContainer = () => {
+  const {userInfo} = useContext(LoginContext);
+  const {directionOptions, validatePost, navigate, onCancel} = useProjectPostForm();
 
   const onSubmit = async (postData) => {
-    try {
+  try {
       if (!validatePost(postData)) return;
+
+      console.log('Content before sending:', postData.content);
 
       const createPostData = {
         title: postData.title.trim(),
@@ -21,10 +21,10 @@ const ProjectPostCreate = () => {
         direction: 'NONE',
         userNickname: userInfo.nickname,
         userId: userInfo.id,
-        projectId: postData.projectId
+        projectId: null
       };
 
-      const response = await api.post(`/projects/${projectId}/posts`, createPostData);
+      const response = await api.post('/posts', createPostData);
 
       if (response.status === 500) {
         console.error('Server error details:', response.data);
@@ -33,33 +33,22 @@ const ProjectPostCreate = () => {
 
       const postId = response.data.id;
 
-
-      // const imageUrls = extractImageUrls(postData.content);
-
-      // for (const url of imageUrls) {
-      //   if(url.startsWith('data:image')) {
-      //     const file = base64ToFile(url);
-      //     await createImgUrl(file);
-      //   } else {
-      //     await saveExternalImageUrl(postId, url);
-      //   }
-      // }
       navigate(`/posts/${postId}`);
     } catch (error) {
       console.error('Error:', error);
       alert(error.message);
-    }
-  };
+  }
+};
 
-  return (
+return (
     <ProjectPostForm
-      onSubmit={onSubmit}
-      onCancel={onCancel}
-      directionOptions={directionOptions}
-      initialData={{ category: 'NONE', title: '', content: '', direction: '' }}
-      isEdit={false}
+    onSubmit={onSubmit}
+    onCancel={onCancel}
+    directionOptions={directionOptions}
+    initialData={{ category: '', title: '', content: '' , direction: 'NONE'}}
+    isEdit={false}
     />
   );
 };
 
-export default ProjectPostCreate;
+  export default PostCreateContainer;

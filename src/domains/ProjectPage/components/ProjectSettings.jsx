@@ -87,6 +87,7 @@ const ProjectSettings = () => {
                 console.error("기술 스택 리스트 조회 실패:", error);
             });
     }, [projectId]);
+    
 
     const handleUpdate = (e) => {
         const { name, value } = e.target;
@@ -192,15 +193,15 @@ const ProjectSettings = () => {
             alignItems: "center"
         }}
     >
-      {previewUrl || setPreviewUrl ? (
-        <img 
-            src={previewUrl || setPreviewUrl} 
-            alt="미리보기" 
-            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-        />
-    ) : (
-        <Typography variant="body2">이미지 없음</Typography>
-    )}
+{previewUrl || setPreviewUrl ? (
+    <img 
+        src={previewUrl || setPreviewUrl} 
+        alt="미리보기" 
+        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+    />
+) : (
+    <Typography variant="body2">이미지 없음</Typography>
+)}
     </Box>
 
    

@@ -11,7 +11,15 @@ import ProjectSettings from "./domains/ProjectPage/components/ProjectSettings";
 import ProjectManagement from "./domains/ProjectPage/components/ProjectManagement";
 import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
-
+import AdminDashboard from "./domains/AdminPage/components/AdminDashboard";
+import AdminUser from "./domains/AdminPage/components/AdminUser";
+import AdminProject from "./domains/AdminPage/components/AdminProject";
+import AdminStack from "./domains/AdminPage/components/AdminStack";
+import AdminRecruitmentPost from "./domains/AdminPage/components/AdminRecruitmentPost";
+import AdminPosts from "./domains/AdminPage/components/AdminPosts";
+import AdminBanner from "./domains/AdminPage/components/AdminBanner";
+import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
+import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <LoginContextProvider>
@@ -27,7 +35,17 @@ createRoot(document.getElementById("root")).render(
           <Route path="settings" element={<ProjectSettings />} />
           <Route path="manage" element={<ProjectManagement />} />
           <Route path="pending" element={<PendingMembers />} />
+        
         </Route>
+        <Route path="admin" element={<AdminDashboard />} />
+        <Route path="admin/user" element={<AdminUser />} />
+        <Route path="admin/project" element={<AdminProject />} />
+        <Route path="admin/stack" element={<AdminStack />} />
+        <Route path="admin/recruitment" element={<AdminRecruitmentPost />} />
+        <Route path="admin/posts" element={<AdminPosts />} />
+        <Route path="admin/banners" element={<AdminBanner />} />
+        <Route path="admin/stackusage" element={<AdminStackUsage />} />
+        <Route path="admin/hopeposition" element={<AdminHopePositionUsage />} />
         </Route>
       </Routes>
     </LoginContextProvider>

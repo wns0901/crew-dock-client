@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-
 import api from "../../../apis/baseApi";
-import PostList from "../components/PostList";
-import { Category } from "../\bconstants/\bCategory";
+import ProjectPostList from "../components/ProjectPostList";
+import { Direction } from "../constants/Direction";
+import { useParams } from "react-router-dom";
 
-const PostListContainers = () => {
+const ProjectListContainers = () => {
+    const {projectId} = useParams();
     const [posts, setPosts] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedDirection, setSelectedDirection] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchParams, setSearchParams] = useState({
@@ -27,14 +28,14 @@ const PostListContainers = () => {
                 let response;
                 let postData = [];
                 
-                if (selectedCategory === '') {
+                if (selectedDirection === '') {
                     const responses = await Promise.all(
-                        Object.values(Category).map(category => 
-                            api.get('/posts', { 
+                        Object.values(Direction).map(direction => 
+                            api.get(`/projects/${projectId}/posts`, { 
                                 params: { 
                                     page: 0, 
                                     size: 1000, 
-                                    category: category,
+                                    direction: direction,
                                     searchType: searchParams.type,
                                     keyword: searchParams.query
                                 } 
@@ -48,7 +49,7 @@ const PostListContainers = () => {
                         params: { 
                             page: currentPage - 1,
                             size: pagination.pageSize,
-                            category: selectedCategory,
+                            direction: selectedDirection,
                             searchType: searchParams.type,
                             keyword: searchParams.query
                         } 
@@ -75,7 +76,7 @@ const PostListContainers = () => {
                     return true;
                 });
 
-                if (selectedCategory === '') {
+                if (selectedDirection === '') {
                     const startIndex = (currentPage - 1) * pagination.pageSize;
                     const endIndex = startIndex + pagination.pageSize;
                     const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
@@ -97,7 +98,7 @@ const PostListContainers = () => {
             }
         };
         fetchPosts();
-    }, [selectedCategory, currentPage, searchParams]);
+    }, [selectedDirection, currentPage, searchParams]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -109,8 +110,8 @@ const PostListContainers = () => {
         setCurrentPage(1);
     };
     
-    const handleCategoryChange = (category) => {
-        setSelectedCategory(category);
+    const handleDirectionChange = (direction) => {
+        setSelectedDirection(direction);
         setCurrentPage(1);
 
         setSearchParams({
@@ -120,11 +121,11 @@ const PostListContainers = () => {
     };
 
     return (
-        <PostList
+        <ProjectPostList
             posts={posts}
             loading={loading}
-            selectedCategory={selectedCategory} 
-            setSelectedCategory={handleCategoryChange}
+            selectedDirection={selectedDirection} 
+            setSelectedDirection={handleDirectionChange}
             pagination={pagination}
             onPageChange={handlePageChange}
             onSearch={handleSearch}
@@ -132,4 +133,4 @@ const PostListContainers = () => {
     );
 }
 
-export default PostListContainers;
+export default ProjectListContainers;

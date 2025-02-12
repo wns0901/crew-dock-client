@@ -18,8 +18,9 @@ import PostCreateContainer from "./domains/BoardPage/containers/PostCreateContai
 import PostDetailContainer from "./domains/BoardPage/containers/PostDetailContainer";
 import PostEditContainer from "./domains/BoardPage/containers/PostEditiorContainer";
 import PostListContainers from "./domains/BoardPage/containers/PostListContainer";
-import ProjectPostCreate from "./domains/ProjectPage/containers/ProjectPostCreate";
-import ProjectPostEdit from "./domains/ProjectPage/containers/ProjectPostEdit";
+import ProjectCreateContainer from "./domains/ProjectPage/containers/ProjectCreateContainer";
+import ProjectEditContainer from "./domains/ProjectPage/containers/ProjectEditContainer";
+import ProjectListContainer from "./domains/ProjectPage/containers/ProjectListContainer";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -40,10 +41,10 @@ createRoot(document.getElementById("root")).render(
               <Route path="manage" element={<ProjectManagement />} />
               <Route path="pending" element={<PendingMembers />} />
               <Route path="posts">
-                <Route index element={<PostListContainers />} />
-                <Route path="create" element={<ProjectPostCreate />} />
+                <Route index element={<ProjectListContainer />} />
+                <Route path="create" element={<ProjectCreateContainer />} />
                 <Route path=":postId" element={<PostDetailContainer />} />
-                <Route path=":postId/edit" element={<ProjectPostEdit />} />
+                <Route path=":postId/edit" element={<ProjectEditContainer />} />
               </Route>
             </Route>
 

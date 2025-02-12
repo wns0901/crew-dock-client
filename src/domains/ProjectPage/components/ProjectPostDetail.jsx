@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import MarkdownRenderer from './MarkdownRederer';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
 
-const PostDetail = ({
+const ProjectPostDetail = ({
     post = null, 
     comments = [], 
     fixedComment = null,
@@ -288,7 +287,7 @@ const CommentItem = ({
     );
 };
 
- PostDetail.propTypes = {
+ ProjectPostDetail.propTypes = {
     post: PropTypes.object,
     comments: PropTypes.array, 
     onUpdatePost: PropTypes.func,
@@ -311,5 +310,5 @@ const CommentItem = ({
     isReply: PropTypes.bool
 };
 
-export default PostDetail;
+export default ProjectPostDetail;
 export { CommentItem };

@@ -55,9 +55,9 @@ const ProjectPostForm = ({
                 <MenuItem value="">
                   <em>카테고리</em>
                 </MenuItem>
-                {directionOptions.map(cat => (
-                  <MenuItem key={cat} value={cat}>
-                    {DirectionLabel[cat]}
+                {directionOptions.map(dir => (
+                  <MenuItem key={dir} value={dir}>
+                    {DirectionLabel[dir]}
                   </MenuItem>
                 ))}
               </Select>

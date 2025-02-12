@@ -4,9 +4,9 @@ import ProjectPostForm from "../components/ProjectPostForm";
 import { useProjectPostForm } from "../hooks/useProjectPostForm";
 import api from "../../../apis/baseApi";
 
-const ProjectPostEdit = () => {
+const ProjectEditContainer = () => {
     const {postId, projectId} = useParams();
-    const { categoryOptions, validatePost, navigate, onCancel } = useProjectPostForm();
+    const { directionOptions, validatePost, navigate, onCancel } = useProjectPostForm();
     const [initialData, setInitialData] = useState(null);
 
     useEffect(() => {
@@ -70,9 +70,9 @@ const ProjectPostEdit = () => {
             isEdit={true}
             onSubmit={onSubmit}
             onCancel={onCancel}
-            categoryOptions={categoryOptions}
+            directionOptions={directionOptions}
         />
     );
 };
 
-export default ProjectPostEdit;
+export default ProjectEditContainer;

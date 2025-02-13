@@ -5,8 +5,7 @@ ARG VITE_BASE_URL
 ENV VITE_BASE_URL=${VITE_BASE_URL}
 
 WORKDIR /app
-COPY package.json .
-COPY package-lock.json .
+COPY package*.json ./
 RUN npm ci
 COPY . .
 

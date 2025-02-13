@@ -57,7 +57,11 @@ const RegisterPage = () => {
     if (!nickName) return;
 
     const debounce = setTimeout(() => {
-      verifyNickname(nickName).catch((err) => {
+      verifyNickname(nickName)
+      .then((res) => {
+        setErrorMsgInfo({ ...errorMsgInfo, nickName: "" });
+      })
+      .catch((err) => {
         setErrorMsgInfo({ ...errorMsgInfo, nickName: err.response.data });
       });
     }, 500);

@@ -8,13 +8,16 @@ import api from '../../../apis/baseApi';
 import AddProjectSchedule from './AddProjectSchedule';
 import UpdateProjectSchedule from './UpdateProjectSchedule';
 import styles from "../FullCalendar.module.css";
+import { useParams } from 'react-router-dom';
 
-const ProjectCalendar = ({ projectId }) => {
+const ProjectCalendar = ({}) => {
+  const {projectId} = useParams();
   const [events, setEvents] = useState([]); // 프로젝트 일정 데이터 저장 상태
   const [holidays, setHolidays] = useState([]); // 공휴일 데이터를 저장할 상태
   const [todays, setTodayEvents] = useState([]); // 오늘의 팀 일정 데이터 저장 상태
   const [completedEvents, setCompletedEvents] = useState(new Set()); // 체크된 일정 ID 저장
   const {userInfo, projectRoles} = useContext(LoginContext);
+  // const {userId, setUserId} = useState(null);
   const [selectedDate, setSelectedDate] = useState(null); // 선택한 일정 데이터 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); // 일정 추가 모달 상태
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false); // 수정 모달 상태
@@ -22,9 +25,20 @@ const ProjectCalendar = ({ projectId }) => {
   const [anchorEl, setAnchorEl] = useState();
   const [calendarId, setCalendarId] = useState(null);  // 수정할 일정 ID 저장
 
+  // 로그인한 유저저
+  useEffect(() => {
+    if (userInfo?.id) {
+      // setUserId(userInfo.id);
+      console.log(userInfo.id);
+      // userId = userInfo.id;
+      
+    }
+  }, [userInfo]);
+  
 
   // 특정 프로젝트 ID에 해당하는 일정만 가져오기
   useEffect(() => {
+    console.log(projectId);
     if (!projectId) return;
 
     const fetchProjectCalendarData = async () => {
@@ -51,6 +65,7 @@ const ProjectCalendar = ({ projectId }) => {
 
             return {
               id: event.id,
+              userId: event.userId,
               title: event.content,
               start: event.startDate,
               end: event.endDate,
@@ -257,6 +272,7 @@ const ProjectCalendar = ({ projectId }) => {
         {isAddModalOpen && (
           <AddProjectSchedule
             projectId={projectId}
+            userId={userInfo.id}
             selectedDate={selectedDate}
             onClose={() => setIsAddModalOpen(false)}
             events={events}
@@ -271,6 +287,7 @@ const ProjectCalendar = ({ projectId }) => {
         {isUpdateModalOpen && selectedEvent && (
           <UpdateProjectSchedule
             projectId={projectId}
+            userId={userInfo.id}
             calendarId={calendarId}
             selectedEvent={selectedEvent}
             onUpdateEvent={handleUpdateEventData}

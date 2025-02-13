@@ -24,6 +24,8 @@ import AdminPosts from "./domains/AdminPage/components/AdminPosts";
 import AdminBanner from "./domains/AdminPage/components/AdminBanner";
 import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
+import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
+import MyCalendar from "./domains/MyPage/components/MyCalendar";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Provider store={myStore}>
@@ -35,6 +37,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
               <Route index element={<GitData />} />
+              <Route path="calendar" element={<ProjectCalendar/>}/>
               <Route path="issues" element={<ProjectIssue/>}/>
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
@@ -44,6 +47,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="pending" element={<PendingMembers />} />
             </Route>
 
+            <Route path="/mypage/calendar" element={<MyCalendar/>}/>
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="admin/user" element={<AdminUser />} />
             <Route path="admin/project" element={<AdminProject />} />

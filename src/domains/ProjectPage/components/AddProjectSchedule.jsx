@@ -7,13 +7,14 @@ import { Add, Close } from "@mui/icons-material";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 
-const AddProjectSchedule = ({ projectId, selectDate, onClose, events, setEvents, todays, setTodays, onAddSchedule, anchorEl }) => {
+const AddProjectSchedule = ({ projectId, userId, selectedDate, onClose, events, setEvents, todays, setTodays, onAddSchedule, anchorEl }) => {
   const [formData, setFormData] = useState({
     content: "",
+    userId: userId,
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
     endTime: dayjs().hour(23).minute(59), // 기본값 23:59
-    startDate: dayjs(),
-    endDate: dayjs(),
+    startDate: dayjs(selectedDate),
+    endDate: dayjs(selectedDate),
     project: projectId || null, // 프로젝트 ID가 반드시 포함
   });
 
@@ -27,18 +28,22 @@ const AddProjectSchedule = ({ projectId, selectDate, onClose, events, setEvents,
 
   // 팀 일정 추가 요청
   const handleSubmit = async (e) => {
+    console.log("userId", userId);
+    
     e.preventDefault();
     try {
       // 서버 API에 맞게 요청 URL 변경
       const response = await api.post(
-        `/calendars?projectId=${projectId}`,
+        `/calendars/project?projectId=${projectId}&userId=${userId}`,
         {
+          userId: formData.userId,
           content: formData.content,
           startDate: formData.startDate.format("YYYY-MM-DD"),
           endDate: formData.endDate.format("YYYY-MM-DD"),
           startTime: formData.startTime.format("HH:mm:ss"),
           endTime: formData.endTime.format("HH:mm:ss"),
-          project: formData.project, // 프로젝트 ID 포함
+          projectId: formData.projectId, // 프로젝트 ID 포함
+          isHoliday: formData.isHoliday,
         }
       );
 
@@ -67,13 +72,13 @@ const AddProjectSchedule = ({ projectId, selectDate, onClose, events, setEvents,
              return a.sTime.localeCompare(b.sTime);
            });
    
-         setTodays(filteredEvents); // 필터링된 일정만 업데이트
-         setTodays([... todays, eventData])
-         console.log("오늘의 일정: ", filteredEvents);
+           setTodays(filteredEvents); // 필터링된 일정만 업데이트
+        setTodays([... todays, eventData])
+        console.log("오늘의 일정: ", filteredEvents);
        }
        onClose(); // 모달 닫기
-      onAddSchedule(eventData); // 팀 일정 추가 후 일정 업데이트
-      alert("팀 일정이 추가되었습니다.");
+      onAddSchedule(response.data);
+      alert("일정이 추가되었습니다.");
     } catch (error) {
       console.error("Failed to add project schedule", error);
     }
@@ -84,14 +89,15 @@ const AddProjectSchedule = ({ projectId, selectDate, onClose, events, setEvents,
     onClose(); // 모달 닫기
   };
 
-    // 추가 버튼 클릭 시 일정 추가
-  const handleAddClick = (event) => {
+   // 추가 버튼 클릭 시 일정 추가
+   const handleAddClick = (event) => {
     handleSubmit(event); // 일정 추가 함수 호출
   };
 
+
   return (
     <Dialog
-        anchorEl={true}
+        // anchorEl={true}
         open={open}
         maxWidth="sm"
         fullWidth

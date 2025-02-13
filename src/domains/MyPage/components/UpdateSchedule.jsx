@@ -14,7 +14,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
     endTime: dayjs().hour(23).minute(59), // 기본값 23:59
     startDate: dayjs(),
     endDate: dayjs(),
-    project: projectId || null, // 프로젝트 ID 선택사항
+    projectId: projectId || null, // 프로젝트 ID 선택사항
   });
 
   // 입력 필드 변경 핸들러
@@ -45,7 +45,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
             endDate: endDate,
             startTime: startDate,
             endTime: endDate,
-            project: data.projectId || null,
+            projectId: data.projectId || null,
           });
         } catch (error) {
           console.error("Failed to fetch calendar details", error);
@@ -59,6 +59,12 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
   // 일정 수정 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(projectId) {
+      alert("팀 프로젝트 일정에서 관리가 가능합니다.");
+      return;
+    }
+  
     try {
       // 서버 API에 맞게 요청 URL 변경 (PATCH)
       const response = await api.patch(`/calendars/${calendarId}`,
@@ -68,7 +74,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
           endDate: formData.endDate.format("YYYY-MM-DD"),
           startTime: formData.startTime.format("HH:mm"),
           endTime: formData.endTime.format("HH:mm"),
-          project: formData.project,
+          projectId: formData.projectId,
         }
       );
 
@@ -105,6 +111,12 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
 
   // 일정 삭제
   const handleDelete = async () => {
+
+    if (projectId) {
+      alert("팀 프로젝트 일정은 삭제할 수 없습니다.");
+      return;
+    }
+
     if (window.confirm("해당 일정을 삭제하시겠습니까?")) {
       try {
         const response = await api.delete( `/calendars`, {
@@ -154,6 +166,16 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
       }
     }
   };
+
+  const handleProjectClick = () => {
+    if (projectId) {
+      alert("팀 프로젝트 일정에서 관리가 가능합니다.");
+      onClose();
+    }
+  };
+
+   // 프로젝트 ID가 있을 경우 수정과 삭제 버튼 비활성화
+  //  const isProjectScheduled = projectId;
 
   return (
     <Dialog
@@ -246,7 +268,13 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                           }}>
                               <Button
                                 type="button"
-                                onClick={handleDelete}
+                                onClick={() => {
+                                  if (!formData.projectId) {
+                                    handleDelete();
+                                  } else {
+                                    handleProjectClick();
+                                  }
+                                }}
                                 variant="contained"
                                 color="primary"
                                 startIcon={<Delete />}
@@ -263,6 +291,13 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
                                 color="primary"
                                 startIcon={<Check/>}
                                 className="rounded-lg"
+                                onClick={() => {
+                                  if(!formData.projectId) {
+                                    handleSubmit();
+                                  } else {
+                                    handleProjectClick();
+                                  }
+                                }}
                               >
                                 수정 완료
                               </Button>

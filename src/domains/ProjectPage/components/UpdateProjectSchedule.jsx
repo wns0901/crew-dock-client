@@ -7,14 +7,14 @@ import dayjs from "dayjs";
 import { Check, Close, Delete } from "@mui/icons-material";
 import api from "../../../apis/baseApi";
 
-const UpdateProjectSchedule = ({projectId,calendarId,selectedEvent,onClose,onUpdateEvent,onDeleteEvent,setEvents,events,todays,setTodays}) => {
+const UpdateProjectSchedule = ({projectId, userId, calendarId,selectedEvent,onClose,onUpdateEvent,onDeleteEvent,setEvents,events,todays,setTodays}) => {
   const [formData, setFormData] = useState({
-    content: selectedEvent?.content || "",
-    startTime: selectedEvent ? dayjs(selectedEvent.startTime) : dayjs().hour(0).minute(0),
-    endTime: selectedEvent ? dayjs(selectedEvent.endTime) : dayjs().hour(23).minute(59),
-    startDate: selectedEvent ? dayjs(selectedEvent.startDate) : dayjs(),
-    endDate: selectedEvent ? dayjs(selectedEvent.endDate) : dayjs(),
-    project: projectId || null,
+    content: "",
+    startTime: dayjs().hour(0).minute(0), // 기본값 00:00
+    endTime: dayjs().hour(23).minute(59), // 기본값 23:59
+    startDate: dayjs(),
+    endDate: dayjs(),
+    projectId: projectId || null,
   });
 
   // 입력 필드 변경 핸들러
@@ -45,7 +45,7 @@ useEffect(() => {
             endDate: endDate,
             startTime: startDate,
             endTime: endDate,
-            project: data.projectId || null,
+            projectId: data.projectId || null,
           });
         } catch (error) {
           console.error("Failed to fetch calendar details", error);
@@ -66,7 +66,7 @@ useEffect(() => {
         endDate: formData.endDate.format("YYYY-MM-DD"),
         startTime: formData.startTime.format("HH:mm"),
         endTime: formData.endTime.format("HH:mm"),
-        project: formData.project,
+        projectId: formData.projectId,
       });
 
       const eventData = {
@@ -104,7 +104,7 @@ useEffect(() => {
   const handleDelete = async () => {
     if (window.confirm("해당 일정을 삭제하시겠습니까?")) {
       try {
-        const response = await api.delete(`/calendars/project?projectId=${projectId}&calendarId=${calendarId}`);
+        const response = await api.delete(`/calendars/project/${projectId}/${calendarId}`);
 
         const eventData = {
           id: response.data.id,
@@ -113,22 +113,30 @@ useEffect(() => {
           end: response.data.endDate,
         };
 
+        // 오늘 일정 필터링
         const today = new Date();
-        const filteredEvents = events
-          .filter((event) => {
-            const eventStartDate = new Date(event.start);
-            const eventEndDate = new Date(event.end);
-            return (
-              eventStartDate.toDateString() === today.toDateString() ||
-              (eventStartDate <= today && eventEndDate >= today)
-            );
-          })
-          .sort((a, b) => a.start.localeCompare(b.start));
+        if (Array.isArray(response.data)) {
+          const filteredEvents = response.data
+            .filter((event) => {
+              const eventStartDate = new Date(event.start);
+              const eventEndDate = new Date(event.end);
+              return (
+                eventStartDate.toDateString() === today.toDateString() ||
+                (eventStartDate <= today && eventEndDate >= today)
+              );
+            })
+            .sort((a, b) => {
+              // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+              if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+              return a.sTime.localeCompare(b.sTime);
+            });
+    
+          setTodays(filteredEvents); // 필터링된 일정만 업데이트
+          setTodays([... todays, eventData])
+          console.log("오늘의 일정: ", filteredEvents);
+        }
 
-        setTodays(filteredEvents);
-        setEvents([...events, eventData]);
-
-        onClose();
+        onClose(); // 모달 닫기
         onDeleteEvent(response.data); // 삭제된 이벤트 반영
         alert("일정이 삭제되었습니다.");
       } catch (error) {

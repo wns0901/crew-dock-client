@@ -7,14 +7,13 @@ import { Add, Cancel, Close } from "@mui/icons-material";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 
-const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, events, setEvents, todays, setTodays, onAddSchedule }) => {
+const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvents, todays, setTodays, onAddSchedule }) => {
   const [formData, setFormData] = useState({
     content: "",
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
     endTime: dayjs().hour(23).minute(59), // 기본값 23:59
     startDate: dayjs(selectedDate),
-    endDate: dayjs(selectedDate),
-    project: projectId || null, // 프로젝트 ID 선택사항
+    endDate: dayjs(selectedDate)
   });
 
   // 입력 필드 변경 핸들러
@@ -96,6 +95,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
   return (
     <Dialog
       anchorEl={true}
+      open={open}
       maxWidth="sm"
       fullWidth
       PaperProps={{

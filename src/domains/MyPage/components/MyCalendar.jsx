@@ -27,14 +27,16 @@ const MyCalendar = ({}) => {
   useEffect(() => {
     if (userInfo?.id) {
       setUserId(userInfo.id);
+      console.log(userInfo.id);
+      
     }
-  }, []);
-
+  }, [userInfo]);
 
   const projectIds = Array.isArray(projectRoles)
   ? projectRoles.map(role => role.projectId)
   : [];
-
+  // console.log("현재 본인이 속한 팀 id: ", projectIds);
+  
 
   // 모든 일정 가져오기
   useEffect(() => {
@@ -42,23 +44,28 @@ const MyCalendar = ({}) => {
   
     const fetchCalendarData = async () => {
       try {
-        const response = await api.get(`/calendars?userId=${userId}`);
+        const response = await api.get(`/calendars?userId=${userId}&projectIds=${projectIds.join(',')}`);
   
         if (Array.isArray(response.data)) {
           const formattedEvents = response.data.map(event => {
             
             const startDate = new Date(event.startDate);
             const endDate = new Date(event.endDate);
-            
+
+             // 한국 시간으로 변환 (UTC +9)
+            const koreaOffset = 9 * 60; // 한국은 UTC+9
+            startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset() + koreaOffset);
+            endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset() + koreaOffset);
+
             // 시간 설정: startTime과 endTime이 있다면 날짜에 시간을 더해줍니다.
             if (event.startTime) {
               const [startHour, startMinute] = event.startTime.split(":");
-              startDate.setHours(startHour, startMinute);
+              startDate.setHours(parseInt(startHour, 10), parseInt(startMinute, 10));  // 숫자로 변환 후 setHours 호출
             }
-  
+
             if (event.endTime) {
               const [endHour, endMinute] = event.endTime.split(":");
-              endDate.setHours(endHour, endMinute);
+              endDate.setHours(parseInt(endHour, 10), parseInt(endMinute, 10));  // 숫자로 변환 후 setHours 호출
             }
   
             return {
@@ -101,7 +108,7 @@ const MyCalendar = ({}) => {
     };
   
     fetchCalendarData();
-  }, [userId]);
+  }, [userId, projectIds]);
 
   const handleDateSelect = (info) => {
     setSelectedDate(info.startStr);
@@ -115,12 +122,7 @@ const MyCalendar = ({}) => {
     const eventId2 = event.event.id;  // 캘린더 이벤트 ID
     setSelectedEvent(eventId2);
     setCalendarId(eventId2);  // 캘린더 ID 설정
-
-    // selectedEvent가 설정된 후 모달을 열도록 setTimeout 사용 (setState 비동기 해결)
-    setTimeout(() => {
-      setIsUpdateModalOpen(true);
-    }, 0);
-
+    setIsUpdateModalOpen(true); 
     console.log("Updated selectedEvent:", eventId2);
     console.log("Modal Open:", isUpdateModalOpen);
   }
@@ -173,13 +175,14 @@ const MyCalendar = ({}) => {
     });
   };
 
-   // 일정 색상 설정 함수
+   // 일정 색상 설정 함수 
    const getEventColor = (projectId) => {
     if (!projectId) return "#ccdcf4"; // 개인 일정은 노란색
     const hash = Array.from(projectId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const colors = [ "#ff8469", "#6f8afe", "#ff81c9", "#f5fc7c", "#ffa865", "#b67eff", "#88f8b9"];
     return colors[hash % colors.length]; // 같은 projectId는 같은 색 유지
   };
+
   return (
     
     <div style={{ display: 'flex' }}>
@@ -252,9 +255,7 @@ const MyCalendar = ({}) => {
         select={handleDateSelect}
         events={events.map(event => ({
           ...event,
-          color: getEventColor(event.projectId),
-          textColor: "#000000", // 글자 색상 통일
-          borderColor: getEventColor(event.projectId), // 테두리 제거
+          color: getEventColor(event.projectId)
         }))}
         timeZone="Asia/Seoul"
         firstDay={0}
@@ -272,7 +273,6 @@ const MyCalendar = ({}) => {
       {isAddModalOpen && (
         <AddSchedule
           userId={userId}
-          projectId={projectIds}
           selectedDate={selectedDate}
           onClose={() => setIsAddModalOpen(false)}
           events={events}
@@ -288,6 +288,7 @@ const MyCalendar = ({}) => {
         <UpdateSchedule
           userId={userId}
           calendarId={calendarId}
+          projectId={projectIds}
           selectedEvent={selectedEvent}
           onUpdateEvent={handleUpdateEventData}
           onDeleteEvent={handleDeleteEvent}

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import axios from 'axios';
 import AddSchedule from './AddSchedule';
 import UpdateSchedule from './UpdateSchedule';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
@@ -143,8 +142,6 @@ const MyCalendar = ({}) => {
     setEvents(prev => [data, ...prev]);
   }
 
-
-
   const formatTime = (time) => {
     if (!time) {
       return ''; // time이 유효하지 않으면 빈 문자열 반환
@@ -275,6 +272,7 @@ const MyCalendar = ({}) => {
       {isAddModalOpen && (
         <AddSchedule
           userId={userId}
+          projectId={projectIds}
           selectedDate={selectedDate}
           onClose={() => setIsAddModalOpen(false)}
           events={events}
@@ -282,6 +280,7 @@ const MyCalendar = ({}) => {
           todays={todays}
           setTodays={setTodayEvents}
           onAddSchedule={onAddSchedule}
+          anchorEl={anchorEl}
         />
       )}
 

@@ -95,7 +95,7 @@ const AddSchedule = ({ userId, projectId, selectedDate, anchorEl, onClose, event
 
   return (
     <Dialog
-      open={open}
+      anchorEl={true}
       maxWidth="sm"
       fullWidth
       PaperProps={{

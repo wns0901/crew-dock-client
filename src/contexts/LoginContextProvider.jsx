@@ -129,6 +129,10 @@ const LoginContextProvider = ({ children }) => {
 
     api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
+    if(!nickname) {
+      navigate("/social-register");
+    }
+
     const updateProjectRoles = [];
     const updateUserInfo = { id, username, nickname };
     const updatedRoles = { isMember: false, isAdmin: false, project: [] };

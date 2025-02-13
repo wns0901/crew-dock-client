@@ -46,9 +46,6 @@ const ProjectDetailContainer = () => {
     };
 
     const onUpdatePost = async () => {
-        console.log('프로젝트 ID:', projectId);
-        console.log('게시글 ID:', postId);
-
         if(window.confirm('게시글을 수정하시겠습니까?')) {
             navigate(`/projects/${projectId}/posts/${postId}/edit`)
         }

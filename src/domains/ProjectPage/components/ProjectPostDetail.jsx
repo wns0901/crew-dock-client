@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import MarkdownRenderer from './MarkdownRederer';
+import MarkdownRenderer from './MarkdownRenderer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
+import { DirectionLabel } from '../constants/Direction';
 
 const ProjectPostDetail = ({
     post = null, 
@@ -36,7 +37,7 @@ const ProjectPostDetail = ({
                 <Stack spacing={3}>
                     {/* 카테고리 */}
                     <Typography variant="h6" className="post-category">
-                        {[post?.direction]}
+                        {DirectionLabel[post?.direction]}
                     </Typography>
 
                     {/* 제목 */}

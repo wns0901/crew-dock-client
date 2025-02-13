@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import MarkdownRenderer from './MarkdownRederer';
+import MarkdownRenderer from './MarkdownRenderer';
 import { CategoryLabel } from '../constants/Category';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
@@ -22,8 +22,11 @@ const PostDetail = ({
 
     const handleSubmitComment = () => {
         if (comment.content.trim()) {
-            onSubmitComment(comment);
-            setComment({ content: ''});
+            onSubmitComment({
+                content: comment.content,
+                parentComment: null
+            }, userInfo);
+            setComment({ content: '' });
         }
     };
 
@@ -112,6 +115,7 @@ const PostDetail = ({
                                 <CommentItem
                                     key={`fixed-${fixedComment.id}`}
                                     comment={fixedComment}
+                                    comments={comments}
                                     isAuthor={post?.userId === userInfo?.id}
                                     isCommentUser={fixedComment.userId === userInfo?.id}
                                     onFixedComment={onFixedComment}
@@ -123,28 +127,19 @@ const PostDetail = ({
                         )}
 
                         {comments.filter(comment => !comment.parentComment).length > 0 ? (
-                            comments.filter(comment => !comment.parentComment).map(comment => {
-                                const childComments = comments.filter(c => 
-                                    (c.parentComment && c.parentComment.id === comment.id) || 
-                                    (c.parentComment === comment.id)
-                                );
-                        
-                                return (
-                                    <CommentItem
-                                        key={`comment-${comment.id}`}
-                                        comment={{
-                                            ...comment,
-                                            childComments: childComments
-                                        }}
-                                        isAuthor={isAuthor}
-                                        isCommentUser={comment.userId === userInfo.id}
-                                        onFixedComment={onFixedComment}
-                                        onDeleteComment={onDeleteComment}
-                                        onSubmitComment={onSubmitComment}
-                                        userInfo={userInfo}
-                                    />
-                                );
-                            })
+                            comments.filter(comment => !comment.parentComment).map(comment => (
+                                <CommentItem
+                                    key={`comment-${comment.id}`}
+                                    comment={comment}
+                                    isAuthor={isAuthor}
+                                    isCommentUser={comment.userId === userInfo.id}
+                                    onFixedComment={onFixedComment}
+                                    onDeleteComment={onDeleteComment}
+                                    onSubmitComment={onSubmitComment}
+                                    userInfo={userInfo}
+                                    allComments={comments}
+                                />
+                            ))
                         ) : (
                             <Typography variant="body2" align="center">
                                 댓글이 아직 없습니다.
@@ -158,7 +153,8 @@ const PostDetail = ({
 };
 
 const CommentItem = ({ 
-    comment, 
+    comment,
+    comments = [],
     isAuthor, 
     isCommentUser, 
     onFixedComment, 
@@ -171,34 +167,34 @@ const CommentItem = ({
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
 
+    const childComments = comments.filter(c => c.parentsId === comment.id);
+
     const handleSubmitReply = () => {
-        console.log('답글 작성 시도:', {
-            content: replyContent,
-            parentsId: comment.id,
-            userInfo: userInfo
-        });
         if (replyContent.trim()) {
             onSubmitComment({
                 content: replyContent,
-                parentsId: comment.id
-            }, userInfo);
+                parentComment: { id: comment.id },
+                fixed: false,
+            }, userInfo);    
             setReplyContent('');
             setShowReplyForm(false);
         }
     };
 
-    if (comment.deleted && (!comment.childComments || comment.childComments.length === 0)) {
+    if (comment.deleted && childComments.length === 0) {
         return null; 
     }
 
     return (
         <Box sx={{ py: 2 }}>
             <Stack spacing={1}>
-                <Typography variant="subtitle2">{comment.userNickname}</Typography>
                 {comment.deleted ? (
                     <Typography variant="body2" color="textSecondary">삭제된 댓글입니다.</Typography>
                 ) : (
-                    <Typography variant="body1">{comment.content}</Typography>
+                    <>
+                        <Typography variant="subtitle2">{comment.userNickname}</Typography>
+                        <Typography variant="body1">{comment.content}</Typography>
+                    </>
                 )}
                 <Box sx={{ 
                     display: 'flex', 
@@ -206,45 +202,47 @@ const CommentItem = ({
                     alignItems: 'center' 
                 }}>
                     <Typography variant="caption">{comment.createdAt}</Typography>
-                    <Box>
-                        {!comment.deleted && (
-                            <>
-                                {isAuthor && !comment.fixed && (
-                                    <Button 
-                                        size="small" 
-                                        onClick={() => onFixedComment(comment.id)}
-                                    >
-                                        고정
-                                    </Button>
-                                )}
-                                {(isCommentUser || isAuthor) && (
-                                    <Button 
-                                        size="small" 
-                                        color="error"
-                                        onClick={() => onDeleteComment(comment.id)}
-                                    >
-                                        삭제
-                                    </Button>
-                                )}
-                                {!isReply && (
-                                    <Button 
-                                        size="small"
-                                        onClick={() => setShowReplyForm(!showReplyForm)}
-                                    >
-                                        답글
-                                    </Button>
-                                )}
-                            </>
-                        )}
-                        {!isReply && comment.childComments && comment.childComments.length > 0 && (
-                            <Button 
-                                size="small"
-                                onClick={() => setShowReplies(!showReplies)}
-                            >
-                                {showReplies ? '답글 숨기기' : `답글 ${comment.childComments.length}개 보기`}
-                            </Button>
-                        )}
-                    </Box>
+                    {!comment.deleted && (
+                        <Box>
+                            {!comment.deleted && (
+                                <>
+                                    {isAuthor && !comment.fixed && (
+                                        <Button 
+                                            size="small" 
+                                            onClick={() => onFixedComment(comment.id)}
+                                        >
+                                            고정
+                                        </Button>
+                                    )}
+                                    {(isCommentUser || isAuthor) && (
+                                        <Button 
+                                            size="small" 
+                                            color="error"
+                                            onClick={() => onDeleteComment(comment.id)}
+                                        >
+                                            삭제
+                                        </Button>
+                                    )}
+                                    {!isReply && (
+                                        <Button 
+                                            size="small"
+                                            onClick={() => setShowReplyForm(!showReplyForm)}
+                                        >
+                                            답글
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+                            {!isReply && comment.childComments && comment.childComments.length > 0 && (
+                                <Button 
+                                    size="small"
+                                    onClick={() => setShowReplies(!showReplies)}
+                                >
+                                    {showReplies ? '답글 숨기기' : `답글 ${comment.childComments.length}개 보기`}
+                                </Button>
+                            )}
+                        </Box>
+                    )}
                 </Box>
             </Stack>
 
@@ -252,38 +250,28 @@ const CommentItem = ({
                 <Box sx={{ mt: 2 }}>
                     <TextField
                         fullWidth
-                        variant="outlined"
                         value={replyContent}
                         onChange={(e) => setReplyContent(e.target.value)}
                         placeholder="답글을 입력하세요"
-                        margin="normal"
                     />
-                    <Button 
-                        variant="contained" 
-                        onClick={handleSubmitReply}
-                    >
-                        답글 작성
-                    </Button>
+                    <Button onClick={handleSubmitReply}>답글 작성</Button>
                 </Box>
             )}
-            {!isReply && showReplies && comment.childComments && (
-                <Box sx={{ pl: 4, mt: 2 }}>
-                    {comment.childComments.map(childComment => (
-                        <CommentItem
-                            key={`child-${childComment.id}`}
-                            comment={childComment}
-                            isAuthor={isAuthor}
-                            isCommentUser={childComment.userId === userInfo.id}
-                            onFixedComment={onFixedComment}
-                            onDeleteComment={onDeleteComment}
-                            onSubmitComment={onSubmitComment}
-                            userInfo={userInfo}
-                            isReply={true}
-                        />
-                    ))}
-                </Box>
-            )}
-            <Divider sx={{ mt: 2 }} />
+
+            {!isReply && showReplies && comment.childComments && comment.childComments.map(childComment => (
+                <CommentItem
+                    key={`child-comment-${childComment.id}`}
+                    comment={childComment}
+                    comments={comments}
+                    isAuthor={isAuthor}
+                    isCommentUser={childComment.userId === userInfo.id}
+                    onFixedComment={onFixedComment}
+                    onDeleteComment={onDeleteComment}
+                    onSubmitComment={onSubmitComment}
+                    userInfo={userInfo}
+                    isReply={true}
+                />
+            ))}
         </Box>
     );
 };
@@ -302,12 +290,14 @@ const CommentItem = ({
 
  CommentItem.propTypes = {
     comment: PropTypes.object,
+    comments: PropTypes.array, 
     isAuthor: PropTypes.bool,
     isCommentUser: PropTypes.bool,
     onFixedComment: PropTypes.func, 
     onDeleteComment: PropTypes.func,
     onSubmitComment: PropTypes.func,
     userInfo: PropTypes.object,
+    allComments: PropTypes.array,
     isReply: PropTypes.bool
 };
 

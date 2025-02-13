@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { Direction } from "../constants/Direction";
 
-export const useProjectPostForm = (projectId) => {
+export const useProjectPostForm = () => {
     const navigate = useNavigate();
     const {roles} = useContext(LoginContext);
 

@@ -45,7 +45,7 @@ const ProjectListContainers = () => {
 
                     postData = responses.flatMap(response => response.data.posts.post);
                 } else {
-                    response = await api.get('/posts', { 
+                    response = await api.get(`/projects/${projectId}/posts`, { 
                         params: { 
                             page: currentPage - 1,
                             size: pagination.pageSize,

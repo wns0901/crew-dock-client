@@ -32,7 +32,6 @@ const ProjectPostList = ({
     onSearch
 }) => {
     const {projectId} = useParams();
-    const { roles } = useContext(LoginContext);
     const navigate = useNavigate();
     const [searchType, setSearchType] = useState('title');
     const [searchQuery, setSearchQuery] = useState('');
@@ -73,21 +72,21 @@ const ProjectPostList = ({
 
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between">
                     <Box display="flex" gap={1}>
-                    <Button
-                        variant={selectedDirection === '' ? 'contained' : 'outlined'}
-                        onClick={() => setSelectedDirection('')}
-                    >
-                        전체
-                    </Button>
-                    {Object.values(Direction).map((direction) => (
                         <Button
-                            key={direction}
-                            variant={selectedDirection === direction ? 'contained' : 'outlined'}
-                            onClick={() => setSelectedDirection(direction)}
+                            variant={selectedDirection === '' ? 'contained' : 'outlined'}
+                            onClick={() => setSelectedDirection('')}
                         >
-                            {DirectionLabel[direction]}
+                            전체
                         </Button>
-                    ))}
+                        {Object.values(Direction).map((direction) => (
+                            <Button
+                                key={direction}
+                                variant={selectedDirection === direction ? 'contained' : 'outlined'}
+                                onClick={() => setSelectedDirection(direction)}
+                            >
+                                {DirectionLabel[direction]}
+                            </Button>
+                        ))}
                     </Box>
 
                     <Box component="form" onSubmit={handleSearch} display="flex" gap={1} flexGrow={1}>
@@ -105,14 +104,16 @@ const ProjectPostList = ({
                             placeholder='검색어를 입력하세요'
                             size="small"
                             fullWidth
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton type="submit">
-                                            <SearchIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
+                            slotProps={{
+                                input: {
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton type="submit">
+                                                <SearchIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }
                             }}
                         />
                     </Box>
@@ -123,7 +124,7 @@ const ProjectPostList = ({
                         <Card key={post.id} onClick={() => handlePostClick(post.id)}>
                             <CardContent>
                                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                    <Chip label={DirectionLabel[post.category]} color="primary" size="small" />
+                                    <Chip label={DirectionLabel[post.direction]} color="primary" size="small" />
                                     <Typography variant="caption">{post?.createdAt}</Typography>
                                 </Box>
                                 <Typography variant="h6" gutterBottom>{post.title}</Typography>
@@ -155,7 +156,7 @@ ProjectPostList.propTypes = {
     posts: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number.isRequired,
         title: PropTypes.string.isRequired,
-        category: PropTypes.string,
+        direction: PropTypes.string,
         user: PropTypes.shape({
             nickname: PropTypes.string
         }),

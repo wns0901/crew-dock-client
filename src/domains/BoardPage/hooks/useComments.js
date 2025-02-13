@@ -98,16 +98,22 @@ export const useComments = (postId) => {
             const response = await api.delete(`/posts/${postId}/comments/${commentId}`);
             
             if (response.status === 200) {
-               setComments(prevComments => {
-                    const updatedComments = prevComments
-                        .map(comment => ({
-                            ...comment,
-                            childComments: comment.childComments.filter(child => child.id !== commentId)
-                        }))
-                        .filter(comment => comment.id !== commentId);
-                    return updatedComments;
-                });
-            
+                setComments(comments.map(comment => {
+                        console.log(1);
+                        
+                        if (comment.id === commentId) {
+                            return { ...comment, deleted: true, content: "삭제된 댓글입니다." };
+                        }
+                        if (comment.childComments) {
+                            return {
+                                ...comment,
+                                childComments: comment.childComments.filter(childComment => childComment.id !== commentId)
+                            };
+                        }
+                        return comment;
+                    }).filter(comment => !comment.deleted || (comment.childComments && comment.childComments.length > 0))
+                );
+    
                 if (fixedComment?.id === commentId) {
                     setFixedComment(null);
                 }

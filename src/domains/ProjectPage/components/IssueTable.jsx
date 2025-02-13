@@ -8,10 +8,10 @@ import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 import qs from 'qs';
+import { useParams } from "react-router-dom";
 
 const IssueTable = () => {
-  const projectId = 1;
-  // const projectId = useParams();
+  const {projectId} = useParams();
   const [issues, setIssues] = useState([]); // 이슈 상태 관리 =
   const [openUpdateModal, setopenUpdateModal] = useState(false);  // 수정 모달 상태
   const [selectedIssue, setSelectedIssue] = useState(null); // 선택된 이슈

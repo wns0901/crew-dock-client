@@ -3,8 +3,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
-import AddSchedule from './AddSchedule';
-import UpdateSchedule from './UpdateSchedule';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import { Divider, Box, List, ListItem, Card, CardContent, ListItemText, Checkbox, Typography } from '@mui/material';
 import api from '../../../apis/baseApi';
@@ -40,7 +38,7 @@ const ProjectCalendar = ({}) => {
 
     const fetchCalendarData = async () => {
       try {
-        // /calendars/project?projectId=1&userId=1
+        // /calendars/project?projectId=1
         const response = await api.get(`/calendars/project?${projectId}`);
 
         if (Array.isArray(response.data)) {

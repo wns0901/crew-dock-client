@@ -19,27 +19,19 @@ const ProjectDetailContainer = () => {
     } = useComments(postId);
 
     useEffect(() => {
-        fetchPost();
-        fetchAttachment();
+        ( async () => {
+            const data1 = await fetchPost();
+            const data2 = await fetchAttachment();
+            setPost({
+                ...data1,
+                data2
+            })
+        })();
     }, []);
 
     const fetchPost = async () => {
         try {
-            const response = await api.get(`/projects/${projectId}/posts/${postId}`);
-
-            setPost({
-                id: response.data.id,
-                createdAt: response.data.createdAt,
-                title: response.data.title,
-                content: response.data.content,
-                category: response.data.category,
-                direction: response.data.direction,
-                userId: response.data.user?.id || response.data.userId,
-                projectId: response.data.projectId,
-                userNickname: response.data.userNickname || null,
-            });
-
-
+            return (await api.get(`/projects/${projectId}/posts/${postId}`)).data;
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
         }
@@ -47,30 +39,15 @@ const ProjectDetailContainer = () => {
 
     const fetchAttachment = async () => {
         try {
-            const response = await api.get(`/projects/${projectId}/posts/${postId}/attachments`);
-            
-            const attachmentsWithUrls = await Promise.all(
-                response.data.map(async (attachment) => {
-                    const fileUrl = await api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachment.id}`, { responseType: 'blob' });
-                    return {
-                        ...attachment,
-                        url: URL.createObjectURL(fileUrl.data)
-                    };
-                })
-            );
-    
-            setPost({
-                ...response.data,
-                attachments: attachmentsWithUrls,
-            });
+               return (await (api.get(`/projects/${projectId}/posts/${postId}/attachments`))).data;
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
         }
     }
 
-    const handleDownloadAttachment = async (attachmentId, fileName) => {
+    const handleDownloadAttachment = (attachmentId, fileName) => {
         try {
-            const response = await api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachmentId}`, 
+            const response = api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachmentId}`, 
                 { responseType: 'blob' }
             );
             const url = window.URL.createObjectURL(new Blob([response.data]));

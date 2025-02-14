@@ -21,6 +21,9 @@ const ProjectPostDetail = ({
     const [comment, setComment] = useState({ content: '' });
     const isAuthor = post?.userId === userInfo?.id;
 
+    console.log(post?.attachments);
+    
+
     const handleSubmitComment = () => {
         if (comment.content.trim()) {
             onSubmitComment({
@@ -85,19 +88,20 @@ const ProjectPostDetail = ({
 
                     {/* 첨부파일 및 이미지 표시 */}
                     {post?.attachments?.length > 0 && (
-                        <Box>
+                        <Box sx={{ position: 'relative', zIndex: 1000, overflow: 'visible' }}>
                             <Typography variant="h6">첨부 파일</Typography>
                             <Stack spacing={1}>
                                 {post.attachments.map((attachment, index) => (
                                     <Box key={index}>
                                         <Button onClick={() => onDownloadAttachment(attachment.id, attachment.name)}>
-                                            {attachment.name}
+                                            {attachment.url}
                                         </Button>
                                     </Box>
                                 ))}
                             </Stack>
                         </Box>
                     )}
+
 
                     <Divider />
 

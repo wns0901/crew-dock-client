@@ -6,8 +6,8 @@ import ChatComponent from "./components/chat/ChatComponent";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginContextProvider from "./contexts/LoginContextProvider";
 import SampleIndex from "./SampleIndex";
-import GitData from "./domains/ProjectPage/components/gitData";
-import ProjectIssue from"./domains/ProjectPage/components/IssueTable";
+import GitData from "./domains/ProjectPage/components/GitData";
+import ProjectIssue from "./domains/ProjectPage/components/IssueTable";
 import ProjectMembers from "./domains/ProjectPage/components/ProjectMembers";
 import Resignations from "./domains/ProjectPage/components/Resignations";
 import ProjectMain from "./domains/ProjectPage/components/ProjectMain";
@@ -40,7 +40,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/social-register" element={<SocialRegisterPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
               <Route index element={<GitData />} />
-              <Route path="issues" element={<ProjectIssue/>}/>
+              <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
               <Route path="resignations" element={<Resignations />} />
@@ -53,13 +53,18 @@ createRoot(document.getElementById("root")).render(
             <Route path="admin/user" element={<AdminUser />} />
             <Route path="admin/project" element={<AdminProject />} />
             <Route path="admin/stack" element={<AdminStack />} />
-            <Route path="admin/recruitment" element={<AdminRecruitmentPost />} />
+            <Route
+              path="admin/recruitment"
+              element={<AdminRecruitmentPost />}
+            />
             <Route path="admin/posts" element={<AdminPosts />} />
             <Route path="admin/banners" element={<AdminBanner />} />
             <Route path="admin/stackusage" element={<AdminStackUsage />} />
-            <Route path="admin/hopeposition" element={<AdminHopePositionUsage />} />
+            <Route
+              path="admin/hopeposition"
+              element={<AdminHopePositionUsage />}
+            />
           </Route>
-
         </Routes>
       </LoginContextProvider>
     </Provider>

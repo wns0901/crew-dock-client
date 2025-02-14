@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AdminSidebar from "./AdminSidebar";
+import AdminSideBar from "./AdminSideBar";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AdminBanner = () => {
@@ -75,9 +75,13 @@ const AdminBanner = () => {
     if (selectedFile) formData.append("file", selectedFile);
 
     try {
-      await axios.put(`${BASE_URL}/admin/banners/${editingBanner.id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.put(
+        `${BASE_URL}/admin/banners/${editingBanner.id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       resetForm();
       fetchBanners();
     } catch (error) {
@@ -125,10 +129,18 @@ const AdminBanner = () => {
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* 사이드바 */}
-      <AdminSidebar />
+      <AdminSideBar />
 
       {/* 배너 관리 컨텐츠 */}
-      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center", p: 4 }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          p: 4,
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           배너 관리
         </Typography>
@@ -164,12 +176,22 @@ const AdminBanner = () => {
           {banners.map((banner) => (
             <Grid item xs={12} sm={6} md={4} key={banner.id}>
               <Card>
-                <CardMedia component="img" height="180" image={banner.url} alt={banner.title} />
+                <CardMedia
+                  component="img"
+                  height="180"
+                  image={banner.url}
+                  alt={banner.title}
+                />
                 <CardContent>
                   <Typography variant="h6">{banner.title}</Typography>
 
                   {/* 활성화 상태 토글 버튼 */}
-                  <Box display="flex" alignItems="center" justifyContent="space-between" mt={2}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mt={2}
+                  >
                     <Typography variant="body2">
                       {banner.activate ? "활성화됨" : "비활성화됨"}
                     </Typography>

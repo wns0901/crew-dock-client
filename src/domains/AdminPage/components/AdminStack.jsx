@@ -11,7 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import axios from "axios";
-import AdminSidebar from "./AdminSidebar";
+import AdminSideBar from "./AdminSideBar";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -64,7 +64,7 @@ const AdminStack = () => {
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* 사이드바 */}
       <Box sx={{ width: 250, flexShrink: 0 }}>
-        <AdminSidebar />
+        <AdminSideBar />
       </Box>
 
       {/* 메인 컨텐츠 */}
@@ -86,7 +86,11 @@ const AdminStack = () => {
               value={newStackName}
               onChange={(e) => setNewStackName(e.target.value)}
             />
-            <Button variant="contained" color="primary" onClick={handleAddStack}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddStack}
+            >
               추가
             </Button>
           </Box>

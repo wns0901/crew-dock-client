@@ -97,6 +97,7 @@ const ProjectsPage = () => {
         };
 
         const fetchIssues = async (projectsData) => {
+            if (!Array.isArray(projectsData) || projectsData.length === 0) return;
             try {
                 const accessToken = Cookies.get("accessToken");
                 if (!accessToken) return;
@@ -130,6 +131,8 @@ const ProjectsPage = () => {
                 console.error("🚨 이슈 가져오기 실패:", error);
             }
         };
+
+
 
         const fetchData = async () => {
             setLoading(true);
@@ -245,7 +248,7 @@ const ProjectsPage = () => {
                     <Grid container spacing={3}>
                         {projects.map((project, index) => (
                             <Grid item xs={12} key={index}>
-                                <Card sx={{ cursor: "pointer", p: 2, "&:hover": { boxShadow: 3 }, backgroundColor: "#f0f0f0" }} onClick={() => navigate(`/project/${project.id}`)}>
+                                <Card sx={{ cursor: "pointer", p: 2, "&:hover": { boxShadow: 3 }, backgroundColor: "#f0f0f0" }} onClick={() => navigate(`/projects/${project.id}`)}>
                                     <CardContent>
                                         <Typography variant="h6" fontWeight="bold" sx={{ fontSize: "1.5rem" }}>[{project.name}］</Typography>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>

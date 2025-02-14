@@ -36,4 +36,4 @@ const ProjectMain = () => {
   );
 };
 
-export default MypageMain;
+export default ProjectMain;

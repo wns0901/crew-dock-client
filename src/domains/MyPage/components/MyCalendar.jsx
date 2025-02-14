@@ -28,7 +28,7 @@ const MyCalendar = ({}) => {
   useEffect(() => {
     if (userInfo?.id) {
       setUserId(userInfo.id);
-      console.log(userInfo.id);
+      // console.log(userInfo.id);
       
     }
   }, [userInfo]);
@@ -49,6 +49,7 @@ const MyCalendar = ({}) => {
   
         if (Array.isArray(response.data)) {
           const formattedEvents = response.data.map(event => {
+            console.log("응답 데이터: ",response.data);
             
             const startDate = new Date(event.startDate);
             const endDate = new Date(event.endDate);
@@ -103,6 +104,9 @@ const MyCalendar = ({}) => {
             });
   
           setEvents(formattedEvents);  // 전체 일정
+          console.log("전체 일정: ", formattedEvents);
+          
+          
           setTodayEvents(todaysEvents); // 오늘 일정만 따로 저장
         } else {
           console.error('유효한 JSON 데이터가 아닙니다.');
@@ -113,7 +117,7 @@ const MyCalendar = ({}) => {
     };
   
     fetchCalendarData();
-  }, [userId, projectIds]);
+  }, [userId]);
 
   const handleDateSelect = (info) => {
     setSelectedDate(info.startStr);
@@ -130,6 +134,8 @@ const MyCalendar = ({}) => {
     setIsUpdateModalOpen(true); 
     console.log("Updated selectedEvent:", eventId2);
     console.log("Modal Open:", isUpdateModalOpen);
+    console.log("선택된 projectId: ", event.event.projectId);
+    
   }
 
   // 일정 수정 후 상태 업데이트

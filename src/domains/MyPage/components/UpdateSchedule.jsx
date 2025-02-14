@@ -8,6 +8,8 @@ import { Check, Close, Delete } from "@mui/icons-material";
 import api from "../../../apis/baseApi";
 
 const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUpdateEvent, onDeleteEvent, setEvents, events, todays, setTodays}) => {
+  console.log("projectId: ", projectId);
+  
   const [formData, setFormData] = useState({
     content: "",
     startTime: dayjs().hour(0).minute(0), // 기본값 00:00
@@ -60,7 +62,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(projectId) {
+    if(formData.projectId) {
       alert("팀 프로젝트 일정에서 관리가 가능합니다.");
       return;
     }
@@ -112,7 +114,7 @@ const UpdateSchedule = ({ userId, projectId, calendarId, anchorEl, onClose, onUp
   // 일정 삭제
   const handleDelete = async () => {
 
-    if (projectId) {
+    if (formData.projectId) {
       alert("팀 프로젝트 일정은 삭제할 수 없습니다.");
       return;
     }

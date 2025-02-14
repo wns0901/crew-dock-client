@@ -13,6 +13,8 @@ import ProjectSettings from "./domains/ProjectPage/components/ProjectSettings";
 import ProjectManagement from "./domains/ProjectPage/components/ProjectManagement";
 import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
+import MainPage from "./domains/MainPage/MainPage";
+import WriteRecruitmentPost from "./domains/MainPage/components/WriteRecruitmentPost";
 import MypageMain from "./domains/MyPage/components/MypageMain";
 import PostsPage from "./domains/MyPage/components/PostsPage";
 import PortfoliosPage from "./domains/MyPage/components/PortfoliosPage";
@@ -40,6 +42,8 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<SampleIndex />} />
+            <Route path="/main" element={<MainPage/>} />
+            <Route path="/recruitmemt/write" element={<WriteRecruitmentPost />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />

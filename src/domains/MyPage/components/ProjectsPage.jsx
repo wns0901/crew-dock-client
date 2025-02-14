@@ -226,7 +226,11 @@ const ProjectsPage = () => {
 
     return (
         <Box sx={{ display: "flex", minHeight: "100vh" }}>
-            <Box sx={{ width: "250px", flexShrink: 0 }}>
+            <Box sx={{display: "flex", 
+        minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
+        backgroundColor: "#f9f9f9",
+        alignItems: "stretch",
+        borderRight: "1px solid #ccc" }}>
                 <MypageSidebar user={user} />
             </Box>
 

@@ -102,7 +102,11 @@ const PortfoliosPage = () => {
         <Box sx={{ display: "flex", height: "100vh", overflowY: "auto" }}>
             <Box sx={{ display: "flex", flexGrow: 1, marginTop: "0px" }}>
                 {/* ✅ 사이드바 */}
-                <Box>
+                <Box sx={{display: "flex", 
+        minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
+        backgroundColor: "#f9f9f9",
+        alignItems: "stretch",
+        borderRight: "1px solid #ccc" }}>
                     <MypageSidebar user={user} />
                 </Box>
 
@@ -168,6 +172,7 @@ const PortfoliosPage = () => {
                     )}
 
                     {/* ✅ 추가 버튼 (포트폴리오 생성 페이지로 이동) */}
+                    {isOwner && (
                     <Fab
                         color="primary"
                         aria-label="add"
@@ -176,6 +181,7 @@ const PortfoliosPage = () => {
                     >
                         <AddIcon />
                     </Fab>
+                    )}
                 </Box>
             </Box>
         </Box>

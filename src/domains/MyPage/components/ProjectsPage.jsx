@@ -99,6 +99,7 @@ const ProjectsPage = () => {
 
         const fetchIssues = async (projectsData) => {
             try {
+                console.log("이슈이슈", projectsData)
                 const accessToken = Cookies.get("accessToken");
                 if (!accessToken) return;
                 const issuePromises = projectsData.map(async (project) => {

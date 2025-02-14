@@ -6,6 +6,7 @@ ENV VITE_BASE_URL=${VITE_BASE_URL}
 
 WORKDIR /app
 COPY package*.json ./
+RUN rm -rf node_modules/
 RUN npm ci
 COPY . .
 

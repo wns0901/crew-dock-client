@@ -1,7 +1,7 @@
 import React from 'react';
 import DeadlineProjects from './components/DeadlineProjects';
 import RecruitmentsCompoent from './components/RecruitmentsCompoent';
-import Banners from './components/banners';
+import Banners from './components/Banners';
 import WriteRecruitmentPost from './components/WriteRecruitmentPost';
 import WriteBtn from './components/WriteBtn';
 

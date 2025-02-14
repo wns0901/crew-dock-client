@@ -35,6 +35,7 @@ const ProjectsPage = () => {
     
 
     useEffect(() => {
+        console.log("🔴🔴🔴🔴🔴🔴🔴🔴useEffect 실행됨됨")
         if (!userInfo || !userInfo.id) {
             console.warn("🔴 로그인 정보가 없음, 로그인 체크 중...");
             return;

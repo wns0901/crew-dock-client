@@ -11,7 +11,7 @@ import styles from "../FullCalendar.module.css";
 
 const MyCalendar = ({}) => {
   const [events, setEvents] = useState([]); // 추가된 일정 데이터 저장할 상태
-  const [holidays, setHolidays] = useState([]); // 공휴일 데이터를 저장할 상태
+  const [isHoliday, setIsHoliday] = useState([]); // 공휴일 데이터를 저장할 상태
   const [todays, setTodayEvents] = useState([]); // 오늘의 일정 데이터 저장할 상태
   const [completedEvents, setCompletedEvents] = useState(new Set()); // 체크된 일정 ID 저장
   const {userInfo, projectRoles} = useContext(LoginContext);
@@ -22,6 +22,7 @@ const MyCalendar = ({}) => {
   const [anchorEl, setAnchorEl] = useState();
   const [userId, setUserId] = useState(null);
   const [calendarId, setCalendarId] = useState(null);  // 수정할 일정 ID 저장
+  const [currentMonth, setCurrentMonth] = useState(null); //  현재 월 정보 저장
 
   // 로그인한 유저 ID
   useEffect(() => {
@@ -76,9 +77,13 @@ const MyCalendar = ({}) => {
               sTime: event.startTime,
               eTime: event.endTime,
               projectId: event.projectId,
-              isHoliday: event.isHoliday || false
+              isHoliday: event.holiday || false
             };
           });
+
+          // 공휴일만 따로 필터링
+          const holidays = formattedEvents.filter(event => event.isHoliday === true);
+          setIsHoliday(holidays);
   
           // 오늘의 일정 필터링
           const today = new Date();
@@ -144,6 +149,13 @@ const MyCalendar = ({}) => {
     setEvents(prev => [data, ...prev]);
   }
 
+  
+  // FullCalendar의 월이 변경될 때 currentMonth 업데이트
+  const handleMonthChange = (info) => {
+    setCurrentMonth(info.view.title);  // 현재 월 정보를 상태에 저장
+    console.log("Current Month:", info.view.title);
+  };
+
   const formatTime = (time) => {
     if (!time) {
       return ''; // time이 유효하지 않으면 빈 문자열 반환
@@ -176,12 +188,16 @@ const MyCalendar = ({}) => {
   };
 
    // 일정 색상 설정 함수 
-   const getEventColor = (projectId) => {
-    if (!projectId) return "#ccdcf4"; // 개인 일정은 노란색
+   const getEventColor = (projectId, isHoliday) => {
+    console.log(projectId, isHoliday);
+    
+    if (!projectId) return "#ccdcf4"; 
+    if (isHoliday) return "#ff3d3d";
     const hash = Array.from(projectId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colors = [ "#ff8469", "#6f8afe", "#ff81c9", "#f5fc7c", "#ffa865", "#b67eff", "#88f8b9"];
+    const colors = [ "#6f8afe", "#ff81c9", "#f5fc7c", "#ffa865", "#b67eff", "#88f8b9"];
     return colors[hash % colors.length]; // 같은 projectId는 같은 색 유지
   };
+
 
   return (
     
@@ -255,7 +271,7 @@ const MyCalendar = ({}) => {
         select={handleDateSelect}
         events={events.map(event => ({
           ...event,
-          color: getEventColor(event.projectId)
+          color: getEventColor(event.projectId, event.isHoliday)
         }))}
         timeZone="Asia/Seoul"
         firstDay={0}
@@ -268,6 +284,7 @@ const MyCalendar = ({}) => {
           center: "title",
           right: "next today"
         }}
+        datesSet={handleMonthChange}
       />
       
       {isAddModalOpen && (

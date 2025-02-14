@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 const ProjectCalendar = ({}) => {
   const {projectId} = useParams();
   const [events, setEvents] = useState([]); // 프로젝트 일정 데이터 저장 상태
-  const [holidays, setHolidays] = useState([]); // 공휴일 데이터를 저장할 상태
+  const [isHoliday, setIsHoliday] = useState(); // 공휴일 데이터를 저장할 상태
   const [todays, setTodayEvents] = useState([]); // 오늘의 팀 일정 데이터 저장 상태
   const [completedEvents, setCompletedEvents] = useState(new Set()); // 체크된 일정 ID 저장
   const {userInfo, projectRoles} = useContext(LoginContext);
@@ -24,12 +24,14 @@ const ProjectCalendar = ({}) => {
   const [selectedEvent, setSelectedEvent] = useState(null); // 수정할 이벤트 상태
   const [anchorEl, setAnchorEl] = useState();
   const [calendarId, setCalendarId] = useState(null);  // 수정할 일정 ID 저장
+  const [currentMonth, setCurrentMonth] = useState(null); //  현재 월 정보 저장
+  
 
-  // 로그인한 유저저
+  // 로그인한 유저
   useEffect(() => {
     if (userInfo?.id) {
       // setUserId(userInfo.id);
-      console.log(userInfo.id);
+      console.log("userId:", userInfo.id);
       // userId = userInfo.id;
       
     }
@@ -45,7 +47,8 @@ const ProjectCalendar = ({}) => {
       try {
         // /calendars/project?projectId=1
         const response = await api.get(`/calendars/project?projectId=${projectId}`);
-
+        console.log(response.data);
+        
         if (Array.isArray(response.data)) {
           // 프로젝트 ID 필터링
           const formattedEvents = response.data.filter(event => event.projectId !== null).map (event => {
@@ -65,16 +68,22 @@ const ProjectCalendar = ({}) => {
 
             return {
               id: event.id,
-              userId: event.userId,
               title: event.content,
               start: event.startDate,
               end: event.endDate,
               sTime: event.startTime,
               eTime: event.endTime,
               projectId: event.projectId,
-              isHoliday: event.isHoliday || false
+              isHoliday: event.holiday
             };
           });
+
+          // 공휴일만 따로 필터링
+          const holidays = formattedEvents.filter(event => event.isHoliday === true);
+          console.log("holidays", holidays);
+
+          setIsHoliday(holidays);
+          setEvents(formattedEvents);
 
           // 오늘의 일정 필터링
           const today = new Date();
@@ -92,8 +101,9 @@ const ProjectCalendar = ({}) => {
               if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
               return a.sTime.localeCompare(b.sTime);
             });
+            console.log(formattedEvents);
 
-          setEvents(formattedEvents);  // 전체 일정
+            
           setTodayEvents(todaysEvents); // 오늘 일정만 따로 저장
         } else {
           console.error('유효한 JSON 데이터가 아닙니다.');
@@ -111,6 +121,12 @@ const ProjectCalendar = ({}) => {
     setSelectedDate(info.startStr);
     console.log("Select Date: ", info.startStr);
     setIsAddModalOpen(true); // 날짜 클릭 시 일정 추가 모달 열기
+  };
+
+  // FullCalendar의 월이 변경될 때 currentMonth 업데이트
+  const handleMonthChange = (info) => {
+    setCurrentMonth(info.view.title);  // 현재 월 정보를 상태에 저장
+    console.log("Current Month:", info.view.title);
   };
 
   // 일정 수정 모달창
@@ -173,13 +189,10 @@ const ProjectCalendar = ({}) => {
     });
   };
 
-   // 일정 색상 설정 함수
-  //  const getEventColor = (projectId) => {
-  //   if (!projectId) return "#ccdcf4"; // 개인 일정은 노란색
-  //   const hash = Array.from(projectId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  //   const colors = [ "#ff8469", "#6f8afe", "#ff81c9", "#f5fc7c", "#ffa865", "#b67eff", "#88f8b9"];
-  //   return colors[hash % colors.length]; // 같은 projectId는 같은 색 유지
-  // };
+  //  일정 색상 설정 함수
+   const getEventColor = (isHoliday) => {    
+    if(isHoliday) return "#ff3d3d";
+  };
 
   return (
     <div style={{ display: 'flex' }}>
@@ -251,11 +264,9 @@ const ProjectCalendar = ({}) => {
           initialView="dayGridMonth"
           selectable={true}
           select={handleDateSelect}
-          events={events.map(event => ({
-            ...event,
-            textColor: "#000000",
-            borderColor: "",
-          }))}
+          events={events}
+          eventColor={event => getEventColor(event.isHoliday)}
+          datesSet={handleMonthChange}
           timeZone="Asia/Seoul"
           firstDay={0}
           weekends={true}

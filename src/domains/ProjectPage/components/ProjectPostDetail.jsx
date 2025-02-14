@@ -2,20 +2,20 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
 import { DirectionLabel } from '../constants/Direction';
 
 const ProjectPostDetail = ({
-    post = null, 
-    comments = [], 
+    post = null,
+    comments = [],
     fixedComment = null,
-    onUpdatePost = () => {}, 
-    onDeletePost = () => {}, 
-    onSubmitComment, 
-    onFixedComment = () => {}, 
-    onDeleteComment = () => {},
-    onDownloadAttachment = () => {},
+    onUpdatePost = () => { },
+    onDeletePost = () => { },
+    onSubmitComment,
+    onFixedComment = () => { },
+    onDeleteComment = () => { },
+    onDownloadAttachment = () => { },
     userInfo = null,
 }) => {
     const [comment, setComment] = useState({ content: '' });
@@ -46,24 +46,24 @@ const ProjectPostDetail = ({
 
                     <Typography variant="h4">{post?.title}</Typography>
 
-                    <Box sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center' 
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}>
                         <Typography variant="body2">
                             {post?.userNickname} | {post?.createdAt}
                         </Typography>
-                        
+
                         {isAuthor && (
                             <Box>
-                                <Button 
+                                <Button
                                     onClick={onUpdatePost}
                                     startIcon={<FontAwesomeIcon icon={faPenToSquare} />}
                                 >
                                     수정
                                 </Button>
-                                <Button 
+                                <Button
                                     onClick={onDeletePost}
                                     startIcon={<FontAwesomeIcon icon={faTrashCan} />}
                                     color="error"
@@ -89,13 +89,13 @@ const ProjectPostDetail = ({
                         <Box sx={{ position: 'relative', zIndex: 1000, overflow: 'visible' }}>
                             <Typography variant="h6">첨부 파일</Typography>
                             <Stack spacing={1}>
-                                {post.attachments.map((attachment, index) => (
-                                    <Box key={index}>
-                                        <Button onClick={() => onDownloadAttachment(attachment.id, attachment.name)}>
-                                            {attachment.url}
-                                        </Button>
-                                    </Box>
-                                ))}
+                                {post.attachments.map((attachment, index) =>
+                                (<Box key={index}>
+                                    <Button onClick={() => onDownloadAttachment(attachment.id, attachment.fileName)}>
+                                        {attachment.fileName}
+                                    </Button>
+                                </Box>)
+                                )}
                             </Stack>
                         </Box>
                     )}
@@ -113,9 +113,9 @@ const ProjectPostDetail = ({
                             placeholder="댓글을 입력하세요"
                             margin="normal"
                         />
-                        <Button 
+                        <Button
                             fullWidth
-                            variant="contained" 
+                            variant="contained"
                             onClick={handleSubmitComment}
                         >
                             댓글 작성
@@ -168,12 +168,12 @@ const ProjectPostDetail = ({
     );
 };
 
-const CommentItem = ({ 
+const CommentItem = ({
     comment,
     comments = [],
-    isAuthor, 
-    isCommentUser, 
-    onFixedComment, 
+    isAuthor,
+    isCommentUser,
+    onFixedComment,
     onDeleteComment,
     onSubmitComment,
     userInfo,
@@ -191,14 +191,14 @@ const CommentItem = ({
                 content: replyContent,
                 parentComment: { id: comment.id },
                 fixed: false,
-            }, userInfo);    
+            }, userInfo);
             setReplyContent('');
             setShowReplyForm(false);
         }
     };
 
     if (comment.deleted && childComments.length === 0) {
-        return null; 
+        return null;
     }
 
     return (
@@ -212,10 +212,10 @@ const CommentItem = ({
                         <Typography variant="body1">{comment.content}</Typography>
                     </>
                 )}
-                <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center' 
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                 }}>
                     <Typography variant="caption">{comment.createdAt}</Typography>
                     {!comment.deleted && (
@@ -223,16 +223,16 @@ const CommentItem = ({
                             {!comment.deleted && (
                                 <>
                                     {isAuthor && !comment.fixed && (
-                                        <Button 
-                                            size="small" 
+                                        <Button
+                                            size="small"
                                             onClick={() => onFixedComment(comment.id)}
                                         >
                                             고정
                                         </Button>
                                     )}
                                     {(isCommentUser || isAuthor) && (
-                                        <Button 
-                                            size="small" 
+                                        <Button
+                                            size="small"
                                             color="error"
                                             onClick={() => onDeleteComment(comment.id)}
                                         >
@@ -240,7 +240,7 @@ const CommentItem = ({
                                         </Button>
                                     )}
                                     {!isReply && (
-                                        <Button 
+                                        <Button
                                             size="small"
                                             onClick={() => setShowReplyForm(!showReplyForm)}
                                         >
@@ -250,7 +250,7 @@ const CommentItem = ({
                                 </>
                             )}
                             {!isReply && comment.childComments && comment.childComments.length > 0 && (
-                                <Button 
+                                <Button
                                     size="small"
                                     onClick={() => setShowReplies(!showReplies)}
                                 >
@@ -292,9 +292,9 @@ const CommentItem = ({
     );
 };
 
- ProjectPostDetail.propTypes = {
+ProjectPostDetail.propTypes = {
     post: PropTypes.object,
-    comments: PropTypes.array, 
+    comments: PropTypes.array,
     onUpdatePost: PropTypes.func,
     onDeletePost: PropTypes.func,
     onSubmitComment: PropTypes.func.isRequired,
@@ -303,14 +303,14 @@ const CommentItem = ({
     onDownloadAttachment: PropTypes.func,
     userInfo: PropTypes.object.isRequired,
     fixedComment: PropTypes.object
- };
+};
 
- CommentItem.propTypes = {
+CommentItem.propTypes = {
     comment: PropTypes.object,
-    comments: PropTypes.array, 
+    comments: PropTypes.array,
     isAuthor: PropTypes.bool,
     isCommentUser: PropTypes.bool,
-    onFixedComment: PropTypes.func, 
+    onFixedComment: PropTypes.func,
     onDeleteComment: PropTypes.func,
     onSubmitComment: PropTypes.func,
     userInfo: PropTypes.object,

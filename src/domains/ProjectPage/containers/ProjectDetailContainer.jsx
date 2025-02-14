@@ -24,7 +24,7 @@ const ProjectDetailContainer = () => {
             const data2 = await fetchAttachment();
             setPost({
                 ...data1,
-                data2
+                attachments: data2
             })
         })();
     }, []);

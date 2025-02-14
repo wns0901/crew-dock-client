@@ -69,8 +69,11 @@ const ProjectsPage = () => {
         const fetchProjects = async () => {
             try {
                 const accessToken = Cookies.get("accessToken");
-                if (!accessToken) return;
-
+                if (!accessToken) {
+                    console.warn("🚨 토큰 없음, 프로젝트 조회 불가");
+                    return []; // ✅ 빈 배열 반환
+                }
+        
                 const response = await fetch(`${API_BASE_URL}/projects/members`, {
                     method: "GET",
                     headers: {
@@ -78,11 +81,22 @@ const ProjectsPage = () => {
                         "Content-Type": "application/json"
                     }
                 });
-
-                if (!response.ok) throw new Error("프로젝트 불러오기 실패");
-
+        
+                if (!response.ok) {
+                    console.error("🚨 프로젝트 불러오기 실패 (status:", response.status, ")");
+                    return []; // ✅ 빈 배열 반환
+                }
+        
                 const data = await response.json();
-                
+        
+                // ✅ API 응답이 배열인지 확인
+                if (!Array.isArray(data)) {
+                    console.error("🚨 프로젝트 응답이 배열이 아님!", data);
+                    return []; // ✅ 배열이 아닐 경우 빈 배열 반환
+                }
+        
+                console.log("📌 받아온 프로젝트 데이터:", data);
+        
                 const sortedProjects = data.sort((a, b) => {
                     const statusOrder = { BOARDING: 1, CRUISING: 2, COMPLETED: 3, SINKING: 4 };
                     if (statusOrder[a.status] !== statusOrder[b.status]) {
@@ -90,52 +104,108 @@ const ProjectsPage = () => {
                     }
                     return new Date(b.startDate) - new Date(a.startDate);
                 });
-                
+        
                 setProjects(sortedProjects);
+                return sortedProjects; // ✅ 데이터 반환 추가
             } catch (error) {
                 console.error("🚨 프로젝트 가져오기 실패:", error);
+                return []; // ✅ 오류 발생 시 빈 배열 반환
             }
         };
+        
 
         const fetchIssues = async (projectsData) => {
+            if (!Array.isArray(projectsData) || projectsData.length === 0) {
+                console.warn("⚠️ 프로젝트 데이터가 없어서 이슈 조회를 건너뜀.");
+                return;
+            }
+        
+            console.log("📡 fetchIssues 실행 시작! projectsData:", projectsData);
+        
             try {
-                console.log("이슈이슈", projectsData)
                 const accessToken = Cookies.get("accessToken");
-                if (!accessToken) return;
+                if (!accessToken) {
+                    console.error("🚨 인증 토큰 없음!");
+                    return;
+                }
+        
+                console.log("✅ 인증 토큰 확인됨, 이슈 가져오기 시작");
+        
                 const issuePromises = projectsData.map(async (project) => {
-                    const response = await fetch(`${API_BASE_URL}/projects/${project.id}/issues`, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${accessToken}`,
-                            "Content-Type": "application/json"
+                    console.log(`📡 프로젝트 ${project.id}의 이슈 가져오기 시작`);
+        
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/projects/${project.id}/issues`, {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bearer ${accessToken}`,
+                                "Content-Type": "application/json"
+                            }
+                        });
+        
+                        if (!response.ok) {
+                            console.error(`🚨 프로젝트 ${project.id}의 이슈 API 호출 실패 (status: ${response.status})`);
+                            return { projectId: project.id, unresolvedIssues: [] };
                         }
-                    });
-                    
-                    if (!response.ok) throw new Error(`이슈 불러오기 실패 (프로젝트 ID: ${project.id})`);
-                    const data = await response.json();
-                    
-                    const unresolvedIssues = data.filter(issue => 
-                        (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
-                    );
-                    
-                    return { projectId: project.id, unresolvedIssues };
+        
+                        const data = await response.json();
+        
+                        if (!Array.isArray(data)) {
+                            console.error(`❌ 프로젝트 ${project.id}의 응답 데이터가 배열이 아님!`, data);
+                            return { projectId: project.id, unresolvedIssues: [] };
+                        }
+        
+                        const unresolvedIssues = data.filter(issue => 
+                            (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
+                        );
+        
+                        console.log(`🚀 프로젝트 ${project.id}의 미해결 이슈:`, unresolvedIssues);
+                        
+                        return { projectId: project.id, unresolvedIssues };
+                    } catch (error) {
+                        console.error(`❌ 프로젝트 ${project.id} 이슈 가져오기 실패:`, error);
+                        return { projectId: project.id, unresolvedIssues: [] };
+                    }
                 });
+        
                 const issuesData = await Promise.all(issuePromises);
+                console.log("📌 모든 프로젝트의 이슈 데이터:", issuesData);
+        
+                if (!issuesData || !Array.isArray(issuesData)) {
+                    console.error("🚨 `issuesData`가 배열이 아님. 초기화함.");
+                    setIssues({});
+                    return;
+                }
+        
                 const issuesMap = issuesData.reduce((acc, { projectId, unresolvedIssues }) => {
-                    acc[projectId] = unresolvedIssues.length;
+                    acc[projectId] = unresolvedIssues.length || 0;
                     return acc;
                 }, {});
+        
+                console.log("✅ 최종 변환된 이슈 맵:", issuesMap);
                 setIssues(issuesMap);
             } catch (error) {
                 console.error("🚨 이슈 가져오기 실패:", error);
             }
         };
         
+        
         const fetchData = async () => {
             setLoading(true);
-            await Promise.all([fetchUserData(), fetchProjects(), fetchIssues()]);
+            await fetchUserData();
+        
+            const projectsData = await fetchProjects(); // ✅ 데이터를 반환하도록 수정
+            console.log("🔍 fetchProjects 반환 데이터:", projectsData);
+        
+            if (Array.isArray(projectsData) && projectsData.length > 0) {
+                await fetchIssues(projectsData); // ✅ undefined 방지
+            } else {
+                console.warn("⚠️ 프로젝트 데이터가 없어서 fetchIssues() 실행 안 함!");
+            }
+        
             setLoading(false);
         };
+        
         
         fetchData();
     }, [userId, userInfo,navigate]);

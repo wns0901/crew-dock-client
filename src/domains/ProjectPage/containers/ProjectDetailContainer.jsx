@@ -20,6 +20,7 @@ const ProjectDetailContainer = () => {
 
     useEffect(() => {
         fetchPost();
+        fetchAttachment();
     }, []);
 
     const fetchPost = async () => {
@@ -36,12 +37,51 @@ const ProjectDetailContainer = () => {
                 userId: response.data.user?.id || response.data.userId,
                 projectId: response.data.projectId,
                 userNickname: response.data.userNickname || null,
-                attachments: response.data.attachments || [],
             });
 
 
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
+        }
+    };
+
+    const fetchAttachment = async () => {
+        try {
+            const response = await api.get(`/projects/${projectId}/posts/${postId}/attachments`);
+            
+            const attachmentsWithUrls = await Promise.all(
+                response.data.map(async (attachment) => {
+                    const fileUrl = await api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachment.id}`, { responseType: 'blob' });
+                    return {
+                        ...attachment,
+                        url: URL.createObjectURL(fileUrl.data)
+                    };
+                })
+            );
+    
+            setPost({
+                ...response.data,
+                attachments: attachmentsWithUrls,
+            });
+        } catch (error) {
+            console.error('게시글 로딩 실패:', error);
+        }
+    }
+
+    const handleDownloadAttachment = async (attachmentId, fileName) => {
+        try {
+            const response = await api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachmentId}`, 
+                { responseType: 'blob' }
+            );
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('첨부파일 다운로드 실패:', error);
         }
     };
 
@@ -78,6 +118,7 @@ const ProjectDetailContainer = () => {
             onSubmitComment={handleSubmitComment}
             onFixedComment={onFixedComment}
             onDeleteComment={onDeleteComment}
+            onDownloadAttachment={handleDownloadAttachment}
         />
     );
 };

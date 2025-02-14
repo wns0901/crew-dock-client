@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import api from "../../../apis/baseApi";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import ProjectPostForm from "../components/ProjectPostForm";
@@ -6,16 +6,14 @@ import { useProjectPostForm } from "../hooks/useProjectPostForm";
 import { useParams } from "react-router-dom";
 
 const PostCreateContainer = () => {
-  const { projectId } = useParams(); 
-  const {userInfo} = useContext(LoginContext);
-  const {directionOptions, validatePost, navigate, onCancel} = useProjectPostForm();
+  const { projectId } = useParams();
+  const { userInfo } = useContext(LoginContext);
+  const { directionOptions, validatePost, navigate, onCancel } = useProjectPostForm();
 
   const onSubmit = async (postData) => {
-  try {
+    try {
       if (!validatePost(postData)) return;
-
-      console.log('Content before sending:', postData.content);
-
+  
       const createPostData = {
         title: postData.title.trim(),
         content: postData.content.trim(),
@@ -23,34 +21,69 @@ const PostCreateContainer = () => {
         direction: postData.direction,
         userNickname: userInfo.nickname,
         userId: userInfo.id,
-        projectId: projectId
+        projectId: projectId,
       };
-
+  
       const response = await api.post(`/projects/${projectId}/posts`, createPostData);
-
-      if (response.status === 500) {
-        console.error('Server error details:', response.data);
-        throw new Error(response.data.message || '서버 오류가 발생했습니다.');
+  
+      if (response.status !== 200) {
+        throw new Error(response.data.message || '게시글 생성 중 오류 발생');
       }
-
-      const postId = response.data.id;
-
-      navigate(`/projects/${projectId}/posts/${postId}`);
+  
+      const newPostId = response.data.id;
+  
+      if (postData.attachments && postData.attachments.length > 0) {
+        const formData = new FormData();
+        
+        postData.attachments.forEach((attachment, index) => {
+          console.log(`Appending file ${index + 1}:`, attachment.file);
+          formData.append('file', attachment.file);
+        }
+      );
+  
+        console.log("formData:", formData);
+        
+        const fileResponse = await api.post(
+          `/projects/${projectId}/posts/${newPostId}/attachments`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        console.log('fileAPI응답:', fileResponse.data);
+  
+        if (fileResponse.status !== 200) {
+          console.error('파일 업로드 실패:', fileResponse.data);
+          alert('파일 업로드 중 오류가 발생했습니다.');
+        }
+      }
+  
+      if (newPostId) {
+        try {
+          navigate(`/projects/${projectId}/posts/${newPostId}`);
+        } catch (navError) {
+          console.error('Navigation error:', navError);
+          window.location.href = `/projects/${projectId}/posts/${newPostId}`;
+        }
+      }
     } catch (error) {
-      console.error('Error:', error);
-      alert(error.message);
-  }
-};
+      console.error('Full error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      alert(`게시글 생성 오류: ${error.message}`);
+    }
+  };
 
-return (
+  return (
     <ProjectPostForm
-    onSubmit={onSubmit}
-    onCancel={onCancel}
-    directionOptions={directionOptions}
-    initialData={{ category: 'NONE', title: '', content: '' , direction: ''}}
-    isEdit={false}
+      onSubmit={onSubmit}
+      onCancel={onCancel}
+      directionOptions={directionOptions}
+      initialData={{ category: 'NONE', title: '', content: '', direction: '' }}
+      isEdit={false}
+      projectId={projectId}
     />
   );
 };
 
-  export default PostCreateContainer;
+export default PostCreateContainer;

@@ -88,7 +88,7 @@ const PostForm = ({
               commands={customCommands}
               preview="live"
               data-color-mode="light"
-              height={400}
+              height={600}
             />
           </Box>
 

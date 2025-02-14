@@ -4,7 +4,8 @@ const MarkdownRenderer = ({ content = '' }) => {
     const lines = content?.split('\n') || [];
     
     return (
-      <div>
+      <div style={{ 
+      }}>
         {lines.map((line, index) => {
           if (line.match(/!\[.*?\]\(.*?\)/)) {
             const url = line.match(/\((.*?)\)/)[1];

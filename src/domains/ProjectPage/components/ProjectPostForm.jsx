@@ -2,18 +2,26 @@ import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Direction, DirectionLabel } from '../constants/Direction';
+import CloseIcon from '@mui/icons-material/Close';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { 
-    Box, 
-    Stack,
-    TextField,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    Button,
-    Typography,
-    Container
-  } from '@mui/material';
+  Box, 
+  Stack,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Typography,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Divider,
+} from '@mui/material';
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 
 const ProjectPostForm = ({
@@ -26,17 +34,54 @@ const ProjectPostForm = ({
   const [direction, setDirection] = useState(initialData.direction);
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
+  const [attachments, setAttachments] = useState([]);
+  const [fileDialogOpen, setFileDialogOpen] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [tempAttachments, setTempAttachments] = useState([])
+
 
   useEffect(() => {
     setDirection(initialData.direction);
     setTitle(initialData.title);
     setContent(initialData.content);
-}, [initialData]);
+  }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({direction, title, content});
-  }
+    console.log("첨부파일 제출 직전 상태:", attachments); 
+    onSubmit({ direction, title, content, attachments });
+  };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (files) {
+      const newAttachments = Array.from(files).map(file => ({
+        type: 'file',
+        name: file.name,
+        file
+      }));
+      setTempAttachments([...tempAttachments, ...newAttachments]);
+    }
+  };
+
+  const handleAddUrl = () => {
+    if (urlInput.trim()) {
+      setTempAttachments([...tempAttachments, { type: 'url', url: urlInput }]);
+      setUrlInput('');
+    }
+  };
+  
+  const handleRemoveTempAttachment = (index) => {
+    setTempAttachments(tempAttachments.filter((_, i) => i !== index));
+  };
+
+  const handleSaveAttachments = () => {
+    const newAttachments = [...attachments, ...tempAttachments];
+    setAttachments(newAttachments);
+    setTempAttachments([]);
+    setFileDialogOpen(false);
+    console.log('Form Data:', { direction, title, content, attachments });
+  };
 
   return (
     <Container maxWidth="lg">
@@ -87,11 +132,14 @@ const ProjectPostForm = ({
               commands={customCommands}
               preview="live"
               data-color-mode="light"
-              height={400}
+              height={500}
             />
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button variant="outlined" onClick={() => setFileDialogOpen(true)}>
+              첨부파일 추가
+            </Button>
             <Button variant="outlined" onClick={onCancel}>
               취소
             </Button>
@@ -101,23 +149,77 @@ const ProjectPostForm = ({
           </Box>
         </Stack>
       </Box>
+
+      <Box sx={{ mt: 3 }}>
+        {attachments.map((item, index) => (
+          <Stack key={index} direction="row" spacing={1} alignItems="center">
+            {item.type === 'file' ? (
+              <Typography variant="body2">{item.name}</Typography>
+            ) : (
+              <a href={item.url} target="_blank" rel="noopener noreferrer">{item.url}</a>
+            )}
+          </Stack>
+        ))}
+      </Box>
+
+      <Dialog open={fileDialogOpen} onClose={() => setFileDialogOpen(false)}>
+        <DialogTitle>첨부파일 추가</DialogTitle>
+        <DialogContent>
+          <Button variant="outlined" component="label" fullWidth startIcon={<CloudUploadIcon />}>
+            파일 선택
+            <input type="file" hidden onChange={handleFileChange} />
+          </Button>
+          <Divider sx={{ my: 2 }} />
+          <TextField
+            fullWidth
+            label="이미지 URL 입력"
+            variant="outlined"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+          />
+          <Button variant="contained" fullWidth onClick={handleAddUrl} sx={{ mt: 2 }}>
+            URL 추가
+          </Button>
+          <Box sx={{ mt: 2 }}>
+            {tempAttachments.map((item, index) => (
+              <Stack key={index} direction="row" spacing={1} alignItems="center">
+                {item.type === 'file' ? (
+                  <Typography variant="body2">{item.name}</Typography>
+                ) : (
+                  <Typography variant="body2">{item.url}</Typography>
+                )}
+                <IconButton size="small" onClick={() => handleRemoveTempAttachment(index)}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setFileDialogOpen(false)} color="primary">
+            닫기
+          </Button>
+          <Button onClick={handleSaveAttachments} color="primary">
+              저장
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
 
 ProjectPostForm.propTypes = {
-    initialData: PropTypes.shape({
-        direction: PropTypes.string,
-        title: PropTypes.string,
-        content: PropTypes.string
-    }),
-    isEdit: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    onCancel: PropTypes.func,
-    onImageUpload: PropTypes.func,
-    directionOptions: PropTypes.arrayOf(
-        PropTypes.oneOf(Object.values(Direction))
-    )
+  initialData: PropTypes.shape({
+    direction: PropTypes.string,
+    title: PropTypes.string,
+    content: PropTypes.string
+  }),
+  isEdit: PropTypes.bool,
+  onSubmit: PropTypes.func,
+  onCancel: PropTypes.func,
+  directionOptions: PropTypes.arrayOf(
+    PropTypes.oneOf(Object.values(Direction))
+  )
 };
 
 export default ProjectPostForm;

@@ -15,6 +15,7 @@ const ProjectPostDetail = ({
     onSubmitComment, 
     onFixedComment = () => {}, 
     onDeleteComment = () => {},
+    onDownloadAttachment = () => {},
     userInfo = null,
 }) => {
     const [comment, setComment] = useState({ content: '' });
@@ -81,6 +82,22 @@ const ProjectPostDetail = ({
                             댓글 수: {comments.length}
                         </Typography>
                     </Box>
+
+                    {/* 첨부파일 및 이미지 표시 */}
+                    {post?.attachments?.length > 0 && (
+                        <Box>
+                            <Typography variant="h6">첨부 파일</Typography>
+                            <Stack spacing={1}>
+                                {post.attachments.map((attachment, index) => (
+                                    <Box key={index}>
+                                        <Button onClick={() => onDownloadAttachment(attachment.id, attachment.name)}>
+                                            {attachment.name}
+                                        </Button>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Box>
+                    )}
 
                     <Divider />
 
@@ -281,6 +298,7 @@ const CommentItem = ({
     onSubmitComment: PropTypes.func.isRequired,
     onFixedComment: PropTypes.func,
     onDeleteComment: PropTypes.func,
+    onDownloadAttachment: PropTypes.func,
     userInfo: PropTypes.object.isRequired,
     fixedComment: PropTypes.object
  };

@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import api from "../../../apis/baseApi";
+import { useParams } from "react-router-dom";
 
 export const useComments = (postId) => {
+    const {projectId} = useParams();
     const [comments, setComments] = useState([]);
     const [fixedComment, setFixedComment] = useState(null);
 
     const fetchComments = async () => {
         try {
-            const response = await api.get(`/posts/${postId}/comments`);
+            const response = await api.get(`/projects/${projectId}/posts/${postId}/comments`);
             const allComments = response.data.comments;
             
             const commentMap = new Map();
@@ -53,16 +55,41 @@ export const useComments = (postId) => {
         const payload = {
             postId: postId,
             content: commentData.content,
-            fixed: false,
+            fixed: commentData.fixed,
             parentComment:  commentData?.parentComment ? { id: commentData.parentComment.id } : null,
             user: { id: userInfo.id }
         };
 
         try {
-            const response = await api.post(`/posts/${postId}/comments`, payload);
-            
+            const response = await api.post(`/projects/${projectId}/posts/${postId}/comments`, payload);
+
             if (response.status === 200 || response.status === 201) {
-                await fetchComments();
+                const newComment = { ...payload, id: response.data.id };
+
+                if (commentData.parentComment) {
+                    const updatedComments = comments.map(comment => {
+                        if (comment.id === commentData.parentComment.id) {
+                            const updatedChildComments = [...comment.childComments, newComment];
+
+                            return {
+                                ...comment,
+                                childComments: updatedChildComments,
+                                childCommentCount: updatedChildComments.length,
+                            };
+                        }
+                        return comment;
+                    });
+
+                    const fixed = updatedComments.find(comment => comment.fixed);
+                    setFixedComment(fixed || null);
+                    setComments(updatedComments);
+                } else {
+                    const newComments = [...comments, newComment];
+                    setComments(newComments);
+                }
+
+                const fixed = comments.find(comment => comment.fixed);
+                setFixedComment(fixed || null);
             }
         } catch (error) {
             console.error('댓글 작성 실패:', error);
@@ -72,21 +99,33 @@ export const useComments = (postId) => {
     
     const onFixedComment = async (commentId) => {
         try {
-            if (fixedComment) {
-                await api.patch(`/posts/${postId}/comments`, { 
-                    id: fixedComment.id,
-                    fixed: false 
+            if (fixedComment?.id === commentId) {
+                await api.patch(`/projects/${projectId}/posts/${postId}/comments`, { 
+                    id: commentId,
+                    fixed: false
                 });
-            }
-    
-            const response = await api.patch(`/posts/${postId}/comments`, { 
-                id: commentId,
-                fixed: true 
-            });
-            
-            if (response.status === 200) {
-                setFixedComment(comments.find(comment => comment.id === commentId) || null);
-                setComments(prev => prev.map(c => ({ ...c, fixed: c.id === commentId })));
+            } else {
+                if (fixedComment) {
+                    await api.patch(`/projects/${projectId}/posts/${postId}/comments`, { 
+                        id: fixedComment.id,
+                        fixed: false 
+                    });
+                }
+        
+                const response = await api.patch(`/projects/${projectId}/posts/${postId}/comments`, { 
+                    id: commentId,
+                    fixed: true 
+                });
+                
+                if (response.status === 200) {
+                    const updatedComment = response.data;
+                    const updatedComments = comments.map(comment => 
+                        comment.id === updatedComment.id ? updatedComment : { ...comment, fixed: false }
+                    );
+                    const newFixedComment = updatedComment.fixed ? updatedComment : null;
+                    setFixedComment(newFixedComment);
+                    setComments(updatedComments);
+                }
             }
         } catch (error) {
             console.error('댓글 고정 실패:', error);
@@ -95,12 +134,10 @@ export const useComments = (postId) => {
     
     const onDeleteComment = async (commentId) => {
         try {
-            const response = await api.delete(`/posts/${postId}/comments/${commentId}`);
+            const response = await api.delete(`/projects/${projectId}/posts/${postId}/comments/${commentId}`);
             
             if (response.status === 200) {
-                setComments(comments.map(comment => {
-                        console.log(1);
-                        
+                setComments(comments.map(comment => {                      
                         if (comment.id === commentId) {
                             return { ...comment, deleted: true, content: "삭제된 댓글입니다." };
                         }

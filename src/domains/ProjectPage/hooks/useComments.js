@@ -11,6 +11,7 @@ export const useComments = (postId) => {
         try {
             const response = await api.get(`/projects/${projectId}/posts/${postId}/comments`);
             const allComments = response.data.comments;
+            console.log(response.data);
             
             const commentMap = new Map();
             allComments.forEach(comment => {
@@ -62,15 +63,16 @@ export const useComments = (postId) => {
 
         try {
             const response = await api.post(`/projects/${projectId}/posts/${postId}/comments`, payload);
-
+    
             if (response.status === 200 || response.status === 201) {
-                const newComment = { ...payload, id: response.data.id };
-
+                const newComment = response.data;
+    
+                let updatedComments;
                 if (commentData.parentComment) {
-                    const updatedComments = comments.map(comment => {
+                    updatedComments = comments.map(comment => {
                         if (comment.id === commentData.parentComment.id) {
                             const updatedChildComments = [...comment.childComments, newComment];
-
+    
                             return {
                                 ...comment,
                                 childComments: updatedChildComments,
@@ -79,17 +81,14 @@ export const useComments = (postId) => {
                         }
                         return comment;
                     });
-
-                    const fixed = updatedComments.find(comment => comment.fixed);
-                    setFixedComment(fixed || null);
-                    setComments(updatedComments);
                 } else {
-                    const newComments = [...comments, newComment];
-                    setComments(newComments);
+                    updatedComments = [...comments, newComment];
                 }
+                setComments(updatedComments);
 
-                const fixed = comments.find(comment => comment.fixed);
-                setFixedComment(fixed || null);
+                if (fixedComment) {
+                    setFixedComment(fixedComment);
+                }
             }
         } catch (error) {
             console.error('댓글 작성 실패:', error);
@@ -135,22 +134,25 @@ export const useComments = (postId) => {
     const onDeleteComment = async (commentId) => {
         try {
             const response = await api.delete(`/projects/${projectId}/posts/${postId}/comments/${commentId}`);
-            
             if (response.status === 200) {
-                setComments(comments.map(comment => {                      
+                setComments(comments.map(comment => {      
                         if (comment.id === commentId) {
                             return { ...comment, deleted: true, content: "삭제된 댓글입니다." };
                         }
                         if (comment.childComments) {
                             return {
                                 ...comment,
-                                childComments: comment.childComments.filter(childComment => childComment.id !== commentId)
+                                childComments: comment.childComments.map(childComment => {
+                                    if (childComment.id === commentId) {
+                                        return { ...childComment, deleted: true, content: "삭제된 댓글입니다." };
+                                    }
+                                    return childComment;
+                                })
                             };
                         }
                         return comment;
                     }).filter(comment => !comment.deleted || (comment.childComments && comment.childComments.length > 0))
                 );
-    
                 if (fixedComment?.id === commentId) {
                     setFixedComment(null);
                 }
@@ -159,6 +161,7 @@ export const useComments = (postId) => {
             console.error('댓글 삭제 실패:', error);
         }
     };
+    
 
     return {
         comments,

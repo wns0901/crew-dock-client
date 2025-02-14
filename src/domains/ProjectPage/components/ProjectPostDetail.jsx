@@ -21,8 +21,6 @@ const ProjectPostDetail = ({
     const [comment, setComment] = useState({ content: '' });
     const isAuthor = post?.userId === userInfo?.id;
 
-    console.log(post?.attachments);
-    
 
     const handleSubmitComment = () => {
         if (comment.content.trim()) {

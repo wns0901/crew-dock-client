@@ -7,8 +7,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import axios from "axios";
 import { Password } from "@mui/icons-material";
+import api from "../../../apis/baseApi";
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = api.defaults.baseURL; 
 
 const MypageEdit = ({ open, onClose, userId }) => {
     const { userInfo, setUserInfo } = useContext(LoginContext);

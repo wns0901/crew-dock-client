@@ -39,7 +39,7 @@ const Header = () => {
              
                 <Box>
                     <Button color="inherit" onClick={() => navigate("/posts")}>게시판</Button>
-                    <Button color="inherit" onClick={() => navigate(`/mypage/${userInfo.id}/ProjectsPage`)}>내 프로젝트</Button>
+                    <Button color="inherit" onClick={() => navigate(`/mypage/projects`)}>내 프로젝트</Button>
 
                     
                     {isLogin ? (

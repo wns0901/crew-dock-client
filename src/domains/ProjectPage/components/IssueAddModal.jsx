@@ -138,17 +138,17 @@ useEffect(() => {
     return (
         <Box sx={{ backgroundColor: 'transparent' }}>
             <h3>작업 추가</h3>
-            <IconButton
+            {/* <IconButton
             onClick={handleCancelClick}
             sx={{
                 position: 'absolute',
-                top: 10,
-                right: 10,
+                top: 40,
+                right: 320,
                 color: 'grey.500',
             }}
             >
                 <Close />
-            </IconButton>
+            </IconButton> */}
             <form onSubmit={handleAddClick}>
                 <TextField
                     label="작업명"

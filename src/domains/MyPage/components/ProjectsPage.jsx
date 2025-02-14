@@ -98,46 +98,82 @@ const ProjectsPage = () => {
         };
 
         const fetchIssues = async (projectsData) => {
-            if (!Array.isArray(projectsData) || projectsData.length === 0) return;
+            if (!Array.isArray(projectsData) || projectsData.length === 0) {
+                console.warn("⚠️ 프로젝트 데이터가 없어서 이슈 조회를 건너뜀.");
+                return;
+            }
+        
+            console.log("📡 fetchIssues 실행 시작!");
+        
             try {
                 const accessToken = Cookies.get("accessToken");
-                if (!accessToken) return;
-
+                if (!accessToken) {
+                    console.error("🚨 인증 토큰 없음!");
+                    return;
+                }
+        
+                console.log("✅ 인증 토큰 확인됨, 이슈 가져오기 시작");
+        
                 const issuePromises = projectsData.map(async (project) => {
-                    const response = await fetch(`${API_BASE_URL}/projects/${project.id}/issues`, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${accessToken}`,
-                            "Content-Type": "application/json"
+                    console.log(`📡 프로젝트 ${project.id}의 이슈 가져오기 시작`);
+        
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/projects/${project.id}/issues`, {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bearer ${accessToken}`,
+                                "Content-Type": "application/json"
+                            }
+                        });
+        
+                        if (!response.ok) {
+                            console.error(`🚨 프로젝트 ${project.id}의 이슈 API 호출 실패 (status: ${response.status})`);
+                            return { projectId: project.id, unresolvedIssues: [] };
                         }
-                    });
-                    
-                    if (!response.ok) throw new Error(`이슈 불러오기 실패 (프로젝트 ID: ${project.id})`);
-                    const data = await response.json();
-                    
-                    const unresolvedIssues = data.filter(issue => 
-                        (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
-                    );
-
-                    console.log(`🚀 프로젝트 ${project.id}의 미해결 이슈:`, unresolvedIssues);
-                    
-                    return { projectId: project.id, unresolvedIssues };
+        
+                        const data = await response.json();
+        
+                        // 🔥 데이터가 배열인지 확인 (API 응답이 예상과 다를 경우 대비)
+                        if (!Array.isArray(data)) {
+                            console.error(`❌ 프로젝트 ${project.id}의 응답 데이터가 배열이 아님!`, data);
+                            return { projectId: project.id, unresolvedIssues: [] };
+                        }
+        
+                        const unresolvedIssues = data.filter(issue => 
+                            (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
+                        );
+        
+                        console.log(`🚀 프로젝트 ${project.id}의 미해결 이슈:`, unresolvedIssues);
+                        
+                        return { projectId: project.id, unresolvedIssues };
+                    } catch (error) {
+                        console.error(`❌ 프로젝트 ${project.id} 이슈 가져오기 실패:`, error);
+                        return { projectId: project.id, unresolvedIssues: [] };
+                    }
                 });
-
+        
                 const issuesData = await Promise.all(issuePromises);
-                console.log("최종 이슈 데이터",issuesMap);
-
+                console.log("📌 모든 프로젝트의 이슈 데이터:", issuesData);
+        
+                // 🔥 데이터가 undefined일 경우 방어 코드 추가
+                if (!issuesData || !Array.isArray(issuesData)) {
+                    console.error("🚨 `issuesData`가 배열이 아님. 초기화함.");
+                    setIssues({});
+                    return;
+                }
+        
                 const issuesMap = issuesData.reduce((acc, { projectId, unresolvedIssues }) => {
-                    acc[projectId] = unresolvedIssues.length;
+                    acc[projectId] = unresolvedIssues.length || 0; // 🚨 undefined 방지
                     return acc;
                 }, {});
-
-                console.log("✅ 변환된 이슈 맵:", issuesMap);
+        
+                console.log("✅ 최종 변환된 이슈 맵:", issuesMap);
                 setIssues(issuesMap);
             } catch (error) {
                 console.error("🚨 이슈 가져오기 실패:", error);
             }
         };
+        
 
 
 

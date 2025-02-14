@@ -117,15 +117,21 @@ const ProjectsPage = () => {
                     const unresolvedIssues = data.filter(issue => 
                         (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
                     );
+
+                    console.log(`🚀 프로젝트 ${project.id}의 미해결 이슈:`, unresolvedIssues);
                     
                     return { projectId: project.id, unresolvedIssues };
                 });
 
                 const issuesData = await Promise.all(issuePromises);
+                console.log("최종 이슈 데이터",issuesMap);
+
                 const issuesMap = issuesData.reduce((acc, { projectId, unresolvedIssues }) => {
                     acc[projectId] = unresolvedIssues.length;
                     return acc;
                 }, {});
+
+                console.log("✅ 변환된 이슈 맵:", issuesMap);
                 setIssues(issuesMap);
             } catch (error) {
                 console.error("🚨 이슈 가져오기 실패:", error);
@@ -136,10 +142,17 @@ const ProjectsPage = () => {
 
         const fetchData = async () => {
             setLoading(true);
-            await Promise.all([fetchUserData(), fetchProjects(), fetchIssues()]);
+            
+            await fetchUserData();
+        
+            const projectsData = await fetchProjects(); // 프로젝트 데이터를 먼저 가져오기
+            if (projectsData.length > 0) {
+                await fetchIssues(projectsData); // 프로젝트 데이터가 있을 때만 이슈 불러오기
+            }
+        
             setLoading(false);
         };
-
+        
         fetchData();
     }, [userId, userInfo,navigate]);
 

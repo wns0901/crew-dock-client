@@ -1,29 +1,58 @@
 import React, { useEffect, useState, useContext } from "react";
-import Chip from "@mui/material/Chip";
-import { Box, Typography, CircularProgress, Avatar, Button, Grid } from "@mui/material";
+import { Box,
+    Typography,
+    CircularProgress,
+    Grid,
+    Card,
+    CardContent,
+    Button,
+    Chip, } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import MypageSidebar from "./MypageSidebar";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import Cookies from "js-cookie";
+import dayjs from "dayjs";
+import api from "../../../apis/baseApi";
 
-const API_BASE_URL = "http://localhost:8080"; // ✅ 백엔드 API URL
+const API_BASE_URL = api.defaults.baseURL; 
 
 const MypageMain = () => {
     const navigate = useNavigate();
-    const { userId: paramUserId } = useParams(); // ✅ URL에서 userId 가져오기
-    const { userInfo } = useContext(LoginContext); // ✅ 로그인된 유저 정보 가져오기
+    const { userId: paramUserId } = useParams();
+    const { userInfo } = useContext(LoginContext);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [portfolios, setPortfolios] = useState([]);
     const [projects, setProjects] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [recruitments, setRecruitments] = useState([]);
+    const [scrappedPosts, setScrappedPosts] = useState([]);
+    const [combinedPosts, setCombinedPosts] = useState([]); // ✅ 추가된 useState
 
-    // ✅ `userId`가 없으면 로그인된 사용자의 ID 사용
-    const userId = paramUserId || userInfo?.id;
+    console.log("[DEBUG] paramUserId (raw):", paramUserId);
+    console.log("[DEBUG] userInfo:", userInfo);
+
+
+    const userId = paramUserId && !isNaN(paramUserId) ? Number(paramUserId) : userInfo?.id ?? null;
+    console.log("[DEBUG] paramUserId:", paramUserId);
+    console.log("[DEBUG] userInfo.id:", userInfo?.id);
+    console.log("[DEBUG] 최종 userId:", userId);
 
     useEffect(() => {
-        if (!userId) {
-            console.warn("🔴 유저 ID를 가져올 수 없음, 로그인 페이지로 이동");
-            navigate("/login");  // 🔥 로그인 안 되어 있으면 로그인 페이지로 이동
+        if (!userInfo || !userInfo.id) {
+            console.warn("🔴 로그인 정보가 없음, 로그인 체크 중...");
+            return;
+        }
+
+         if (!userId) {
+             console.warn("🔴 유저 ID를 가져올 수 없음, 로그인 페이지로 이동");
+             navigate("/login");
+             return;
+         }
+
+         if (userInfo.id !== userId) {
+            console.warn("👀 다른 사용자의 마이페이지로 접근 중, 포트폴리오로 이동");
+            navigate(`/mypage/${userId}/portfolios`);
             return;
         }
 
@@ -41,6 +70,28 @@ const MypageMain = () => {
             }
         };
 
+        const fetchPosts = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts/user/${userId}?row=3`);
+                const postsData = await response.json();
+                console.log("[DEBUG] 작성글 데이터:", postsData);
+                setPosts(postsData);
+            } catch (err) {
+                console.error("🚨 작성글 불러오기 실패:", err);
+            }
+        };
+
+        const fetchRecruitments = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/recruitments/user/${userId}?row=3`);
+                const recruitmentsData = await response.json();
+                console.log("[DEBUG] 모집글 데이터:", recruitmentsData);
+                setRecruitments(recruitmentsData);
+            } catch (err) {
+                console.error("🚨 모집글 불러오기 실패:", err);
+            }
+        };
+
         const fetchPortfolios = async () => {
             try {
                 const portfoliosRes = await fetch(`${API_BASE_URL}/portfolios/${userId}?row=3`);
@@ -54,17 +105,15 @@ const MypageMain = () => {
 
         const fetchProjects = async () => {
             try {
-                const accessToken = Cookies.get("accessToken"); // 쿠키에서 토큰 가져오기
+                const accessToken = Cookies.get("accessToken");
                 const response = await fetch(`${API_BASE_URL}/projects/members?row=3`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${accessToken}`,  // ✅ 토큰 추가
+                        "Authorization": `Bearer ${accessToken}`,
                         "Content-Type": "application/json"
                     }
                 });
-        
-                if (!response.ok) throw new Error("프로젝트 불러오기 실패");
-        
+
                 const projectsData = await response.json();
                 console.log("[DEBUG] 프로젝트 데이터:", projectsData);
                 setProjects(projectsData);
@@ -72,15 +121,36 @@ const MypageMain = () => {
                 console.error("🚨 프로젝트 불러오기 실패:", err);
             }
         };
-        
-        
-        
-        
+
+        const fetchScrappedPosts = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/recruitments/scraps?userId=${userId}&row=3`);
+                const scrappedData = await response.json();
+                console.log("[DEBUG] 스크랩 데이터:", scrappedData);
+                setScrappedPosts(scrappedData);
+            } catch (err) {
+                console.error("🚨 스크랩 불러오기 실패:", err);
+            }
+        };
 
         fetchUserData();
+        fetchPosts();
+        fetchRecruitments();
         fetchPortfolios();
         fetchProjects();
-    }, [userId, navigate]);
+        fetchScrappedPosts();
+    }, [userInfo, userId, navigate]);
+
+    // ✅ combinedPosts 상태 업데이트
+    useEffect(() => {
+        if (posts.length === 0 && recruitments.length === 0) return;
+
+        const mergedPosts = [...posts, ...recruitments]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 3);
+
+        setCombinedPosts(mergedPosts);
+    }, [posts, recruitments]);
 
     if (loading) {
         return (
@@ -91,89 +161,215 @@ const MypageMain = () => {
     }
 
     return (
-        <Box sx={{ display: "flex", height: "100vh", overflowY: "auto" }}>
+        <Box sx={{ display: "flex",  minHeight: "100vh", overflowY: "auto" }}>
             {/* ✅ 좌측 사이드바 */}
-            <Box sx={{ width: "250px", backgroundColor: "#f4f4f4", padding: "16px", borderRight: "1px solid #ccc", height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", position: "fixed", top: 0, left: 0 }}>
+            <Box sx={{display: "flex", 
+        minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
+        overflowY: "auto",
+        backgroundColor: "#f9f9f9",
+        alignItems: "stretch",
+        borderRight: "1px solid #ccc" }} >
                 <MypageSidebar user={user} />
             </Box>
 
             {/* ✅ 메인 컨텐츠 영역 */}
-            <Box sx={{ flexGrow: 1, marginLeft: "270px", marginRight: "100px", padding: "40px" }}>
+            <Box sx={{ flexGrow: 1, marginLeft: "20px", marginRight: "100px", padding: "40px" }}>
                 {/* 섹션 1: 일정 관리 + 작성글 */}
                 <Box mb={4}>
-                    <Typography variant="h6">📅 일정 관리</Typography>
+                    <Typography variant="h6" >📅 일정 관리</Typography>
                     <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}>
                         <Typography>캘린더 영역</Typography>
                     </Box>
                 </Box>
                 <Box mb={4}>
-                    <Typography variant="h6">📝 작성한 글</Typography>
+                  <Typography variant="h6"sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                    onClick={() => navigate("/mypage/posts")}>📝 작성한 글 </Typography>
                     <Grid container spacing={3}>
-                        {[...Array(3)].map((_, index) => (
-                            <Grid item xs={4} key={index}>
-                                <Box sx={{ border: "1px solid #ddd", padding: 3, borderRadius: 2, height: "120px", mb: 2 }}>
-                                    <Typography>작성 글 {index + 1} 영역</Typography>
-                                </Box>
-                            </Grid>
-                        ))}
+                        {combinedPosts.length > 0 ? combinedPosts.map((post, index) => (
+                            post ? (
+                                <Grid item xs={4} key={index}>
+                                    <Box 
+                                        sx={{ 
+                                            border: "1px solid #ddd", 
+                                            padding: 2, 
+                                            borderRadius: 2, 
+                                            height: "120px", 
+                                            display: "flex", 
+                                            flexDirection: "column", 
+                                            justifyContent: "space-between",
+                                            cursor: post ? "pointer" : "default",
+                                            backgroundColor: post ? "white" : "#f9f9f9",
+                                            color: post ? "black" : "#bbb",
+                                            "&:hover": post ? { backgroundColor: "#f9f9f9" } : {}
+                                        }}
+                                        onClick={() => post && navigate(post?.recruitedField ? `/recruitment/${post.id}` : `/post/${post.id}`)}
+                                    >
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
+                                        
+                                        <Typography variant="subtitle1" fontWeight="bold">
+                                            {post?.title ? `[${post.title}]` : "작성된 글 없음"}
+                                        </Typography>
+                                        <Typography>
+                                                {post?.recruitedField ? "모집글" : "게시글"}
+                                            </Typography>
+                                        </Box>    
+                                    
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
+                                        <Typography>{post?.createdAt ? dayjs(post.createdAt).format("YYYY-MM-DD") : "-"}</Typography>
+                                        <Typography>
+                                          댓글 수 : {(post?.comments?.length || 0) + (post?.filteredComments?.length || 0)}
+                                        </Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                            ) : null
+                        )) : (
+                            <Typography>작성된 글이 없습니다.</Typography>
+                        )}
                     </Grid>
                 </Box>
+
+
 
                 {/* 섹션 2: 포트폴리오 + 프로젝트 + 스크랩 */}
                 <Box mb={4}>
-                    <Typography variant="h6">🚀 프로젝트</Typography>
-                    <Grid container spacing={3}>
-                        {projects.length > 0 ? projects.map((project, index) => (
-                            <Grid item xs={4} key={project.id || index}>
-                                <Box sx={{ border: "1px solid #ddd", padding: 3, borderRadius: 2, height: "140px", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left", mb: 2 }}>
-                                    <Typography variant="subtitle1" fontWeight="bold" sx={{ ml: 1, mt: 3 }}>
-                                        "{project.name}"
-                                    </Typography>
-                                    
-                                    <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 1, flexWrap: "wrap", mt: "auto", pb: 1, ml: 1 }}>
-                                        {project.stacks && project.stacks.map((stack) => (
-                                            <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
-                                        ))}
-                                    </Box>
-                                </Box>
-                            </Grid>
-                        )) : <Typography>진행 중인 프로젝트가 없습니다.</Typography>}
-                    </Grid>
+                <Typography variant="h6"sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                 onClick={() => navigate("/mypage/projects")}>🚀 프로젝트</Typography>
+                      <Grid container spacing={3}>
+                          {Array.from({ length: 3 }, (_, index) => {
+                              const project = projects[index];
+                              return (
+                                  <Grid item xs={4} key={index}>
+                                      <Box
+                                          sx={{
+                                              border: "1px solid #ddd",
+                                              padding: 3,
+                                              borderRadius: 2,
+                                              height: "140px",
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              justifyContent: "space-between",
+                                              cursor: project ? "pointer" : "default",
+                                              backgroundColor: project ? "white" : "#f9f9f9",
+                                              color: project ? "black" : "#bbb",
+                                              "&:hover": project ? { backgroundColor: "#f9f9f9" } : {},
+                                          }}
+                                          onClick={() => project && navigate(`/project/${project.id}`)}
+                                      >
+                                          <Typography variant="subtitle1" fontWeight="bold">
+                                              {project ? `"${project.name}"` : "프로젝트 없음"}
+                                          </Typography>
+                                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                                              {project?.stacks?.map((stack) => (
+                                                  <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
+                                              ))}
+                                          </Box>
+                                      </Box>
+                                  </Grid>
+                              );
+                          })}
+                      </Grid>
                 </Box>
 
                 <Box mb={4}>
-                    <Typography variant="h6" >📁 포트폴리오</Typography>
+                <Typography variant="h6"sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                 onClick={() => navigate("/mypage/portfolios")} >📁 포트폴리오</Typography>
                     <Grid container spacing={3}>
-                        {portfolios.length > 0 ? portfolios.map((portfolio, index) => (
-                            <Grid item xs={4} key={portfolio.id || index}>
-                                <Box sx={{ border: "1px solid #ddd", padding: 3, borderRadius: 2, height: "140px", display: "flex", flexDirection: "column", justifyContent: "space-between", textAlign: "left", mb: 2 }}>
-                                    <Typography variant="subtitle1" fontWeight="bold" sx={{ ml: 1, mt: 3 }}>
-                                        "{portfolio.title}"
-                                    </Typography>
-                                    <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 1, flexWrap: "wrap", mt: "auto", pb: 1, ml: 1 }}>
-                                        {portfolio.portfolioStacks && portfolio.portfolioStacks.map((stack) => (
-                                            <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
-                                        ))}
+                        {Array.from({ length: 3 }, (_, index) => {
+                            const portfolio = portfolios[index]; // 존재하는 포트폴리오 가져오기
+                        
+                            return (
+                                <Grid item xs={4} key={index}>
+                                    <Box
+                                        sx={{
+                                            border: "1px solid #ddd",
+                                            padding: 3,
+                                            borderRadius: 2,
+                                            height: "140px",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            justifyContent: "space-between",
+                                            cursor: portfolio ? "pointer" : "default",
+                                            backgroundColor: portfolio ? "white" : "#f9f9f9",
+                                            color: portfolio ? "black" : "#bbb",
+                                            "&:hover": portfolio ? { backgroundColor: "#f9f9f9" } : {},
+                                        }}
+                                        onClick={() => portfolio && navigate(`/mypage/portfolios`)}
+                                    >
+                                        <Typography variant="subtitle1" fontWeight="bold">
+                                            {portfolio ? `"${portfolio.title}"` : "포트폴리오 없음"}
+                                        </Typography>
+                                    
+                                        {/* ✅ 포트폴리오 기술 스택 표시 */}
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: "auto", pb: 1 }}>
+                                            {portfolio?.portfolioStacks?.map((stack) => (
+                                                <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
+                                            ))}
+                                        </Box>
                                     </Box>
-                                </Box>
-                            </Grid>
-                        )) : <Typography>포트폴리오가 없습니다.</Typography>}
+                                </Grid>
+                            );
+                        })}
                     </Grid>
                 </Box>
 
 
 
                 <Box>
-                    <Typography variant="h6">⭐ 스크랩</Typography>
-                    <Grid container spacing={3}>
-                        {[...Array(3)].map((_, index) => (
-                            <Grid item xs={4} key={index}>
-                                <Box sx={{ border: "1px solid #ddd", padding: 3, borderRadius: 2, height: "120px", mb: 2 }}>
-                                    <Typography>스크랩 {index + 1} 영역</Typography>
-                                </Box>
-                            </Grid>
-                        ))}
-                    </Grid>
+                    <Typography variant="h6" sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                    onClick={() => navigate("/mypage/scraps")}>⭐ 스크랩한 모집글</Typography>
+                                 <Grid container spacing={3}>
+                                 {scrappedPosts.length > 0 ? scrappedPosts.map((scrap, index) => {
+                          const today = dayjs();
+                          const deadline = dayjs(scrap.deadline);
+                          const daysLeft = deadline.diff(today, "day"); // 🔥 남은 일 수 계산
+                          const status = daysLeft < 0 ? "마감" : `D-${daysLeft}`;
+
+                          return (
+                              <Grid item xs={4} key={scrap.recruitmentScrapId}>
+                                  <Box
+                                      sx={{
+                                          border: "1px solid #ddd",
+                                          padding: 3,
+                                          borderRadius: 2,
+                                          height: "140px",
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          justifyContent: "space-between",
+                                          cursor: "pointer",
+                                          "&:hover": { backgroundColor: "#f9f9f9" },
+                                      }}
+                                      onClick={() => navigate(`/recruitment/${scrap.recruitmentPostId}`)} // ✅ 모집글 상세 페이지 이동
+                                  >
+                                      {/* ✅ 제목 & 마감 여부 표시 */}
+                                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                          <Typography variant="subtitle1" fontWeight="bold">
+                                              {scrap.title}
+                                          </Typography>
+                                          <Typography
+                                              sx={{
+                                                  fontSize: "0.875rem",
+                                                  fontWeight: "bold",
+                                                  color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
+                                              }}
+                                          >
+                                              {status}
+                                          </Typography>
+                                      </Box>
+
+                                      {/* ✅ 작성 날짜 & 댓글 수 */}
+                                      <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
+                                          <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
+                                          <Typography>댓글 {scrap.commentCount}개</Typography>
+                                      </Box>
+                                  </Box>
+                              </Grid>
+                          );
+                      }) : (
+                          <Typography>스크랩한 모집글이 없습니다.</Typography>
+                      )}
+                  </Grid>
+
                 </Box>
             </Box>
         </Box>

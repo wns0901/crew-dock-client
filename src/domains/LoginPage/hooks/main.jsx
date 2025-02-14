@@ -38,10 +38,9 @@ createRoot(document.getElementById("root")).render(
         </Route>
 
         <Route path="/mypage" element={<MypageMain />} />
-        <Route path="/mypage/:userId" element={<MypageMain />} />
+        
         <Route path="/mypage/posts" element={<PostsPage />} />
         <Route path="/mypage/portfolios" element={<PortfoliosPage />} />
-        <Route path="/mypage/:userId/portfolios" element={<PortfoliosPage />} />
         <Route path="/mypage/portfolios/edit/:portfolioId" element={<PortfoliosEditPage />} /> 
         <Route path="/mypage/portfolios/new" element={<PortfoliosEditPage />} /> 
         <Route path="/mypage/projects" element={<ProjectsPage />} />

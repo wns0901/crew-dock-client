@@ -72,7 +72,7 @@ const LoginContextProvider = ({children}) => {
 
       if (status === 200) {
         Cookies.set("accessToken", accessToken);
-
+        console.log("로그인 성공");
         loginCheck();
 
         navigate("/");
@@ -133,7 +133,7 @@ const LoginContextProvider = ({children}) => {
     localStorage.setItem('userInfo', JSON.stringify(updateUserInfo));
     localStorage.setItem('roles', JSON.stringify(updatedRoles));
     localStorage.setItem('projectRoles', JSON.stringify(projectRoles));
-
+    console.log(localStorage);
   };
 
   const logoutSetting = () => {

@@ -4,6 +4,7 @@ import axios from "axios";
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { Link } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const PendingMembers = () => {
   const { projectId } = useParams();
   const { projectRoles } = useContext(LoginContext); // 로그인 컨텍스트에서 프로젝트 권한 정보 가져오기
@@ -18,7 +19,7 @@ const PendingMembers = () => {
 
   const fetchPendingMembers = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
+      const response = await axios.get(`${BASE_URL}/projects/${projectId}/members`);
       console.log("API 응답 데이터:", response.data);
 
       const filteredMembers = response.data.filter((member) => member.status === "REQUEST");
@@ -30,7 +31,7 @@ const PendingMembers = () => {
 
   const handleApprove = async (userId) => {
     try {
-      await axios.patch(`http://localhost:8080/projects/${projectId}/members`, {
+      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
         userId: userId,
         authority: "CREW",
         status: "APPROVE",
@@ -44,7 +45,7 @@ const PendingMembers = () => {
 
   const handleReject = async (userId) => {
     try {
-      await axios.patch(`http://localhost:8080/projects/${projectId}/members`, {
+      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
         userId: userId,
         status: "WITHDRAW",
       });

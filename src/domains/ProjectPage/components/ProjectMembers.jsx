@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { Link } from "react-router-dom";
-
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const ProjectMembers = () => {
   const { projectId } = useParams();
   const { userInfo, projectRoles } = useContext(LoginContext); // user → userInfo로 변경
@@ -33,7 +33,7 @@ const ProjectMembers = () => {
 
   const fetchMembers = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/projects/${projectId}/members`);
+      const response = await axios.get(`${BASE_URL}/projects/${projectId}/members`);
       setMembers(response.data);
     } catch (error) {
       console.error("멤버 조회 실패:", error);
@@ -57,12 +57,12 @@ const ProjectMembers = () => {
 
   const handleAuthority = async (userId) => {
     try {
-      await axios.patch(`http://localhost:8080/projects/${projectId}/members`, {
+      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
         userId: userId,
         authority: "CAPTAIN",
       });
 
-      await axios.patch(`http://localhost:8080/projects/${projectId}/members`, {
+      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
         userId: userInfo.id,
         authority: "CREW",
       });
@@ -79,7 +79,7 @@ const ProjectMembers = () => {
     }
     try {
       await axios.post(
-        `http://localhost:8080/projects/${projectId}/resignations/members`,
+        `${BASE_URL}/projects/${projectId}/resignations/members`,
         { content: resignation },
         {
           params: { userId: selectedMember.user.id },

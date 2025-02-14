@@ -19,6 +19,7 @@ const ProjectsPage = () => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState({});
     const [projects, setProjects] = useState([]);
+    const [issues, setIssues] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [newProject, setNewProject] = useState({
@@ -67,10 +68,7 @@ const ProjectsPage = () => {
         const fetchProjects = async () => {
             try {
                 const accessToken = Cookies.get("accessToken");
-                if (!accessToken) {
-                    console.error("🚨 인증 토큰이 없음! (로그인 필요)");
-                    return;
-                }
+                if (!accessToken) return;
 
                 const response = await fetch(`${API_BASE_URL}/projects/members`, {
                     method: "GET",
@@ -83,15 +81,59 @@ const ProjectsPage = () => {
                 if (!response.ok) throw new Error("프로젝트 불러오기 실패");
 
                 const data = await response.json();
-                setProjects(Array.isArray(data) ? data : []);
+                
+                const sortedProjects = data.sort((a, b) => {
+                    const statusOrder = { BOARDING: 1, CRUISING: 2, COMPLETED: 3, SINKING: 4 };
+                    if (statusOrder[a.status] !== statusOrder[b.status]) {
+                        return statusOrder[a.status] - statusOrder[b.status];
+                    }
+                    return new Date(b.startDate) - new Date(a.startDate);
+                });
+                
+                setProjects(sortedProjects);
             } catch (error) {
                 console.error("🚨 프로젝트 가져오기 실패:", error);
             }
         };
 
+        const fetchIssues = async (projectsData) => {
+            try {
+                const accessToken = Cookies.get("accessToken");
+                if (!accessToken) return;
+
+                const issuePromises = projectsData.map(async (project) => {
+                    const response = await fetch(`${API_BASE_URL}/projects/${project.id}/issues`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${accessToken}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    
+                    if (!response.ok) throw new Error(`이슈 불러오기 실패 (프로젝트 ID: ${project.id})`);
+                    const data = await response.json();
+                    
+                    const unresolvedIssues = data.filter(issue => 
+                        (issue.status === "INPROGRESS" || issue.status === "YET") && issue.managerId === userInfo.id
+                    );
+                    
+                    return { projectId: project.id, unresolvedIssues };
+                });
+
+                const issuesData = await Promise.all(issuePromises);
+                const issuesMap = issuesData.reduce((acc, { projectId, unresolvedIssues }) => {
+                    acc[projectId] = unresolvedIssues.length;
+                    return acc;
+                }, {});
+                setIssues(issuesMap);
+            } catch (error) {
+                console.error("🚨 이슈 가져오기 실패:", error);
+            }
+        };
+
         const fetchData = async () => {
             setLoading(true);
-            await Promise.all([fetchUserData(), fetchProjects()]);
+            await Promise.all([fetchUserData(), fetchProjects(), fetchIssues()]);
             setLoading(false);
         };
 
@@ -203,7 +245,7 @@ const ProjectsPage = () => {
                                     <CardContent>
                                         <Typography variant="h6" fontWeight="bold" sx={{ fontSize: "1.5rem" }}>[{project.name}］</Typography>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                                            <Typography sx={{ mt: 1 }}>나의 미해결 이슈: <strong>TODO</strong></Typography>
+                                            <Typography sx={{ mt: 1 }}>나의 미해결 이슈: <strong>{issues[project.id] || 0}</strong></Typography>
                                             <Chip
                                                 label={getStatusLabel(project.status)}
                                                 sx={{ 

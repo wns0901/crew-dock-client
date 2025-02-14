@@ -133,7 +133,6 @@ const ProjectsPage = () => {
         
                         const data = await response.json();
         
-                        // 🔥 데이터가 배열인지 확인 (API 응답이 예상과 다를 경우 대비)
                         if (!Array.isArray(data)) {
                             console.error(`❌ 프로젝트 ${project.id}의 응답 데이터가 배열이 아님!`, data);
                             return { projectId: project.id, unresolvedIssues: [] };
@@ -155,14 +154,16 @@ const ProjectsPage = () => {
                 const issuesData = await Promise.all(issuePromises);
                 console.log("📌 모든 프로젝트의 이슈 데이터:", issuesData);
         
-                // 🔥 데이터가 undefined일 경우 방어 코드 추가
                 if (!issuesData || !Array.isArray(issuesData)) {
                     console.error("🚨 `issuesData`가 배열이 아님. 초기화함.");
                     setIssues({});
                     return;
                 }
         
-                const issuesMap = issuesData.reduce((acc, { projectId, unresolvedIssues }) => {
+                const validIssuesData = issuesData.filter(item => item && item.projectId !== undefined && item.unresolvedIssues !== undefined);
+                console.log("✅ 유효한 이슈 데이터:", validIssuesData);
+        
+                const issuesMap = validIssuesData.reduce((acc, { projectId, unresolvedIssues }) => {
                     acc[projectId] = unresolvedIssues.length || 0; // 🚨 undefined 방지
                     return acc;
                 }, {});
@@ -173,6 +174,7 @@ const ProjectsPage = () => {
                 console.error("🚨 이슈 가져오기 실패:", error);
             }
         };
+        
         
 
 

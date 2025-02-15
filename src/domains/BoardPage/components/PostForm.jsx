@@ -1,7 +1,7 @@
 import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Category, CategoryLabel } from '../constants/Category';
+import { Category, CategoryLabel } from '../constants/Category';
 // import '../styles/PostFormStyle.css';
 import { 
     Box, 

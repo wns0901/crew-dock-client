@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CategoryLabel, Category } from '../constants/Category';
+import { CategoryLabel, Category } from '../constants/Category';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';

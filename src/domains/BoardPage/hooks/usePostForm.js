@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom"
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import { Category } from "../\bconstants/\bCategory";
+import { Category } from "../constants/Category";
 
 
 export const usePostForm = () => {

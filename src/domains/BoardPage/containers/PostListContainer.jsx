@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import api from "../../../apis/baseApi";
 import PostList from "../components/PostList";
-import { Category } from "../\bconstants/\bCategory";
+import { Category } from "../constants/Category";
 
 const PostListContainers = () => {
     const [posts, setPosts] = useState([]);

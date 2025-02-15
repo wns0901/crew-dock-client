@@ -1,5 +1,5 @@
 import { Provider } from "react-redux";
-import { myStore } from "./containers/store"
+import { myStore } from "./containers/store";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ChatComponent from "./components/chat/ChatComponent";
@@ -15,7 +15,6 @@ import ProjectSettings from "./domains/ProjectPage/components/ProjectSettings";
 import ProjectManagement from "./domains/ProjectPage/components/ProjectManagement";
 import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
-<<<<<<< HEAD
 import PostCreateContainer from "./domains/BoardPage/containers/PostCreateContainer";
 import PostDetailContainer from "./domains/BoardPage/containers/PostDetailContainer";
 import PostEditContainer from "./domains/BoardPage/containers/PostEditiorContainer";
@@ -24,7 +23,6 @@ import ProjectCreateContainer from "./domains/ProjectPage/containers/ProjectCrea
 import ProjectEditContainer from "./domains/ProjectPage/containers/ProjectEditContainer";
 import ProjectListContainer from "./domains/ProjectPage/containers/ProjectListContainer";
 import ProjectDetailContainer from "./domains/ProjectPage/containers/ProjectDetailContainer";
-=======
 import MainPage from "./domains/MainPage/MainPage";
 import WriteRecruitmentPost from "./domains/MainPage/components/WriteRecruitmentPost";
 import MypageMain from "./domains/MyPage/components/MypageMain";
@@ -45,7 +43,6 @@ import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
->>>>>>> feb55f318117800d2cb152f184952ac5e7e2f9f2
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -55,15 +52,15 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<SampleIndex />} />
-            <Route path="/main" element={<MainPage/>} />
-            <Route path="/recruitmemt/write" element={<WriteRecruitmentPost />} />
+            <Route path="/main" element={<MainPage />} />
+            <Route
+              path="/recruitmemt/write"
+              element={<WriteRecruitmentPost />}
+            />
             <Route path="/login" element={<LoginPage />} />
-<<<<<<< HEAD
 
-=======
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
->>>>>>> feb55f318117800d2cb152f184952ac5e7e2f9f2
             <Route path="/projects/:projectId" element={<ProjectMain />}>
               <Route index element={<GitData />} />
               <Route path="issues" element={<ProjectIssue />} />
@@ -81,15 +78,13 @@ createRoot(document.getElementById("root")).render(
               </Route>
             </Route>
 
-<<<<<<< HEAD
             <Route path="/posts">
               <Route index element={<PostListContainers />} />
               <Route path="create" element={<PostCreateContainer />} />
               <Route path=":postId" element={<PostDetailContainer />} />
               <Route path=":postId/edit" element={<PostEditContainer />} />
             </Route>
-            
-=======
+
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="admin/user" element={<AdminUser />} />
             <Route path="admin/project" element={<AdminProject />} />
@@ -109,13 +104,21 @@ createRoot(document.getElementById("root")).render(
             <Route path="/mypage/:userId" element={<MypageMain />} />
             <Route path="/mypage/posts" element={<PostsPage />} />
             <Route path="/mypage/portfolios" element={<PortfoliosPage />} />
-            <Route path="/mypage/:userId/portfolios" element={<PortfoliosPage />} />
-            <Route path="/mypage/portfolios/edit/:portfolioId" element={<PortfoliosEditPage />} />
-            <Route path="/mypage/portfolios/new" element={<PortfoliosEditPage />} />
+            <Route
+              path="/mypage/:userId/portfolios"
+              element={<PortfoliosPage />}
+            />
+            <Route
+              path="/mypage/portfolios/edit/:portfolioId"
+              element={<PortfoliosEditPage />}
+            />
+            <Route
+              path="/mypage/portfolios/new"
+              element={<PortfoliosEditPage />}
+            />
             <Route path="/mypage/projects" element={<ProjectsPage />} />
             <Route path="/mypage/scraps" element={<ScrapsPage />} />
             <Route path="/mypage/sidebar" element={<MypageSidebar />} />
->>>>>>> feb55f318117800d2cb152f184952ac5e7e2f9f2
           </Route>
         </Routes>
       </LoginContextProvider>

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import MarkdownRenderer from './MarkdownRenderer';
-import { CategoryLabel } from '../constants/Category';
+import { CategoryLabel } from '../constants/Category';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';

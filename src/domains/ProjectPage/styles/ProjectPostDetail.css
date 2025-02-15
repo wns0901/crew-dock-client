@@ -1,0 +1,161 @@
+/* PostDetailStyle.css */
+.post-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+  
+.post-category {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #88d1d3;
+    color: black;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+  
+.post-detail h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+  
+.post-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+  
+.post-info span {
+    margin-right: 16px;
+    color: #666;
+}
+  
+.post-info button {
+    padding: 8px;
+    margin-left: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+}
+  
+.post-info button:hover {
+    color: #333;
+}
+  
+.post-content {
+    position: relative;
+    margin: 24px 0;
+    padding: 24px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+  
+.comment-count {
+    font-size: 12px;
+    color: #666;
+    text-align: right;
+    margin-top: 16px;
+}
+  
+.post-detail input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+  
+.post-detail > button[type='button'] {
+    padding: 8px 16px;
+    background-color: #88d1d3;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+  
+.post-detail h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 24px 0 16px;
+    clear: both;
+}
+  
+/* 댓글 스타일 */
+.comment-list {
+    margin-top: 20px;
+}
+  
+.comment-item {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+  
+.comment-item > div:first-child {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+  
+.comment-item > div:nth-child(2) {
+    margin-bottom: 8px;
+    color: #333;
+}
+  
+.comment-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+  
+.comment-footer button {
+    padding: 4px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #666;
+}
+  
+.comment-footer button:hover {
+    color: #333;
+}
+  
+.comment-footer span {
+    color: #666;
+    font-size: 14px;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    .category-section {
+      grid-column: span 12; 
+    }
+    
+    .button-section {
+      grid-column: span 12;  
+      flex-direction: column; 
+    }
+    
+    .category-select,
+    .title-input,
+    .cancel-button,
+    .submit-button {
+      font-size: 24px; 
+    }
+}

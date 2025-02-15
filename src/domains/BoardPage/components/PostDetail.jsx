@@ -168,9 +168,8 @@ const CommentItem = ({
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
 
-    const childComments = comment.childComments.filter(c => c.parentsId === comment.id && !c.deleted);
-
-
+    const childComments = (comment.childComments || []).filter(c => c.parentsId === comment.id && !c.deleted);
+    
     const handleSubmitReply = () => {
         if (replyContent.trim()) {
             onSubmitComment({

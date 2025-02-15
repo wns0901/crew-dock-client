@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
+import ProjectPostDetail from "../components/ProjectPostDetail";
 import { useComments } from "../hooks/useComments";
 import api from "../../../apis/baseApi";
-import ProjectPostDetail from "../components/ProjectPostDetail";
 
 const ProjectDetailContainer = () => {
     const {postId, projectId} = useParams();
@@ -15,50 +15,32 @@ const ProjectDetailContainer = () => {
         fixedComment, 
         onSubmitComment, 
         onFixedComment, 
-        onDeleteComment 
+        onDeleteComment,
+        getTotalCommentsCount 
     } = useComments(postId);
 
     useEffect(() => {
-        ( async () => {
-            const data1 = await fetchPost();
-            const data2 = await fetchAttachment();
-            setPost({
-                ...data1,
-                attachments: data2
-            })
-        })();
+        fetchPost();
     }, []);
 
     const fetchPost = async () => {
         try {
-            return (await api.get(`/projects/${projectId}/posts/${postId}`)).data;
+            const response = await api.get(`/projects/${projectId}/posts/${postId}`);
+            setPost({
+                id: response.data.id,
+                createdAt: response.data.createdAt,
+                title: response.data.title,
+                content: response.data.content,
+                category: response.data.category,
+                direction: response.data.direction,
+                userId: response.data.user?.id || response.data.userId,
+                userNickname: response.data.userNickname || null,
+                attachments: response.data.attachments || [],
+            });
+
+
         } catch (error) {
             console.error('게시글 로딩 실패:', error);
-        }
-    };
-
-    const fetchAttachment = async () => {
-        try {
-               return (await (api.get(`/projects/${projectId}/posts/${postId}/attachments`))).data;
-        } catch (error) {
-            console.error('게시글 로딩 실패:', error);
-        }
-    }
-
-    const handleDownloadAttachment = (attachmentId, fileName) => {
-        try {
-            const response = api.get(`/projects/${projectId}/posts/${postId}/attachments/${attachmentId}`, 
-                { responseType: 'blob' }
-            );
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-        } catch (error) {
-            console.error('첨부파일 다운로드 실패:', error);
         }
     };
 
@@ -72,7 +54,9 @@ const ProjectDetailContainer = () => {
         if(window.confirm('게시글을 삭제하시겠습니까?')) {
             try {
                 await api.delete(`/projects/${projectId}/posts/${postId}`);
-                navigate(`/projects/${projectId}/posts`);
+                navigate('/posts', {
+                    search: `?page=1&direction=${post.direction}`
+                });
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);
             }
@@ -95,7 +79,7 @@ const ProjectDetailContainer = () => {
             onSubmitComment={handleSubmitComment}
             onFixedComment={onFixedComment}
             onDeleteComment={onDeleteComment}
-            onDownloadAttachment={handleDownloadAttachment}
+            getTotalCommentsCount={getTotalCommentsCount}
         />
     );
 };

@@ -11,7 +11,6 @@ export const useComments = (postId) => {
         try {
             const response = await api.get(`/projects/${projectId}/posts/${postId}/comments`);
             const allComments = response.data.comments;
-            console.log(response.data);
             
             const commentMap = new Map();
             allComments.forEach(comment => {
@@ -66,10 +65,12 @@ export const useComments = (postId) => {
     
             if (response.status === 200 || response.status === 201) {
                 const newComment = response.data;
-    
+
                 let updatedComments;
-                if (commentData.parentComment) {
+                if (commentData.parentComment) {  
+                    
                     updatedComments = comments.map(comment => {
+                        
                         if (comment.id === commentData.parentComment.id) {
                             const updatedChildComments = [...comment.childComments, newComment];
     
@@ -85,7 +86,8 @@ export const useComments = (postId) => {
                     updatedComments = [...comments, newComment];
                 }
                 setComments(updatedComments);
-
+                console.log(updatedComments);
+                
                 if (fixedComment) {
                     setFixedComment(fixedComment);
                 }
@@ -103,6 +105,11 @@ export const useComments = (postId) => {
                     id: commentId,
                     fixed: false
                 });
+
+                setFixedComment(null);
+                setComments(comments.map(comment => 
+                    comment.id === commentId ? { ...comment, fixed: false } : comment
+                ));
             } else {
                 if (fixedComment) {
                     await api.patch(`/projects/${projectId}/posts/${postId}/comments`, { 
@@ -118,11 +125,19 @@ export const useComments = (postId) => {
                 
                 if (response.status === 200) {
                     const updatedComment = response.data;
-                    const updatedComments = comments.map(comment => 
-                        comment.id === updatedComment.id ? updatedComment : { ...comment, fixed: false }
-                    );
-                    const newFixedComment = updatedComment.fixed ? updatedComment : null;
-                    setFixedComment(newFixedComment);
+                    const updatedComments = comments.map(comment => {
+                        if (comment.id === updatedComment.id) {
+                            return { 
+                                ...comment, 
+                                fixed: true,
+                                childComments: comment.childComments || [] // 기존 대댓글 유지
+                            };
+                        } else {
+                            return { ...comment, fixed: false };
+                        }
+                    });
+
+                    setFixedComment(updatedComment);
                     setComments(updatedComments);
                 }
             }
@@ -135,24 +150,36 @@ export const useComments = (postId) => {
         try {
             const response = await api.delete(`/projects/${projectId}/posts/${postId}/comments/${commentId}`);
             if (response.status === 200) {
-                setComments(comments.map(comment => {      
-                        if (comment.id === commentId) {
-                            return { ...comment, deleted: true, content: "삭제된 댓글입니다." };
-                        }
-                        if (comment.childComments) {
-                            return {
-                                ...comment,
-                                childComments: comment.childComments.map(childComment => {
-                                    if (childComment.id === commentId) {
-                                        return { ...childComment, deleted: true, content: "삭제된 댓글입니다." };
-                                    }
-                                    return childComment;
-                                })
-                            };
-                        }
-                        return comment;
-                    }).filter(comment => !comment.deleted || (comment.childComments && comment.childComments.length > 0))
-                );
+                setComments(comments.map(comment => {
+
+                    if (comment.id === commentId) {
+                        return { 
+                            ...comment, 
+                            deleted: true, 
+                            content: "삭제된 댓글입니다.",
+                            childComments: comment.childComments ?? []
+                        };
+                    }
+    
+                    if (comment.childComments) {
+                        return {
+                            ...comment,
+                            childComments: comment.childComments.map(childComment => {
+                                if (childComment.id === commentId) {
+                                    return { 
+                                        ...childComment, 
+                                        deleted: true, 
+                                        content: "삭제된 댓글입니다." 
+                                    };
+                                }
+                                return childComment;
+                            })
+                        };
+                    }
+    
+                    return comment;
+                }));
+    
                 if (fixedComment?.id === commentId) {
                     setFixedComment(null);
                 }
@@ -161,6 +188,12 @@ export const useComments = (postId) => {
             console.error('댓글 삭제 실패:', error);
         }
     };
+
+    const getTotalCommentsCount = (comments) => {
+        return comments.reduce((count, comment) => {
+            return count + 1 + (comment.childComments ? getTotalCommentsCount(comment.childComments) : 0);
+        }, 0);
+    };
     
 
     return {
@@ -168,6 +201,7 @@ export const useComments = (postId) => {
         fixedComment,
         onSubmitComment,
         onFixedComment,
-        onDeleteComment
+        onDeleteComment,
+        getTotalCommentsCount
     };
 };

@@ -149,6 +149,7 @@ export const useComments = (postId) => {
             const response = await api.delete(`/posts/${postId}/comments/${commentId}`);
             if (response.status === 200) {
                 setComments(comments.map(comment => {
+
                     if (comment.id === commentId) {
                         return { 
                             ...comment, 

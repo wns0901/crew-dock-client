@@ -1,0 +1,158 @@
+.post-form-container {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 20px;
+}
+  
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+}
+  
+.category-section {
+    grid-column: span 3;
+    margin-top: 40px;
+}
+  
+.category-select-container {
+    width: 100%;
+    height: 92px;
+    background: transparent;
+    position: relative;
+}
+  
+.category-select {
+    width: 100%;
+    height: 100%;
+    padding: 0 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 40px;
+    font-weight: 400;
+    border-radius: 15px;
+    border: none;
+    appearance: none;
+    background: #ccdcf4;
+    color: #385080;
+}
+  
+.dropdown-icon {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    color: #385080;
+}
+  
+.title-section {
+    grid-column: span 12;
+    margin-top: 20px;
+}
+
+.title-section h3 {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #385080;
+}
+  
+.title-input-container {
+    width: 100%;
+    height: 111px;
+    background: #FFFFFF;
+}
+  
+.title-input {
+    width: 100%;
+    height: 100%;
+    padding: 0 27px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    border: solid 2px #ccc;
+    border-radius: 15px;
+    background: transparent;
+}
+
+.title-input::placeholder {
+    color: #999;
+    font-size: 32px;
+    font-weight: 400;
+}
+
+.category-select:focus,
+.title-input:focus {
+  outline: none;
+}
+  
+.content-section {
+    grid-column: span 12;
+}
+  
+.content-editor-container {
+    width: 100%;
+    min-height: 420px;
+    background: #FFFFFF;
+}
+  
+.divider-section {
+    grid-column: span 12;
+    border-top: 1px solid #000000;
+    margin: 40px 0;
+}
+  
+.button-section {
+    grid-column: 7 / span 6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 19px;
+    margin-bottom: 40px;
+}
+  
+.post-form-container .button-section .cancel-button {
+    width: 243px;
+    height: 92px;
+    background: transparent;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    color: #385080;
+    border: none;
+    cursor: pointer;
+}
+  
+.post-form-container .button-section .submit-button {
+    width: 243px;
+    height: 92px;
+    background: #44a4bd;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+}
+  
+  /* MD Editor customization */
+.w-md-editor {
+    width: 100%;
+    height: 100%;
+    background: #FFFFFF !important;
+    border: none !important;
+}
+  
+.w-md-editor-toolbar {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #ccc !important;
+}
+  
+.w-md-editor-text {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 16px !important;
+}

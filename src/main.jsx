@@ -53,8 +53,8 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route element={<Layout />}>
 
-            <Route path="/" element={<SampleIndex />} />
-            <Route path="/main" element={<MainPage />} />
+            {/* <Route path="/" element={<SampleIndex />} /> */}
+            <Route path="/" element={<MainPage />} />
             <Route
               path="/recruitmemt/write"
               element={<WriteRecruitmentPost />}
@@ -62,9 +62,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
-            <Route path="/projects/:projectId" element={<ProjectMain />}>
             <Route path="issues" element={<ProjectIssue />} />
-            <Route path="/main" element={<MainPage />} />
             <Route
               path="/recruitmemt/write"
               element={<WriteRecruitmentPost />}
@@ -139,7 +137,6 @@ createRoot(document.getElementById("root")).render(
             <Route path="/mypage/scraps" element={<ScrapsPage />} />
             <Route path="/mypage/sidebar" element={<MypageSidebar />} />
             
-            </Route>
           </Route>
         </Routes>
       </LoginContextProvider>

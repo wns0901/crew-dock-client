@@ -36,6 +36,8 @@ import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePosi
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
 
+import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
+import MyCalendar from "./domains/MyPage/components/MyCalendar";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Provider store={myStore}>
@@ -50,8 +52,8 @@ createRoot(document.getElementById("root")).render(
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
-              <Route index element={<GitData />} />
-              <Route path="issues" element={<ProjectIssue />} />
+              <Route index element={<ProjectCalendar/>} />
+              <Route path="issues" element={<ProjectIssue/>}/>
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
               <Route path="resignations" element={<Resignations />} />

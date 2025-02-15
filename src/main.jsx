@@ -16,6 +16,8 @@ import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
 import MainPage from "./domains/MainPage/MainPage";
 import WriteRecruitmentPost from "./domains/MainPage/components/WriteRecruitmentPost";
+import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
+import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -26,7 +28,9 @@ createRoot(document.getElementById("root")).render(
           <Route element={<Layout />}>
             <Route path="/" element={<SampleIndex />} />
             <Route path="/main" element={<MainPage/>} />
-            <Route path="/recruitmemt/write" element={<WriteRecruitmentPost />} />
+            <Route path="/recruitment/write" element={<WriteRecruitmentPost />} />
+            <Route path="/recruitments/:recruitmentsId" element={<DetailRecruitmentsPost />} />  {/* 동적 라우트 추가 */}
+            <Route path="/recruitments/edit/:recruitmentId" element={<EditRecruitmentPost />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
               <Route index element={<GitData />} />

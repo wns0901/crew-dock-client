@@ -72,7 +72,7 @@ export const useComments = (postId) => {
                     updatedComments = comments.map(comment => {
                         
                         if (comment.id === commentData.parentComment.id) {
-                            const updatedChildComments = [...comment.childComments, newComment];
+                            const updatedChildComments = [...(comment.childComments || []), newComment];
     
                             return {
                                 ...comment,

@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
-  Typography,
   Card,
   CardContent,
-  Divider,
-  Select,
-  MenuItem,
   FormControl,
-  InputLabel,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography
 } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import FlagIcon from "@mui/icons-material/Flag";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 

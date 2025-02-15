@@ -15,7 +15,8 @@ const PostDetailContainer = () => {
         fixedComment, 
         onSubmitComment, 
         onFixedComment, 
-        onDeleteComment 
+        onDeleteComment,
+        getTotalCommentsCount 
     } = useComments(postId);
 
     useEffect(() => {
@@ -78,6 +79,7 @@ const PostDetailContainer = () => {
             onSubmitComment={handleSubmitComment}
             onFixedComment={onFixedComment}
             onDeleteComment={onDeleteComment}
+            getTotalCommentsCount={getTotalCommentsCount}
         />
     );
 };

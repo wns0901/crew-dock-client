@@ -1,10 +1,10 @@
+import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Button, Divider, Stack, TextField, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import MarkdownRenderer from './MarkdownRenderer';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
 import { DirectionLabel } from '../constants/Direction';
+import MarkdownRenderer from './MarkdownRenderer';
 
 const ProjectPostDetail = ({
     post = null,

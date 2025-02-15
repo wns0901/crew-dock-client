@@ -6,7 +6,6 @@ import ChatComponent from "./components/chat/ChatComponent";
 import LoginPage from "./domains/LoginPage/LoginPage";
 import LoginContextProvider from "./contexts/LoginContextProvider";
 import SampleIndex from "./SampleIndex";
-import GitData from "./domains/ProjectPage/components/GitData";
 import ProjectIssue from "./domains/ProjectPage/components/IssueTable";
 import ProjectMembers from "./domains/ProjectPage/components/ProjectMembers";
 import Resignations from "./domains/ProjectPage/components/Resignations";
@@ -43,6 +42,7 @@ import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
+import GitData from "./domains/ProjectPage/components/gitData";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -62,7 +62,6 @@ createRoot(document.getElementById("root")).render(
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
-              <Route index element={<GitData />} />
               <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />

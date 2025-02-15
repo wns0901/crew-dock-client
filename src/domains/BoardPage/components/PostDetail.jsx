@@ -16,6 +16,7 @@ const PostDetail = ({
     onFixedComment = () => {}, 
     onDeleteComment = () => {},
     userInfo = null,
+    getTotalCommentsCount = () => {},
 }) => {
     const [comment, setComment] = useState({ content: '' });
     const isAuthor = post?.userId === userInfo?.id;
@@ -81,7 +82,7 @@ const PostDetail = ({
                     <Box>
                         <MarkdownRenderer content={post?.content} />
                         <Typography variant="body2" align="right">
-                            댓글 수: {comments.length}
+                            댓글 수: {getTotalCommentsCount(comments)}
                         </Typography>
                     </Box>
 
@@ -167,7 +168,8 @@ const CommentItem = ({
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
 
-    const childComments = comments.filter(c => c.parentsId === comment.id);
+    const childComments = comment.childComments.filter(c => c.parentsId === comment.id && !c.deleted);
+
 
     const handleSubmitReply = () => {
         if (replyContent.trim()) {
@@ -182,7 +184,7 @@ const CommentItem = ({
     };
 
     if (comment.deleted && childComments.length === 0) {
-        return null; 
+        return null;
     }
 
     return (
@@ -202,11 +204,11 @@ const CommentItem = ({
                     alignItems: 'center' 
                 }}>
                     <Typography variant="caption">{comment.createdAt}</Typography>
-                    {!comment.deleted && (
-                        <Box>
+                    <Box>
+                        <>
                             {!comment.deleted && (
                                 <>
-                                    {isAuthor && !comment.fixed && (
+                                    {isAuthor && (
                                         <Button 
                                             size="small" 
                                             onClick={() => onFixedComment(comment.id)}
@@ -223,26 +225,28 @@ const CommentItem = ({
                                             삭제
                                         </Button>
                                     )}
-                                    {!isReply && (
-                                        <Button 
-                                            size="small"
-                                            onClick={() => setShowReplyForm(!showReplyForm)}
-                                        >
-                                            답글
-                                        </Button>
-                                    )}
                                 </>
                             )}
-                            {!isReply && comment.childComments && comment.childComments.length > 0 && (
+                            {/* 답글 버튼은 항상 표시되게 함 */}
+                            {!isReply && (
                                 <Button 
                                     size="small"
-                                    onClick={() => setShowReplies(!showReplies)}
+                                    onClick={() => setShowReplyForm(!showReplyForm)}
                                 >
-                                    {showReplies ? '답글 숨기기' : `답글 ${comment.childComments.length}개 보기`}
+                                    답글
                                 </Button>
                             )}
-                        </Box>
-                    )}
+                        </>
+                        {/* 자식 댓글 보기/숨기기 버튼 */}
+                        {!isReply && childComments.length > 0 && (
+                            <Button 
+                                size="small"
+                                onClick={() => setShowReplies(!showReplies)}
+                            >
+                                {showReplies ? '답글 숨기기' : `답글 ${childComments.length}개 보기`}
+                            </Button>
+                        )}
+                    </Box>
                 </Box>
             </Stack>
 
@@ -258,7 +262,7 @@ const CommentItem = ({
                 </Box>
             )}
 
-            {!isReply && showReplies && comment.childComments && comment.childComments.map(childComment => (
+            {!isReply && showReplies && childComments && childComments.map(childComment => (
                 <CommentItem
                     key={`child-comment-${childComment.id}`}
                     comment={childComment}
@@ -269,6 +273,7 @@ const CommentItem = ({
                     onDeleteComment={onDeleteComment}
                     onSubmitComment={onSubmitComment}
                     userInfo={userInfo}
+                    allComments={comments}
                     isReply={true}
                 />
             ))}
@@ -285,7 +290,8 @@ const CommentItem = ({
     onFixedComment: PropTypes.func,
     onDeleteComment: PropTypes.func,
     userInfo: PropTypes.object.isRequired,
-    fixedComment: PropTypes.object
+    fixedComment: PropTypes.object,
+    getTotalCommentsCount: PropTypes.func
  };
 
  CommentItem.propTypes = {

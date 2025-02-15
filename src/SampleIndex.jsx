@@ -1,10 +1,9 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import { LoginContext } from "./contexts/LoginContextProvider";
-import { makeChatRoom } from "./containers/userSocketStatusSlice";
 import MDEditor from "@uiw/react-md-editor";
+import React, { useContext, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { makeChatRoom } from "./containers/userSocketStatusSlice";
+import { LoginContext } from "./contexts/LoginContextProvider";
 import { customCommands } from "./utils/mdEditorCustomImgIcon";
 
 const SampleIndex = () => {
@@ -12,7 +11,7 @@ const SampleIndex = () => {
   const [inviteId, setInviteId] = useState("");
   const [text, setText] = useState("");
 
-  const { userInfo, isLogin, roles, projectRoles, logout, loginCheck } =
+  const { userInfo, isLogin, roles, projectRoles, logout } =
     useContext(LoginContext);
 
   const dispath = useDispatch();

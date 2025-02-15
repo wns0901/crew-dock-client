@@ -30,6 +30,7 @@ const ChatWindow = ({ setNewMessage, setIsOpened }) => {
   useEffect(() => {    
     if (selectedRoom) return;
     getChatRooms().then((chatRooms) => {
+      console.log(chatRooms);
       dispath(setChatRooms(chatRooms));
     });
   }, [selectedRoom]);
@@ -87,6 +88,7 @@ const ChatWindowModal = styled.div`
   bottom: 10%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow-y: scroll;
+  z-index: 100;
 `;
 
 export default ChatWindow;

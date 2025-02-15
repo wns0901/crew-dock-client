@@ -79,7 +79,7 @@ const PostListContainers = () => {
                     const startIndex = (currentPage - 1) * pagination.pageSize;
                     const endIndex = startIndex + pagination.pageSize;
                     const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
-
+                    
                     setPosts(paginatedPosts);
                     setPagination(prev => ({
                         ...prev,

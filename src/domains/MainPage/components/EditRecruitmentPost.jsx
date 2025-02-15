@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { position, proceedMethod, region } from "../../MainPage/components/Filter";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
+import RecruitmentAttachmentUpload from "./RecruitmentAttachmentUpload"; 
 
 const EditRecruitmentPost = () => {
     const { userInfo } = useContext(LoginContext);
@@ -41,7 +42,7 @@ const EditRecruitmentPost = () => {
     
         api.get(`/recruitments/${recruitmentId}`)
             .then(response => {
-                console.log("✅ 기존 모집글 데이터:", response.data);
+                console.log("기존 모집글 데이터:", response.data);
                 const postData = response.data;
 
                 setProjectName(postData.projectName || "프로젝트명 없음"); 
@@ -54,11 +55,11 @@ const EditRecruitmentPost = () => {
                 setContent(postData.content || "");
                 setPeriod(postData.period ? `${postData.period}개월` : "기간 없음");
 
-                // ✅ 모집글의 프로젝트 ID를 사용해 기술 스택 조회
+                // 모집글의 프로젝트 ID를 사용해 기술 스택 조회
                 if (response.data.projectId) {
                     api.get(`/projects/${response.data.projectId}/stacks`)
                         .then(res => {
-                            setStacks(res.data.map(stack => stack.stackName)); // ✅ 스택 이름만 저장
+                            setStacks(res.data.map(stack => stack.stackName)); //  스택 이름만 저장
                         })
                         .catch(error => console.error("❌ 프로젝트 스택 가져오기 실패:", error));
                 }
@@ -99,16 +100,16 @@ const EditRecruitmentPost = () => {
             },
         };
 
-        console.log("📌 수정할 모집글 데이터:", JSON.stringify(postData, null, 2));
+        console.log(" 수정할 모집글 데이터:", JSON.stringify(postData, null, 2));
 
         api.patch(`/recruitments/${recruitmentId}`, postData)
             .then(() => {
-                console.log("✅ 모집글이 정상적으로 수정됨");
+                console.log("모집글이 정상적으로 수정됨");
                 alert("모집글이 성공적으로 수정되었습니다!");
                 navigate(`/recruitments/${recruitmentId}`);
             })
             .catch((error) => {
-                console.error("❌ 모집글 수정 실패:", error);
+                console.error(" 모집글 수정 실패:", error);
                 if (error.response) {
                     console.error("백엔드 응답:", error.response.data);
                     alert(`수정 실패: ${error.response.data.message || "알 수 없는 오류 발생"}`);

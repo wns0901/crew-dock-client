@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useSearchParams } from "react-router-dom"; // ✅ URL에서 projectId 가져오기
+import { useSearchParams } from "react-router-dom"; // URL에서 projectId 가져오기
 import MDEditor from "@uiw/react-md-editor";
 import api from "../../../apis/baseApi";
 import { 
@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import { position, proceedMethod, region } from "../../MainPage/components/Filter";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import { useNavigate } from "react-router-dom"; // ✅ 추가
+import { useNavigate } from "react-router-dom"; // 추가
+import RecruitmentAttachmentUpload from "./RecruitmentAttachmentUpload";
 
 const WriteRecruitmentPost = () => {
     const navigate = useNavigate();
@@ -62,6 +63,7 @@ const WriteRecruitmentPost = () => {
             });
     }, [projectId]);
 
+    
     const handleSubmit = () => {
         console.log("🔹 handleSubmit 실행됨!"); // ✅ 디버깅 로그
     
@@ -277,6 +279,7 @@ const WriteRecruitmentPost = () => {
                             />
                         </Paper>
         
+
                         <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
                             <Typography variant="h6" sx={{ textAlign: "left" }}>소개 및 내용</Typography>
                             <Divider sx={{ mb: 2 }} />

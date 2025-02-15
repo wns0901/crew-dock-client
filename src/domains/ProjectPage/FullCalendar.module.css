@@ -1,0 +1,46 @@
+:global(.fc-button) {
+    border: none !important;
+}
+
+:global(.fc-today-button) {
+    background-color: #ccdcf4 !important;
+    color: #000000 !important;
+    border-radius: 5px !important;
+}
+
+:global(.fc-prev-button),
+:global(.fc-next-button) {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+}
+
+:global(.fc-prev-button),
+:global(.fc-next-button),
+:global(.fc-today-button) {
+    margin: 0 30px !important;
+}
+
+:global(.fc-prev-button)::before,
+:global(.fc-next-button)::before {
+    font-size: 1.2rem !important;
+}
+
+:global(.fc-header-toolbar) {
+    display: flex !important;
+    justify-content: space-between !important; /* 좌우 버튼 간격을 띄워주고, 오늘 버튼은 오른쪽으로 배치 */
+    align-items: center !important;
+    width: 100%;
+}
+
+:global(.fc-today-button) {
+    margin-bottom: -5px !important;
+    flex-direction: right !important;
+}
+
+
+:global(.fc-title) {
+    font-size: 1.3rem !important; /* 중앙 제목 크기 조정 */
+    font-weight: bold !important;
+}

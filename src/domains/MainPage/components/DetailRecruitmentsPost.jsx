@@ -9,6 +9,7 @@ import {
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { region, position, proceedMethod } from "../components/Filter"
 import RecruitmentComment from "./RecruitmentComment"; // 
+import Comment from "./comment/Comment";
 
 const DetailRecruitmentPost = () => {
     const { userInfo } = useContext(LoginContext);
@@ -187,7 +188,8 @@ const DetailRecruitmentPost = () => {
             </Paper>
 
             {/* 모집글 상세 내용 */}
-            <RecruitmentComment />
+            {/* <RecruitmentComment /> */}
+            <Comment />
         </Container>
     );
 };

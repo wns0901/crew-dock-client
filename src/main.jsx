@@ -44,6 +44,8 @@ import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePosi
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
 import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
+import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
+import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -59,6 +61,9 @@ createRoot(document.getElementById("root")).render(
               path="/recruitmemt/write"
               element={<WriteRecruitmentPost />}
             />
+            <Route path="/recruitment/write" element={<WriteRecruitmentPost />} />
+            <Route path="/recruitments/:recruitmentsId" element={<DetailRecruitmentsPost />} />  {/* 동적 라우트 추가 */}
+            <Route path="/recruitments/edit/:recruitmentId" element={<EditRecruitmentPost />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />

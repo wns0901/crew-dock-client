@@ -52,8 +52,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
             <Route path="/projects/:projectId" element={<ProjectMain />}>
-              <Route index element={<GitData />} />
-              <Route path="calendar" element={<ProjectCalendar/>}/>
+              <Route index element={<ProjectCalendar/>} />
               <Route path="issues" element={<ProjectIssue/>}/>
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
@@ -63,7 +62,6 @@ createRoot(document.getElementById("root")).render(
               <Route path="pending" element={<PendingMembers />} />
             </Route>
 
-            <Route path="/mypage/calendar" element={<MyCalendar/>}/>
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="admin/user" element={<AdminUser />} />
             <Route path="admin/project" element={<AdminProject />} />

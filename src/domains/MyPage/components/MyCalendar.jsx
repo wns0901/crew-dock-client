@@ -207,11 +207,11 @@ const MyCalendar = ({}) => {
 
   return (
     
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex'}}>
     {/* Today's events section */}
     <Box
       sx={{
-        width: '25%', // 1:3 비율로 설정
+        width: '20%', // 1:3 비율로 설정
         marginRight: '15px',
         backgroundColor: '#f5f5f5',
         borderRadius: 2,
@@ -219,7 +219,7 @@ const MyCalendar = ({}) => {
         padding: 2,
       }}
     >
-    <h2 style={{ fontSize: "2rem", textAlign: "center", margin: "1rem 0" }}>Todays</h2>      <Divider sx={{ marginBottom: 2 }} />
+    <h2 style={{ fontSize: "1.5rem", textAlign: "center", margin: "1rem 0" }}>Todays</h2>      <Divider sx={{ marginBottom: 0.5 }} />
       <List>
         {todays.length > 0 ? (
           todays.map((event) => (
@@ -229,7 +229,7 @@ const MyCalendar = ({}) => {
                   onChange={() => handleCheckboxToggle(event.id)}
                   color="primary"
                 />
-              <Card sx={{ width: '100%', marginBottom: 1 }}>
+              <Card sx={{ width: '100%', marginBottom: 0.5}}>
                 <CardContent>
                  {/* 제목 */}
                 <Typography
@@ -238,8 +238,8 @@ const MyCalendar = ({}) => {
                     textDecoration: completedEvents.has(event.id) ? "line-through" : "none",
                     color: "#000000",
                     textAlign: "left",
-                    mb: 2, // 제목과 날짜 사이 간격 추가
-                    fontSize: "20px",
+                    mb: 1.5, // 제목과 날짜 사이 간격 추가
+                    fontSize: "17px",
                   }}
                 >
                   {event.title}
@@ -251,7 +251,7 @@ const MyCalendar = ({}) => {
                   sx={{
                     textAlign: "right",
                     color: "gray",
-                    fontSize: "12px"
+                    fontSize: "10px"
                   }}
                 >
                   {`${event.start} ${formatTime(event.sTime)} ~ ${event.end} ${formatTime(event.eTime)}`}
@@ -269,7 +269,7 @@ const MyCalendar = ({}) => {
     </Box>
 
     {/* FullCalendar section */}
-    <div style={{ flex: 3 }} className={styles.customCalendar}>
+    <div style={{ flex: 4 }} className={styles.customCalendar}>
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
@@ -285,6 +285,7 @@ const MyCalendar = ({}) => {
         eventTextColor="#000000"
         eventClick={handleUpdateEvent}
         locale="ko"
+        dayMaxEventRows={2}
         headerToolbar={{
           left: "prev",
           center: "title",

@@ -10,6 +10,7 @@ import {
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { region, position, proceedMethod } from "../components/Filter"
 import RecruitmentComment from "./RecruitmentComment"; // 
+import Comment from "./comment/Comment";
 import { useDispatch } from "react-redux";
 import { makeChatRoom } from "../../../containers/userSocketStatusSlice"; 
 
@@ -443,9 +444,10 @@ const DetailRecruitmentPost = () => {
                 {post.content}
                 </div>
             </Paper>
-
-            {/* 모집글 상세 내용 */}
-            <RecruitmentComment />
+        
+            {/* 댓글 */}
+            
+            <Comment url={`/recruitments/${recruitmentsId}`}/>
         </Container>
     );
 };

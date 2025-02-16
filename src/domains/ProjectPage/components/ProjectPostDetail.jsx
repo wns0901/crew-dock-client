@@ -5,6 +5,8 @@ import {DirectionLabel} from '../constants/Direction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
+import Comment from '../../MainPage/components/comment/Comment';
+import { useParams } from 'react-router-dom';
 
 const ProjectPostDetail = ({
     post = null, 
@@ -21,6 +23,7 @@ const ProjectPostDetail = ({
 }) => {
     const [comment, setComment] = useState({ content: '' });
     const isAuthor = post?.userId === userInfo?.id;
+    const { postId, projectId } = useParams();
 
     const handleSubmitComment = () => {
         if (comment.content.trim()) {
@@ -82,9 +85,6 @@ const ProjectPostDetail = ({
                     {/* 본문 */}
                     <Box>
                         <MarkdownRenderer content={post?.content} />
-                        <Typography variant="body2" align="right">
-                            댓글 수: {getTotalCommentsCount(comments)}
-                        </Typography>
                     </Box>
 
                     {/* 첨부파일 및 이미지 표시 */}
@@ -105,65 +105,8 @@ const ProjectPostDetail = ({
 
                     <Divider />
 
-                    {/* 댓글 입력 */}
-                    <Stack spacing={2}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            value={comment.content}
-                            onChange={(e) => setComment({ ...comment, content: e.target.value })}
-                            placeholder="댓글을 입력하세요"
-                            margin="normal"
-                        />
-                        <Button 
-                            fullWidth
-                            variant="contained" 
-                            onClick={handleSubmitComment}
-                        >
-                            댓글 작성
-                        </Button>
-                    </Stack>
-
                     {/* 댓글 목록 */}
-                    <Stack spacing={2}>
-                        <Typography variant="h5">댓글</Typography>
-                        {fixedComment && (
-                            <Box sx={{ bgcolor: 'grey.100', p: 2, borderRadius: 1 }}>
-                                <Typography variant="subtitle1" gutterBottom>고정된 댓글</Typography>
-                                <CommentItem
-                                    key={`fixed-${fixedComment.id}`}
-                                    comment={fixedComment}
-                                    comments={comments}
-                                    isAuthor={post?.userId === userInfo?.id}
-                                    isCommentUser={fixedComment.userId === userInfo?.id}
-                                    onFixedComment={onFixedComment}
-                                    onDeleteComment={onDeleteComment}
-                                    onSubmitComment={onSubmitComment}
-                                    userInfo={userInfo}
-                                />
-                            </Box>
-                        )}
-
-                        {comments.filter(comment => !comment.parentComment).length > 0 ? (
-                            comments.filter(comment => !comment.parentComment).map(comment => (
-                                <CommentItem
-                                    key={`comment-${comment.id}`}
-                                    comment={comment}
-                                    isAuthor={isAuthor}
-                                    isCommentUser={comment.userId === userInfo.id}
-                                    onFixedComment={onFixedComment}
-                                    onDeleteComment={onDeleteComment}
-                                    onSubmitComment={onSubmitComment}
-                                    userInfo={userInfo}
-                                    allComments={comments}
-                                />
-                            ))
-                        ) : (
-                            <Typography variant="body2" align="center">
-                                댓글이 아직 없습니다.
-                            </Typography>
-                        )}
-                    </Stack>
+                    <Comment url={`projects/${projectId}/posts/${postId}`}/>
                 </Stack>
             </Box>
         </Box>

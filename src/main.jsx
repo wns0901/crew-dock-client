@@ -46,6 +46,8 @@ import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
 import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
 import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
 import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
+import UrgentIssues from "./domains/ProjectPage/components/UrgentIssues";
+import ProjectMainDashboard from "./domains/ProjectPage/components/ProjectMainDashBoard";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -78,7 +80,7 @@ createRoot(document.getElementById("root")).render(
             
             <Route path="/projects/:projectId" element={<ProjectMain />}>
 
-              <Route index element={<ProjectCalendar />} />
+              <Route index element={<ProjectMainDashboard />} />
               <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
@@ -86,6 +88,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="settings" element={<ProjectSettings />} />
               <Route path="manage" element={<ProjectManagement />} />
               <Route path="pending" element={<PendingMembers />} />
+              <Route path="Urgent" element={<UrgentIssues />} />
 
               <Route path="posts">
                 <Route index element={<ProjectListContainer />} />

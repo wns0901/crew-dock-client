@@ -444,12 +444,11 @@ const DetailRecruitmentPost = () => {
                 {post.content}
                 </div>
             </Paper>
-
-            {/* 모집글 상세 내용 */}
-            {/* <RecruitmentComment /> */}
+        
+            {/* 댓글 */}
             <Typography variant="h6" sx={{ textAlign: "left" }}>댓글</Typography>
                 <Divider sx={{ mb: 2 }} />
-            <Comment />
+            <Comment url={`/recruitments/${recruitmentsId}`}/>
         </Container>
     );
 };

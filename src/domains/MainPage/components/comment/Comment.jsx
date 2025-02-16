@@ -1,19 +1,17 @@
 import { useContext, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Box } from "@mui/material";
 import api from "../../../../apis/baseApi";
 import CommentItem from "./CommentItem";
 import CommentForm from "./CommentForm";
 import { LoginContext } from "../../../../contexts/LoginContextProvider.jsx";
 
-const Comment = () => {
-  const { recruitmentsId } = useParams();
+const Comment = ({url}) => {
   const { userInfo, isLogin } = useContext(LoginContext);
   const [comments, setComments] = useState([]);
   const [replyToId, setReplyToId] = useState(null);
   
   useEffect(() => {
-    api.get(`/recruitments/${recruitmentsId}/comments`).then((response) => {
+    api.get(`${url}/comments`).then((response) => {
       const parentComments = [];
       response.data.forEach((comment) => {
         if (comment.parentCommentId) {
@@ -42,9 +40,7 @@ const Comment = () => {
 
     console.log("🟢 [DEBUG] 작성할 댓글 데이터:", postData);
     
-    console.log(recruitmentsId);
-    
-    api.post(`/recruitments/${recruitmentsId}/comments`,postData)
+    api.post(`${url}/comments`,postData)
       .then((response) => {
         if (parentCommentId) {
           const parentComment = comments.find(
@@ -62,7 +58,7 @@ const Comment = () => {
   };
 
   const handleDeleteComment = async (commentId) => {
-    await api.delete(`/recruitments/${recruitmentsId}/comments/${commentId}`);
+    await api.delete(`${url}/comments/${commentId}`);
 
     setComments(comments.filter((comment) => {
       if (comment.childs.length > 0) {

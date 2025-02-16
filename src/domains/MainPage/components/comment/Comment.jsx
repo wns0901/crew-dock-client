@@ -8,10 +8,10 @@ import { LoginContext } from "../../../../contexts/LoginContextProvider.jsx";
 
 const Comment = () => {
   const { recruitmentsId } = useParams();
-  const { userInfo } = useContext(LoginContext);
+  const { userInfo, isLogin } = useContext(LoginContext);
   const [comments, setComments] = useState([]);
   const [replyToId, setReplyToId] = useState(null);
-
+  
   useEffect(() => {
     api.get(`/recruitments/${recruitmentsId}/comments`).then((response) => {
       const parentComments = [];
@@ -74,7 +74,7 @@ const Comment = () => {
 
   return (
     <Box sx={{ p: 2 }}>
-      <CommentForm onSubmit={handleAddComment} />
+      {isLogin && (<CommentForm onSubmit={handleAddComment} />)}
       <Box sx={{ mt: 2 }}>
         {comments.map((comment) => (
           <CommentItem

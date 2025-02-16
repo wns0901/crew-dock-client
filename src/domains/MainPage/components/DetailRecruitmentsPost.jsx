@@ -401,6 +401,8 @@ const DetailRecruitmentPost = () => {
 
             {/* 모집글 상세 내용 */}
             {/* <RecruitmentComment /> */}
+            <Typography variant="h6" sx={{ textAlign: "left" }}>댓글</Typography>
+                <Divider sx={{ mb: 2 }} />
             <Comment />
         </Container>
     );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ 상세 페이지 이동
+import { useNavigate } from "react-router-dom"; //  상세 페이지 이동
 import api from "../../../apis/baseApi";
 import {
   TextField,
@@ -49,7 +49,7 @@ const RecruitmentsComponent = () => {
         console.log("백엔드 응답 데이터:", response.data);
         const postDatas = response.data.content.map((post) => ({
           ...post,
-          commentCnt: 5, // 프로젝트 ID 추가
+          commentCnt: 5, // 프로젝트 ID 추
         }));
         setProjects(postDatas);
         console.log(1, postDatas);
@@ -63,10 +63,8 @@ const RecruitmentsComponent = () => {
   useEffect(() => {
     projects.forEach((project) => {
       if (!projectStacks[project.projectId]) {
-        console.log("프로젝트 ID:", project.projectId); // 프로젝트 ID 확인
         api.get(`/projects/${project.projectId}/stacks`)
           .then((response) => {
-            console.log(`프로젝트 ${project.projectId}의 스택 데이터:`, response.data); // API 응답 확인
             setProjectStacks((prev) => ({
               ...prev,
               [project.projectId]: response.data.map(stack => stack.stackName) // 필요한 정보만 저장
@@ -85,36 +83,6 @@ const RecruitmentsComponent = () => {
       })
       .catch((error) => console.error("기술 스택 목록 가져오기 실패:", error));
   }, []);
-  
-  // 프로젝트 기술별 스택 가져오기
-  useEffect(() => {
-    const fetchStacks = async () => {
-      const stackRequests = projects.map((project) =>
-        api.get(`/projects/${project.projectId}/stacks`)
-          .then((response) => ({
-            projectId: project.projectId,
-            stacks: response.data.map(stack => stack.stackName)
-          }))
-      );
-  
-      try {
-        const results = await Promise.all(stackRequests);
-        const newProjectStacks = results.reduce((acc, { projectId, stacks }) => {
-          acc[projectId] = stacks;
-          return acc;
-        }, {});
-  
-        setProjectStacks(newProjectStacks);
-      } catch (error) {
-        console.error("프로젝트 스택 가져오기 실패:", error);
-      }
-    };
-  
-    if (projects.length > 0) {
-      fetchStacks();
-    }
-  }, [projects]);
-
   
   const goToDetail = (id) => {
     navigate(`/recruitments/${id}`);
@@ -156,8 +124,18 @@ const RecruitmentsComponent = () => {
       
 {/* 모집글 제목 */}
 <Typography 
-  variant="h6" 
-  sx={{ display: "flex", marginBottom: 2, paddingX: 20, textAlign: "center", maxWidth: "1200px", marginX: "0" }}
+  variant="h5" 
+  sx={{ 
+    fontWeight: "bold",
+    display: "flex", 
+    marginBottom: 2, 
+    paddingX: 20, 
+    textAlign: "left", 
+    maxWidth: "1200px", 
+    marginLeft: "0",
+    marginTop: 3,
+    justifyContent: "flex-start" // Flexbox에서 왼쪽 정렬 보장
+  }}
 >
   전체 프로젝트 모집글
 </Typography>
@@ -233,92 +211,109 @@ const RecruitmentsComponent = () => {
 
 </Box>
 
-      {/* 프로젝트 리스트 */}
-      <Grid container spacing={3} sx={{ padding: 2 , paddingX: 20 }}>
-        {projects.length === 0 ? (
-          <Typography variant="h6">모집 중인 프로젝트가 없습니다.</Typography>
-        ) : (
-          projects.map((project) => (
-            <Grid item xs={12} sm={6} md={3} key={project.id} gap={3}>
-              <Card sx={{ 
-                borderRadius: "12px", padding: 1, boxShadow: 3, 
-                textAlign: "left", cursor: "pointer", 
-                width: "320px", height: "250px"}} onClick={() => goToDetail(project.id)}>
-                <CardContent>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: -1 }}>
-                    <Typography variant="caption">마감일: {project.deadline || "미정"}</Typography>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Chip label={calculateDDay(project.deadline)} color="error" size="small" />
-                      <IconButton onClick={() => handleScrap(project.id)}>
-                    {scrappedPosts[project.id] ? (
-                      <BookmarkIcon sx={{ color: "gray" }} />  // 스크랩됨
-                    ) : (
-                      <BookmarkBorderIcon sx={{ color: "gray" }} />  // 스크랩 안됨
-                    )}
-                    </IconButton>
-                    </Box>
-                    </Box>
-                  <hr/>
-                  <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>
-                  {project.title.length > 12 ? project.title.slice(0, 12) + "..." : project.title}
-                  </Typography>
+<Grid container spacing={3} sx={{ padding: 2, paddingX: 26, justifyContent: "center", flexWrap: "wrap" }}>
+  {projects.length === 0 ? (
+    <Typography variant="h6">모집 중인 프로젝트가 없습니다.</Typography>
+  ) : (
+    projects.map((project) => (
+      <Grid 
+        item 
+        xs={12}  // 모바일 화면에서는 한 줄에 하나
+        sm={6}   // 태블릿에서는 한 줄에 두 개
+        md={4}   // 노트북 크기에서는 한 줄에 세 개
+        lg={3}   // 큰 화면에서는 한 줄에 네 개
+        key={project.id} 
+        sx={{ display: "flex", justifyContent: "center" }}
+      >
+        <Card
+          sx={{
+            borderRadius: "12px",
+            padding: 0.5,
+            boxShadow: 3,
+            textAlign: "left",
+            cursor: "pointer",
+            maxWidth: "320px",  // 카드가 너무 커지지 않도록 제한
+            maxHeight: "320px",
+            width: "100%", // 부모 크기에 맞춰 유동적으로 조정
+            height: "100%", 
+            display: "flex",
+            flexDirection: "column", 
+            flexShrink: 0,
+            margin: 4
+          }}
+          onClick={() => goToDetail(project.id)}
+        >
+          <CardContent sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: -1 }}>
+              <Typography variant="caption">마감일: {project.deadline || "미정"}</Typography>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Chip label={calculateDDay(project.deadline)} color="error" size="small" />
+                <IconButton onClick={() => handleScrap(project.id)}>
+                  {scrappedPosts[project.id] ? (
+                    <BookmarkIcon sx={{ color: "gray" }} />
+                  ) : (
+                    <BookmarkBorderIcon sx={{ color: "gray" }} />
+                  )}
+                </IconButton>
+              </Box>
+            </Box>
+            <hr />
+            <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>
+              {project.title.length > 12 ? project.title.slice(0, 12) + "..." : project.title}
+            </Typography>
 
-                  {/* 기술 스택 표시 */}
-                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", marginBottom: 1 }}>
-                    {projectStacks[project.projectId]?.length > 0 ? (
-                      <>
-                        {projectStacks[project.projectId].slice(0, 3).map((stack, idx) => (
-                          <Chip key={idx} label={`#${stack}`} size="small" variant="outlined" />
-                        ))}
-                        {projectStacks[project.projectId].length > 3 && (
-                          <Chip
-                            label={`+${projectStacks[project.projectId].length - 3}`}
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <Typography variant="body2">기술 스택 없음</Typography>
-                    )}
-                  </Box>
+            {/* 기술 스택 표시 */}
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", marginBottom: 1 }}>
+              {projectStacks[project.projectId]?.length > 0 ? (
+                <>
+                  {projectStacks[project.projectId].slice(0, 3).map((stack, idx) => (
+                    <Chip key={idx} label={`#${stack}`} size="small" variant="outlined" />
+                  ))}
+                  {projectStacks[project.projectId].length > 3 && (
+                    <Chip label={`+${projectStacks[project.projectId].length - 3}`} size="small" variant="outlined" />
+                  )}
+                </>
+              ) : (
+                <Typography variant="body2">기술 스택 없음</Typography>
+              )}
+            </Box>
 
+            <Typography variant="body2" sx={{ fontWeight: "bold", color: "gray", marginBottom: 1 }}>
+              {project.recruitedField
+                ? project.recruitedField.split(",").map((field) => {
+                    const trimmedField = field.trim();
+                    const found = position.find((p) => p.value === trimmedField);
+                    return found ? found.label : trimmedField;
+                  }).join(", ")
+                : "알 수 없음"}
+            </Typography>
 
-                  <Typography variant="body2" sx={{ fontWeight: "bold", color: "gray", marginBottom: 1 }}>
-                    {project.recruitedField
-                      ? project.recruitedField.split(",").map((field) => {
-                          const trimmedField = field.trim();
-                          const found = position.find((p) => p.value === trimmedField);
-                          return found ? found.label : trimmedField;
-                        }).join(", ")
-                      : "알 수 없음"}
-                  </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", marginBottom: 1 }}>
+              <Typography variant="body2">모집 인원: {project.recruitedNumber}</Typography>
+              <Typography variant="body2">
+                지역: {region.find((r) => r.value === project.region)?.label || "알 수 없음"}
+              </Typography>
+            </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", marginBottom: 1 }}>
-                    <Typography variant="body2">모집 인원: {project.recruitedNumber}/3</Typography>
-                    <Typography variant="body2">
-                      지역: {region.find((r) => r.value === project.region)?.label || "알 수 없음"}
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      {project.user?.nickName || "익명"}
-                    </Typography>
-                    <Typography variant="body2">댓글 수</Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
-        )}
+            <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "auto" }}>
+              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                {project.user?.nickName || "익명"}
+              </Typography>
+              <Typography variant="body2">댓글 수: {project.commentCnt}</Typography>
+            </Box>
+          </CardContent>
+        </Card>
       </Grid>
+    ))
+  )}
+</Grid>
+
         {/* 페이지네이션 */}
           <Pagination 
             count={totalPages} 
             page={page} 
             onChange={(event, value) => setPage(value)}
-            sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+            sx={{ display: "flex", justifyContent: "center", mt: 3.5 }}
           />
   </div>
   );

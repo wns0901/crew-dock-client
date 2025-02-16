@@ -5,11 +5,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { LoginContext } from "../../../contexts/LoginContextProvider"; // ✅ LoginContext 가져오기
-import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
-
-const API_BASE_URL = api.defaults.baseURL; 
 
 const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
     const { userInfo } = useContext(LoginContext); // ✅ userInfo 가져오기
@@ -25,7 +22,7 @@ const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
     const [stacks, setStacks] = useState([]);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/stacks/all`)
+        api.get(`/stacks/all`)
             .then((response) => {
                 console.log("📌 불러온 기술 스택 데이터:", response.data);
                 setStacks(response.data);  // ✅ `setStacks`를 객체 배열로 저장

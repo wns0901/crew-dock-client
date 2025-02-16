@@ -40,9 +40,8 @@ const ScrapsPage = () => {
 
         const fetchUserData = async () => {
             try {
-                const response = await api.get(`b b /user/${userId}`);
-                if (!response.ok) throw new Error("유저 데이터 불러오기 실패");
-                const data = await response.data();
+                const response = await api.get(`/user/${userId}`);
+                const data = await response.data;
                 console.log("[DEBUG] 유저 데이터:", data);
                 setUser(data);
             } catch (error) {
@@ -52,9 +51,8 @@ const ScrapsPage = () => {
 
         const fetchScrappedRecruitments = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/recruitments/scraps?userId=${userId}`);
-                if (!response.ok) throw new Error("스크랩한 모집글 불러오기 실패");
-                const data = await response.json();
+                const response = await api.get(`/recruitments/scraps?userId=${userId}`);
+                const data = await response.data;
                 console.log("[DEBUG] 스크랩한 모집글 데이터:", data);
                 setScrappedRecruitments(Array.isArray(data) ? data : []);
             } catch (error) {
@@ -70,7 +68,7 @@ const ScrapsPage = () => {
                     return;
                 }
 
-                const response = await fetch(`${API_BASE_URL}/projects/members/recruitments`, {
+                const response = await api.get(`/projects/members/recruitments`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${accessToken}`,
@@ -78,9 +76,7 @@ const ScrapsPage = () => {
                     }
                 });
 
-                if (!response.ok) throw new Error("지원한 프로젝트 불러오기 실패");
-
-                const data = await response.json();
+                const data = await response.data;
                 console.log("[DEBUG] 내가 지원한 프로젝트 데이터:", data);
                 setAppliedProjects(Array.isArray(data) ? data : []);
             } catch (error) {
@@ -90,9 +86,8 @@ const ScrapsPage = () => {
 
         const fetchAllRecruitments = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/recruitments`);
-                if (!response.ok) throw new Error("모든 모집글 불러오기 실패");
-                const data = await response.json();
+                const response = await api.get(`/recruitments`);
+                const data = await response.data;
                 console.log("[DEBUG] 모든 모집글 데이터:", data);
                 setAllRecruitments(Array.isArray(data?.content) ? data.content : []);
             } catch (error) {

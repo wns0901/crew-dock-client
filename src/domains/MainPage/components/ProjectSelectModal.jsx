@@ -19,7 +19,7 @@ const ProjectSelectModal = ({ open, handleClose, projects }) => {
   };
 
   const handleCreateProject = () => {
-    navigate("/projects/new"); // 새 프로젝트 생성 페이지로 이동
+    navigate("/mypage/projects"); // 새 프로젝트 생성 페이지로 이동
   };
 
   const handleWrite = () => {
@@ -31,10 +31,12 @@ const ProjectSelectModal = ({ open, handleClose, projects }) => {
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="project-modal-title">
       <Box sx={style}>
-        <Typography id="project-modal-title" variant="h6">
+        <Typography id="project-modal-title" variant="h6" sx={{ fontWeight: "bold" }}>
           프로젝트 선택하기
         </Typography>
-        <RadioGroup value={selectedProject} onChange={handleProjectSelect}>
+        
+        {/* 프로젝트 선택 라디오 버튼 */}
+        <RadioGroup value={selectedProject} onChange={handleProjectSelect} sx={{ mt: 2 }}>
           {projects.length > 0 ? (
             projects.map((project) => (
               <FormControlLabel
@@ -45,19 +47,18 @@ const ProjectSelectModal = ({ open, handleClose, projects }) => {
               />
             ))
           ) : (
-            <Typography color="error">캡틴 권한이 있는 프로젝트가 없습니다.</Typography>
+            <Typography color="error" sx={{ mt: 2 }}>
+              캡틴 권한이 있는 프로젝트가 없습니다.
+            </Typography>
           )}
         </RadioGroup>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-          <Button variant="contained" onClick={handleCreateProject}>
+
+        {/* 버튼 그룹 */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+          <Button variant="contained" color="primary" onClick={handleCreateProject}>
             새 프로젝트 생성하기
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleWrite}
-            disabled={!selectedProject}
-          >
+          <Button variant="contained" color="success" onClick={handleWrite} disabled={!selectedProject}>
             작성하기
           </Button>
         </Box>

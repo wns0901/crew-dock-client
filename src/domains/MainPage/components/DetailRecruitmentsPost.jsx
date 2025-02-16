@@ -10,6 +10,10 @@ import {
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { region, position, proceedMethod } from "../components/Filter"
 import RecruitmentComment from "./RecruitmentComment"; // 
+import Comment from "./comment/Comment";
+import { useDispatch } from "react-redux";
+import { makeChatRoom } from "../../../containers/userSocketStatusSlice"; 
+
 
 const DetailRecruitmentPost = () => {
     const { userInfo } = useContext(LoginContext);
@@ -77,6 +81,42 @@ const DetailRecruitmentPost = () => {
         navigate(`/recruitments/edit/${recruitmentsId}`);
     };
 
+    const handleChatBtn = () => {
+        console.log("채팅 버튼 클릭");
+        
+        dispath(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
+    };
+    
+    
+    const handleApply = () => {
+        if (!userInfo) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+    
+        if (!post || !post.projectId) {
+            alert("프로젝트 ID를 찾을 수 없습니다.");
+            return;
+        }
+    
+        api.post(`/projects/${post.projectId}/members`, { userId: userInfo.id })
+            .then(response => {
+                console.log("📌 [DEBUG] 신청 응답:", response.data);
+                const { message, projectId, userId, status } = response.data;
+    
+                alert(`${message} (프로젝트 ID: ${projectId}, 사용자 ID: ${userId}, 상태: ${status})`);
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.error("❌ [ERROR] 신청 실패:", error.response.data);
+                    alert("신청 실패: " + (error.response.data.error || "알 수 없는 오류"));
+                } else {
+                    alert("신청 중 오류가 발생했습니다.");
+                }
+            });
+    };
+    
+
     const handleDownloadAttachment = (attachmentId, fileName) => {
         try {
             const response = api.get(`recruitments/${recruitmentsId}/attachments`,
@@ -113,17 +153,42 @@ const DetailRecruitmentPost = () => {
                         </Button>
                     </Box>
                 ) : (
-                    // ✅ 작성자가 아닐 경우: 채팅 & 신청 버튼 표시
-                    <Box>
-                        <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={() => alert("채팅 기능은 아직 구현되지 않았습니다.")}>
+                    // 🔹 로그인한 사용자만 "채팅", "신청" 버튼 표시
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={handleChatBtn}>
                             채팅
                         </Button>
-                        <Button variant="contained" color="success" onClick={() => alert("신청이 완료되었습니다!")}>
+                        <Button 
+                            variant="contained" 
+                            color="success" 
+                            onClick={() => {
+                                if (userInfo) {
+                                    handleApply();
+                                } else {
+                                    alert("로그인 부탁드립니다.");
+                                }
+                            }}
+                        >
                             신청
-                        </Button>
+                        </Button> 
+
                     </Box>
                 )}
             </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography 
+                variant="body1" 
+                marginTop={-1} 
+                sx={{ cursor: "pointer" }}
+                onClick={() => navigate(`/mypage/${post.user?.userId}`)} >
+                {post.user?.nickName ?? "알 수 없음"}
+            </Typography>
+            <Typography variant="body1" marginTop={-1}>
+                {post.createdAt ?? "알 수 없음"}
+            </Typography>
+            </Box>
+
             <Paper elevation={0} sx={{ p: 2, mb: 1 }}>
                 <Typography variant="h6" sx={{ textAlign: "left" }}>모집 정보</Typography>
                 <Divider sx={{ mb: 2 }} />
@@ -207,25 +272,10 @@ const DetailRecruitmentPost = () => {
                     {post.content}
                 </div>
             </Paper>
-
-            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
-                <Typography variant="h6" sx={{ textAlign: "left" }}>첨부 파일</Typography>
-                <Divider sx={{ mb: 2 }} />
-                {attachments.length > 0 && (
-                    <Stack spacing={1}>
-                        {attachments.map((attachment, index) => (
-                            <Box key={index}>
-                                <Button onClick={() => handleDownloadAttachment(attachment.id, attachment.fileName)}>
-                                    {attachment.fileName}
-                                </Button>
-                            </Box>
-                        ))}
-                    </Stack>
-                )}
-            </Paper>
-
-            {/* 모집글 상세 내용 */}
-            <RecruitmentComment />
+        
+            {/* 댓글 */}
+            
+            <Comment url={`/recruitments/${recruitmentsId}`}/>
         </Container>
     );
 };

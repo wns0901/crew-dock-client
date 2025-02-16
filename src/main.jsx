@@ -15,6 +15,7 @@ import ProjectSettings from "./domains/ProjectPage/components/ProjectSettings";
 import ProjectManagement from "./domains/ProjectPage/components/ProjectManagement";
 import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
+import Footer from "./domains/MainPage/components/footer";
 import PostCreateContainer from "./domains/BoardPage/containers/PostCreateContainer";
 import PostDetailContainer from "./domains/BoardPage/containers/PostDetailContainer";
 import PostEditContainer from "./domains/BoardPage/containers/PostEditiorContainer";

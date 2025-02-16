@@ -26,13 +26,13 @@ const RecruitmentsComponent = () => {
     region: "",
   });
   const [projects, setProjects] = useState([]);
-  const [projectStacks, setProjectStacks] = useState({}); // ✅ 프로젝트별 기술 스택 상태 추가
+  const [projectStacks, setProjectStacks] = useState({}); // 프로젝트별 기술 스택 상태 추가
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [stacks, setStacks] = useState([]);
   const [scrappedPosts, setScrappedPosts] = useState({}); // 스크랩 상태 관리
   
-  // ✅ 모집글 데이터 가져오기 (필터링 반영)
+  // 모집글 데이터 가져오기 (필터링 반영)
   useEffect(() => {
     const params = new URLSearchParams();
     if (filters.stack) params.append("stack", filters.stack);
@@ -47,30 +47,75 @@ const RecruitmentsComponent = () => {
       .get(`/recruitments/filter?${params.toString()}`)
       .then((response) => {
         console.log("백엔드 응답 데이터:", response.data);
-        setProjects(response.data.content);
+        const postDatas = response.data.content.map((post) => ({
+          ...post,
+          commentCnt: 5, // 프로젝트 ID 추가
+        }));
+        setProjects(postDatas);
+        console.log(1, postDatas);
+        
         setTotalPages(response.data.totalPages);
       })
       .catch((error) => console.error("데이터 가져오기 실패:", error));
   }, [filters, page]);
 
-  // ✅ 프로젝트별 기술 스택 가져오기
+  // 프로젝트별 기술 스택 가져오기
   useEffect(() => {
     projects.forEach((project) => {
       if (!projectStacks[project.projectId]) {
-        console.log("프로젝트 ID:", project.projectId); // ✅ 프로젝트 ID 확인
+        console.log("프로젝트 ID:", project.projectId); // 프로젝트 ID 확인
         api.get(`/projects/${project.projectId}/stacks`)
           .then((response) => {
-            console.log(`프로젝트 ${project.projectId}의 스택 데이터:`, response.data); // ✅ API 응답 확인
+            console.log(`프로젝트 ${project.projectId}의 스택 데이터:`, response.data); // API 응답 확인
             setProjectStacks((prev) => ({
               ...prev,
-              [project.projectId]: response.data.map(stack => stack.stackName) // ✅ 필요한 정보만 저장
+              [project.projectId]: response.data.map(stack => stack.stackName) // 필요한 정보만 저장
             }));
-          })
-          .catch((error) => console.error(`프로젝트 ${project.projectId} 스택 가져오기 실패:`, error));
+      })
+      .catch((error) => console.error(`프로젝트 ${project.projectId} 스택 가져오기 실패:`, error));
       }
     });
   }, [projects]);
 
+  // 스택
+  useEffect(() => {
+    api.get("/stacks/all")
+      .then((response) => {
+        setStacks(response.data); // 전체 스택 목록 저장
+      })
+      .catch((error) => console.error("기술 스택 목록 가져오기 실패:", error));
+  }, []);
+  
+  // 프로젝트 기술별 스택 가져오기
+  useEffect(() => {
+    const fetchStacks = async () => {
+      const stackRequests = projects.map((project) =>
+        api.get(`/projects/${project.projectId}/stacks`)
+          .then((response) => ({
+            projectId: project.projectId,
+            stacks: response.data.map(stack => stack.stackName)
+          }))
+      );
+  
+      try {
+        const results = await Promise.all(stackRequests);
+        const newProjectStacks = results.reduce((acc, { projectId, stacks }) => {
+          acc[projectId] = stacks;
+          return acc;
+        }, {});
+  
+        setProjectStacks(newProjectStacks);
+      } catch (error) {
+        console.error("프로젝트 스택 가져오기 실패:", error);
+      }
+    };
+  
+    if (projects.length > 0) {
+      fetchStacks();
+    }
+  }, [projects]);
+
+  
   const goToDetail = (id) => {
     navigate(`/recruitments/${id}`);
   };
@@ -86,7 +131,7 @@ const RecruitmentsComponent = () => {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? "D-Day" : "마감됨";
     };
-    const handleScrap = async (id) => {  // ✅ async 추가
+    const handleScrap = async (id) => {  // async 추가
       const userId = localStorage.getItem("userId"); 
       if (!userId) {
         alert("로그인이 필요합니다.");
@@ -95,10 +140,10 @@ const RecruitmentsComponent = () => {
     
       try {
         if (scrappedPosts[id]) {
-          await api.delete(`/recruitments/${id}/scrap`);  // ✅ await 사용 가능
+          await api.delete(`/recruitments/${id}/scrap`);  //
           setScrappedPosts((prev) => ({ ...prev, [id]: false }));
         } else {
-          await api.post(`/recruitments/${id}/scrap`);  // ✅ await 사용 가능
+          await api.post(`/recruitments/${id}/scrap`);  //
           setScrappedPosts((prev) => ({ ...prev, [id]: true }));
         }
       } catch (error) {
@@ -108,52 +153,99 @@ const RecruitmentsComponent = () => {
 
   return (
     <div>
-      <Typography variant="h6" sx={{ display: "flex", marginBottom: 2, marginLeft: 2}}>
-              전체 프로젝트 모집글
-            </Typography>
+      
+{/* 모집글 제목 */}
+<Typography 
+  variant="h6" 
+  sx={{ display: "flex", marginBottom: 2, paddingX: 20, textAlign: "center", maxWidth: "1200px", marginX: "0" }}
+>
+  전체 프로젝트 모집글
+</Typography>
 
-      {/* 필터 UI 유지 */}
-      {/* 필터 UI 복구 */}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", marginBottom: 2, marginLeft: 2 }}>
-        <TextField select label="기술 스택" value={filters.stack} onChange={(e) => setFilters((prev) => ({ ...prev, stack: e.target.value }))} sx={{ minWidth: 150 }}>
-          <MenuItem value="">전체</MenuItem>
-          {stacks.map((stack) => (
-            <MenuItem key={stack.id} value={stack.name}>{stack.name}</MenuItem>
-          ))}
-        </TextField>
+{/* 필터 UI 박스 */}
+<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", marginBottom: 2, paddingX: 20, maxWidth: "1200px", marginX: "0" }}>
+  <TextField 
+  select 
+  label="기술 스택" 
+  value={filters.stack || "전체"}  // 값이 없으면 "전체" 표시
+  onChange={(e) => setFilters((prev) => ({ 
+    ...prev, 
+    stack: e.target.value === "전체" ? "" : e.target.value 
+  }))}
+  sx={{ minWidth: 150 }}
+>
+  <MenuItem value="전체">전체</MenuItem>  
+  {stacks.map((stack, index) => (
+    <MenuItem key={index} value={stack}>{stack}</MenuItem>
+  ))}
+</TextField>
 
-        <TextField select label="모집 분야" value={filters.position} onChange={(e) => setFilters((prev) => ({ ...prev, position: e.target.value }))} sx={{ minWidth: 150 }}>
-          <MenuItem value="">전체</MenuItem>
-          {position.map((option) => (
-            <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-          ))}
-        </TextField>
 
-        <TextField select label="진행 방식" value={filters.progress} onChange={(e) => setFilters((prev) => ({ ...prev, progress: e.target.value }))} sx={{ minWidth: 150 }}>
-          <MenuItem value="">전체</MenuItem>
-          {proceedMethod.map((option) => (
-            <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-          ))}
-        </TextField>
+<TextField 
+  select 
+  label="모집 분야" 
+  value={filters.position || "전체"}  // 값이 없으면 "전체" 표시
+  onChange={(e) => setFilters((prev) => ({ 
+    ...prev, 
+    position: e.target.value === "전체" ? "" : e.target.value // "전체" 선택 시 필터 초기화
+  }))}
+  sx={{ minWidth: 150 }}
+>
+  <MenuItem value="전체">전체</MenuItem>  {/* "전체" 선택 가능 */}
+  {position.map((option) => (
+    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+  ))}
+</TextField>
 
-        <TextField select label="지역" value={filters.region} onChange={(e) => setFilters((prev) => ({ ...prev, region: e.target.value }))} sx={{ minWidth: 150 }}>
-          <MenuItem value="">전체</MenuItem>
-          {region.map((option) => (
-            <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-          ))}
-        </TextField>
-      </Box>
+
+<TextField 
+  select 
+  label="진행 방식" 
+  value={filters.progress || "전체"}  // 값이 없으면 "전체" 표시
+  onChange={(e) => setFilters((prev) => ({ 
+    ...prev, 
+    progress: e.target.value === "전체" ? "" : e.target.value // "전체" 선택 시 필터 초기화
+  }))}
+  sx={{ minWidth: 150 }}
+>
+  <MenuItem value="전체">전체</MenuItem>  {/* "전체" 선택 가능 */}
+  {proceedMethod.map((option) => (
+    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+  ))}
+</TextField>
+
+
+<TextField 
+  select 
+  label="지역" 
+  value={filters.region || "전체"}  // 값이 없으면 "전체" 표시
+  onChange={(e) => setFilters((prev) => ({ 
+    ...prev, 
+    region: e.target.value === "전체" ? "" : e.target.value // "전체" 선택 시 필터 초기화
+  }))}
+  sx={{ minWidth: 150 }}
+>
+  <MenuItem value="전체">전체</MenuItem>  {/* "전체" 선택 가능 */}
+  {region.map((option) => (
+    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+  ))}
+</TextField>
+
+</Box>
 
       {/* 프로젝트 리스트 */}
-      <Grid container spacing={3} sx={{ padding: 2 }}>
+      <Grid container spacing={3} sx={{ padding: 2 , paddingX: 20 }}>
         {projects.length === 0 ? (
           <Typography variant="h6">모집 중인 프로젝트가 없습니다.</Typography>
         ) : (
           projects.map((project) => (
-            <Grid item xs={12} sm={6} md={3} key={project.id}>
-              <Card sx={{ maxWidth: 345, borderRadius: "12px", padding: 1, boxShadow: 3, textAlign: "left", cursor: "pointer" }} onClick={() => goToDetail(project.id)}>
+            <Grid item xs={12} sm={6} md={3} key={project.id} gap={3}>
+              <Card sx={{ 
+                borderRadius: "12px", padding: 1, boxShadow: 3, 
+                textAlign: "left", cursor: "pointer", 
+                width: "320px", height: "250px"}} onClick={() => goToDetail(project.id)}>
                 <CardContent>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 1 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: -1 }}>
                     <Typography variant="caption">마감일: {project.deadline || "미정"}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Chip label={calculateDDay(project.deadline)} color="error" size="small" />
@@ -166,17 +258,31 @@ const RecruitmentsComponent = () => {
                     </IconButton>
                     </Box>
                     </Box>
-                    
+                  <hr/>
                   <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 1 }}>
-                    [{project.title}]
+                  {project.title.length > 12 ? project.title.slice(0, 12) + "..." : project.title}
                   </Typography>
 
                   {/* 기술 스택 표시 */}
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", marginBottom: 1 }}>
-                    {projectStacks[project.projectId]?.length > 0
-                      ? projectStacks[project.projectId].map((stack, idx) => <Chip key={idx} label={`#${stack}`} size="small" variant="outlined" />)
-                      : <Typography variant="body2">기술 스택 없음</Typography>}
+                    {projectStacks[project.projectId]?.length > 0 ? (
+                      <>
+                        {projectStacks[project.projectId].slice(0, 3).map((stack, idx) => (
+                          <Chip key={idx} label={`#${stack}`} size="small" variant="outlined" />
+                        ))}
+                        {projectStacks[project.projectId].length > 3 && (
+                          <Chip
+                            label={`+${projectStacks[project.projectId].length - 3}`}
+                            size="small"
+                            variant="outlined"
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <Typography variant="body2">기술 스택 없음</Typography>
+                    )}
                   </Box>
+
 
                   <Typography variant="body2" sx={{ fontWeight: "bold", color: "gray", marginBottom: 1 }}>
                     {project.recruitedField

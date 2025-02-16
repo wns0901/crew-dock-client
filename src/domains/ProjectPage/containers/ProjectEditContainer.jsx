@@ -13,6 +13,7 @@ const ProjectEditContainer = () => {
         const fetchPost = async (postId) => {
             try {
                 const response = await api.get(`/projects/${projectId}/posts/${postId}`);
+                const attachmentsResponse = await api.get(`/projects/${projectId}/posts/${postId}/attachments`);
                 setInitialData({
                     id: response.data.id,
                     createdAt: response.data.createdAt,
@@ -22,7 +23,12 @@ const ProjectEditContainer = () => {
                     direction: response.data.direction,
                     userId: response.data.userId,
                     userNickname: response.data.userNickname || null,
-                    attachments: response.data.attachments || [],
+                    attachments: Array.isArray(attachmentsResponse.data) ? attachmentsResponse.data.map(attachment => ({
+                        id: attachment.postId,
+                        type: 'file',
+                        name: attachment.fileName,
+                        url: attachment.url
+                    })) : []
                 });
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
@@ -31,7 +37,7 @@ const ProjectEditContainer = () => {
             }
         };
         fetchPost(postId);
-    }, [postId, navigate, projectId]);
+    }, []);
 
     const onSubmit = async (postData) => {
         try {
@@ -54,6 +60,38 @@ const ProjectEditContainer = () => {
                 console.error('Server error details:', response.data);
                 throw new Error(response.data.message || '서버 오류가 발생했습니다.');
             }
+
+            if (postData.attachments && postData.attachments.length > 0) {
+                const formData = new FormData();
+                
+                const newFiles = postData.attachments.filter(attachment => attachment.file);
+                newFiles.forEach((attachment, index) => {
+                    console.log(`Appending file ${index + 1}:`, attachment.file);
+                    formData.append('file', attachment.file);
+                });
+
+                if (formData.has('file')) {
+                    const fileResponse = await api.post(
+                        `/projects/${projectId}/posts/${postId}/attachments`,
+                        formData,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+
+                    if (fileResponse.status !== 200) {
+                        throw new Error('파일 업로드 중 오류가 발생했습니다.');
+                    }
+                }
+            }
+
+            const removedAttachments = initialData.attachments.filter(
+                oldAttachment => !postData.attachments.some(
+                    newAttachment => newAttachment.id === oldAttachment.id
+                )
+            );
+
+            for (const attachment of removedAttachments) {
+                await api.delete(`/projects/${projectId}/posts/${postId}/attachments/${attachment.id}`);
+            }
             
             navigate(`/projects/${projectId}/posts/${postId}`);
         } catch (error) {
@@ -61,7 +99,7 @@ const ProjectEditContainer = () => {
             alert(error.message);
         }
     };
-
+    console.log("현재 initialData:", initialData);
     if (!initialData) return <div>Loading...</div>;
 
     return (

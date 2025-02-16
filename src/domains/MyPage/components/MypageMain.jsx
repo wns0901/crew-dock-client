@@ -13,6 +13,8 @@ import { LoginContext } from "../../../contexts/LoginContextProvider";
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
+import MyCalendar from "./MyCalendar";
+
 
 const API_BASE_URL = api.defaults.baseURL; 
 
@@ -164,11 +166,11 @@ const MypageMain = () => {
         <Box sx={{ display: "flex",  minHeight: "100vh", overflowY: "auto" }}>
             {/* ✅ 좌측 사이드바 */}
             <Box sx={{display: "flex", 
-        minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
-        overflowY: "auto",
-        backgroundColor: "#f9f9f9",
-        alignItems: "stretch",
-        borderRight: "1px solid #ccc" }} >
+                minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
+                overflowY: "auto",
+                backgroundColor: "#f9f9f9",
+                alignItems: "stretch",
+                borderRight: "1px solid #ccc" }} >
                 <MypageSidebar user={user} />
             </Box>
 
@@ -177,9 +179,10 @@ const MypageMain = () => {
                 {/* 섹션 1: 일정 관리 + 작성글 */}
                 <Box mb={4}>
                     <Typography variant="h6" >📅 일정 관리</Typography>
-                    <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}>
-                        <Typography>캘린더 영역</Typography>
-                    </Box>
+                    {/* <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}> */}
+                        {/* <Typography>캘린더 영역</Typography> */}
+                    {/* </Box>  */}
+                    <MyCalendar/>
                 </Box>
                 <Box mb={4}>
                   <Typography variant="h6"sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}

@@ -6,6 +6,7 @@ import ChatComponent from "./components/chat/ChatComponent";
 import LoginPage from "./domains/LoginPage/LoginPage";
 import LoginContextProvider from "./contexts/LoginContextProvider";
 import SampleIndex from "./SampleIndex";
+import GitData from "./domains/ProjectPage/components/GitData";
 import ProjectIssue from "./domains/ProjectPage/components/IssueTable";
 import ProjectMembers from "./domains/ProjectPage/components/ProjectMembers";
 import Resignations from "./domains/ProjectPage/components/Resignations";
@@ -42,7 +43,9 @@ import AdminStackUsage from "./domains/AdminPage/components/AdminStackUsage";
 import AdminHopePositionUsage from "./domains/AdminPage/components/AdminHopePositionUsage";
 import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
-import GitData from "./domains/ProjectPage/components/gitData";
+import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
+import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
+import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -51,17 +54,31 @@ createRoot(document.getElementById("root")).render(
         <ChatComponent />
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<SampleIndex />} />
-            <Route path="/main" element={<MainPage />} />
+
+            {/* <Route path="/" element={<SampleIndex />} /> */}
+            <Route path="/" element={<MainPage />} />
+            <Route
+              path="/recruitmemt/write"
+              element={<WriteRecruitmentPost />}
+            />
+            <Route path="/recruitment/write" element={<WriteRecruitmentPost />} />
+            <Route path="/recruitments/:recruitmentsId" element={<DetailRecruitmentsPost />} />  {/* 동적 라우트 추가 */}
+            <Route path="/recruitments/edit/:recruitmentId" element={<EditRecruitmentPost />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/social-register" element={<SocialRegisterPage />} />
+            <Route path="issues" element={<ProjectIssue />} />
             <Route
               path="/recruitmemt/write"
               element={<WriteRecruitmentPost />}
             />
             <Route path="/login" element={<LoginPage />} />
-
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
+            
             <Route path="/projects/:projectId" element={<ProjectMain />}>
+
+              <Route index element={<ProjectCalendar />} />
               <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
@@ -69,12 +86,17 @@ createRoot(document.getElementById("root")).render(
               <Route path="settings" element={<ProjectSettings />} />
               <Route path="manage" element={<ProjectManagement />} />
               <Route path="pending" element={<PendingMembers />} />
+
               <Route path="posts">
                 <Route index element={<ProjectListContainer />} />
                 <Route path="create" element={<ProjectCreateContainer />} />
                 <Route path=":postId" element={<ProjectDetailContainer />} />
-                <Route path=":postId/edit" element={<ProjectEditContainer />} />
+                <Route
+                  path=":postId/edit"
+                  element={<ProjectEditContainer />}
+                />
               </Route>
+
             </Route>
 
             <Route path="/posts">
@@ -99,6 +121,7 @@ createRoot(document.getElementById("root")).render(
               path="admin/hopeposition"
               element={<AdminHopePositionUsage />}
             />
+
             <Route path="/mypage" element={<MypageMain />} />
             <Route path="/mypage/:userId" element={<MypageMain />} />
             <Route path="/mypage/posts" element={<PostsPage />} />
@@ -118,6 +141,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/mypage/projects" element={<ProjectsPage />} />
             <Route path="/mypage/scraps" element={<ScrapsPage />} />
             <Route path="/mypage/sidebar" element={<MypageSidebar />} />
+            
           </Route>
         </Routes>
       </LoginContextProvider>

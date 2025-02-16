@@ -316,61 +316,88 @@ const MypageMain = () => {
 
 
                 <Box>
-                    <Typography variant="h6" sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
-                    onClick={() => navigate("/mypage/scraps")}>⭐ 스크랩한 모집글</Typography>
-                                 <Grid container spacing={3}>
-                                 {scrappedPosts.length > 0 ? scrappedPosts.map((scrap, index) => {
-                          const today = dayjs();
-                          const deadline = dayjs(scrap.deadline);
-                          const daysLeft = deadline.diff(today, "day"); // 🔥 남은 일 수 계산
-                          const status = daysLeft < 0 ? "마감" : `D-${daysLeft}`;
-
-                          return (
-                              <Grid item xs={4} key={scrap.recruitmentScrapId}>
-                                  <Box
-                                      sx={{
-                                          border: "1px solid #ddd",
-                                          padding: 3,
-                                          borderRadius: 2,
-                                          height: "140px",
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          justifyContent: "space-between",
-                                          cursor: "pointer",
-                                          "&:hover": { backgroundColor: "#f9f9f9" },
-                                      }}
-                                      onClick={() => navigate(`/recruitments/${scrap.recruitmentPostId}`)} // ✅ 모집글 상세 페이지 이동
-                                  >
-                                      {/* ✅ 제목 & 마감 여부 표시 */}
-                                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                          <Typography variant="subtitle1" fontWeight="bold">
-                                              {scrap.title}
-                                          </Typography>
-                                          <Typography
-                                              sx={{
-                                                  fontSize: "0.875rem",
-                                                  fontWeight: "bold",
-                                                  color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
-                                              }}
-                                          >
-                                              {status}
-                                          </Typography>
-                                      </Box>
-
-                                      {/* ✅ 작성 날짜 & 댓글 수 */}
-                                      <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                          <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
-                                          <Typography>댓글 {scrap.commentCount}개</Typography>
-                                      </Box>
-                                  </Box>
-                              </Grid>
-                          );
-                      }) : (
-                          <Typography>스크랩한 모집글이 없습니다.</Typography>
-                      )}
-                  </Grid>
-
+                    <Typography 
+                        variant="h6" 
+                        sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                        onClick={() => navigate("/mypage/scraps")}
+                    >
+                        ⭐ 스크랩한 모집글
+                    </Typography>
+                                    
+                    <Grid container spacing={3}>
+                        {scrappedPosts.length > 0 ? (
+                            scrappedPosts.map((scrap, index) => {
+                                const today = dayjs();
+                                const deadline = dayjs(scrap.deadline);
+                                const daysLeft = deadline.diff(today, "day"); // 🔥 남은 일 수 계산
+                                const status = daysLeft < 0 ? "마감" : `D-${daysLeft}`;
+                            
+                                return (
+                                    <Grid item xs={4} key={scrap.recruitmentScrapId}>
+                                        <Box
+                                            sx={{
+                                                border: "1px solid #ddd",
+                                                padding: 3,
+                                                borderRadius: 2,
+                                                height: "140px",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "space-between",
+                                                cursor: "pointer",
+                                                "&:hover": { backgroundColor: "#f9f9f9" },
+                                            }}
+                                            onClick={() => navigate(`/recruitments/${scrap.recruitmentPostId}`)} // ✅ 모집글 상세 페이지 이동
+                                        >
+                                            {/* ✅ 제목 & 마감 여부 표시 */}
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                <Typography variant="subtitle1" fontWeight="bold">
+                                                    {scrap.title}
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: "0.875rem",
+                                                        fontWeight: "bold",
+                                                        color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
+                                                    }}
+                                                >
+                                                    {status}
+                                                </Typography>
+                                            </Box>
+                                                
+                                            {/* ✅ 작성 날짜 & 댓글 수 */}
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
+                                                <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
+                                                <Typography>댓글 {scrap.commentCount}개</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                );
+                            })
+                        ) : (
+                            <Grid item xs={4}>
+                                <Box
+                                    sx={{
+                                        border: "1px solid #ddd",
+                                        padding: 3,
+                                        borderRadius: 2,
+                                        height: "140px",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#f9f9f9",
+                                        color: "#bbb",
+                                    }}
+                                >
+                                    <Typography variant="subtitle1" fontWeight="bold">
+                                        스크랩한 모집글 없음
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        )}
+                    </Grid>
                 </Box>
+
             </Box>
         </Box>
     );

@@ -57,7 +57,7 @@ const PostEditContainer = () => {
             
             navigate(`/posts/${postId}`);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('수정에 실패했습니다', error);
             alert(error.message);
         }
     };

@@ -55,10 +55,12 @@ const ProjectPostForm = ({
 
   const handleFileChange = (e) => {
     const files = e.target.files;
+    console.log('files:', files);
+    
     if (files) {
       const newAttachments = Array.from(files).map(file => ({
         type: 'file',
-        name: file.fileName,
+        name: file.name,
         file
       }));
       setTempAttachments([...tempAttachments, ...newAttachments]);
@@ -163,7 +165,10 @@ const ProjectPostForm = ({
         ))}
       </Box>
 
-      <Dialog open={fileDialogOpen} onClose={() => setFileDialogOpen(false)}>
+      <Dialog open={fileDialogOpen} onClose={() => {
+        setTempAttachments([]);
+        setFileDialogOpen(false);
+        }}>
         <DialogTitle>첨부파일 추가</DialogTitle>
         <DialogContent>
           <Button variant="outlined" component="label" fullWidth startIcon={<CloudUploadIcon />}>
@@ -197,7 +202,10 @@ const ProjectPostForm = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setFileDialogOpen(false)} color="primary">
+          <Button onClick={() => {
+            setTempAttachments([])
+            setFileDialogOpen(false)
+            }} color="primary">
             닫기
           </Button>
           <Button onClick={handleSaveAttachments} color="primary">

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -26,7 +27,7 @@ const AdminStack = () => {
 
   const fetchStacks = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/admin/stacks`);
+      const response = await api.get(`/admin/stacks`);
       setStacks(response.data);
     } catch (error) {
       console.error("Error fetching stacks:", error);
@@ -39,7 +40,7 @@ const AdminStack = () => {
     if (!newStackName.trim()) return;
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${BASE_URL}/admin/stacks`,
         { name: newStackName },
         { headers: { "Content-Type": "application/json" } }
@@ -53,7 +54,7 @@ const AdminStack = () => {
 
   const handleDeleteStack = async (id) => {
     try {
-      await axios.delete(`${BASE_URL}/admin/stacks/${id}`);
+      await api.delete(`/admin/stacks/${id}`);
       setStacks(stacks.filter((stack) => stack.id !== id));
     } catch (error) {
       console.error("Error deleting stack:", error);

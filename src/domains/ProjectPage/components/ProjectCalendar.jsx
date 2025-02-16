@@ -83,7 +83,6 @@ const ProjectCalendar = ({}) => {
           console.log("holidays", holidays);
 
           setIsHoliday(holidays);
-          setEvents(formattedEvents);
 
           // 오늘의 일정 필터링
           const today = new Date();
@@ -101,6 +100,7 @@ const ProjectCalendar = ({}) => {
               if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
               return a.sTime.localeCompare(b.sTime);
             });
+            setEvents(formattedEvents);
             console.log(formattedEvents);
 
             
@@ -143,10 +143,30 @@ const ProjectCalendar = ({}) => {
 
   // 일정 수정 후 상태 업데이트
   const handleUpdateEventData = (updateEvent) => {
-    setEvents((events) => 
-      events.map((event) => (event.id === updateEvent.id ? updateEvent : event))
-    )
-  }
+    const newEvent = {
+      id: updateEvent.id,
+      title: updateEvent.content,
+      start: updateEvent.startDate,
+      end: updateEvent.endDate,
+      sTime: updateEvent.startTime,
+      eTime: updateEvent.endTime,
+      projectId: updateEvent.projectId,
+      isHoliday: updateEvent.holiday || false
+    };
+  
+    setEvents(prev => [newEvent, ...prev]);
+  
+    const today = new Date();
+    const eventStartDate = new Date(newEvent.start);
+    const eventEndDate = new Date(newEvent.end);
+  
+    if (
+      eventStartDate.toDateString() === today.toDateString() ||
+      (eventStartDate <= today && eventEndDate >= today)
+    ) {
+      setTodayEvents(prev => [newEvent, ...prev]);
+    }
+  };
 
   // 삭제된 일정 제거
   const handleDeleteEvent = (calendarId) => {
@@ -155,7 +175,29 @@ const ProjectCalendar = ({}) => {
 
   // 일정 추가 후 상태 업데이트 
   const onAddSchedule = (data) => {
-    setEvents(prev => [data, ...prev]);
+    const newEvent = {
+      id: data.id,
+      title: data.content,
+      start: data.startDate,
+      end: data.endDate,
+      sTime: data.startTime,
+      eTime: data.endTime,
+      projectId: data.projectId,
+      isHoliday: data.holiday || false
+    };
+  
+    setEvents(prev => [newEvent, ...prev]);
+  
+    const today = new Date();
+    const eventStartDate = new Date(newEvent.start);
+    const eventEndDate = new Date(newEvent.end);
+  
+    if (
+      eventStartDate.toDateString() === today.toDateString() ||
+      (eventStartDate <= today && eventEndDate >= today)
+    ) {
+      setTodayEvents(prev => [newEvent, ...prev]);
+    }
   }
 
   const formatTime = (time) => {

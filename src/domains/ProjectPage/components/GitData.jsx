@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const GitData = () => {
@@ -24,11 +24,11 @@ const GitData = () => {
   useEffect(() => {
     const fetchProjectInfo = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/projects/${projectId}`);
-        if (!response.ok)
-          throw new Error("프로젝트 정보를 가져오는데 실패했습니다.");
-        const data = await response.json();
-
+        const response = await api.get(`/projects/${projectId}`);
+        
+        const {data} = response;
+        console.log("------------------",data);
+        
         const urls = [];
         if (data.githubUrl1) urls.push(data.githubUrl1);
         if (data.githubUrl2) urls.push(data.githubUrl2);
@@ -46,13 +46,12 @@ const GitData = () => {
 
     const fetchGitData = async () => {
       try {
-        const url = `${BASE_URL}/projects/${projectId}/githubs?gitURL=${gitUrls.join(
+        const url = `/projects/${projectId}/githubs?gitURL=${gitUrls.join(
           "&gitURL="
         )}`;
-        const response = await fetch(url);
-        if (!response.ok)
-          throw new Error("깃허브 데이터를 가져오는데 실패했습니다.");
-        const data = await response.json();
+        const response = await api.get(url);
+      
+        const {data} = response;
 
         setGitData(data);
       } catch (error) {

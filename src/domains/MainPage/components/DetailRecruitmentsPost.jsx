@@ -10,6 +10,9 @@ import {
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { region, position, proceedMethod } from "../components/Filter"
 import RecruitmentComment from "./RecruitmentComment"; // 
+import { useDispatch } from "react-redux";
+import { makeChatRoom } from "../../../containers/userSocketStatusSlice"; 
+
 
 const DetailRecruitmentPost = () => {
     const { userInfo } = useContext(LoginContext);
@@ -18,6 +21,7 @@ const DetailRecruitmentPost = () => {
     const [post, setPost] = useState(null);
     const [stacks, setStacks] = useState([]); // 스택
     const [loading, setLoading] = useState(true);
+    const dispath = useDispatch();
 
     useEffect(() => {
         console.log("📢 recruitmentsId:", recruitmentsId);
@@ -74,6 +78,11 @@ const DetailRecruitmentPost = () => {
         navigate(`/recruitments/edit/${recruitmentsId}`);
     };
 
+    const handleChatBtn = () => {
+        console.log("채팅 버튼 클릭");
+        
+        dispath(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
+    };
     
     return (
         <Container maxWidth="md">
@@ -95,7 +104,7 @@ const DetailRecruitmentPost = () => {
                 ) : (
                     // 작성자가 아닐 경우: 채팅 & 신청 버튼 표시
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={() => alert("채팅 기능은 아직 구현되지 않았습니다.")}>
+                        <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={handleChatBtn}>
                             채팅
                         </Button>
                         <Button variant="contained" color="success" onClick={() => alert("신청이 완료되었습니다!")}>

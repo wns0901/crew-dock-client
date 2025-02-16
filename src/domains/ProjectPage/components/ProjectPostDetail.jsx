@@ -5,6 +5,7 @@ import {DirectionLabel} from '../constants/Direction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const ProjectPostDetail = ({
     post = null, 
@@ -32,10 +33,6 @@ const ProjectPostDetail = ({
         }
     };
 
-    if (!userInfo) {
-        return <Typography variant="body1">로그인 후 댓글을 작성할 수 있습니다.</Typography>;
-    }
-
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 4 }}>
             <Box sx={{ width: '100%', maxWidth: 800 }}>
@@ -55,7 +52,11 @@ const ProjectPostDetail = ({
                         alignItems: 'center' 
                     }}>
                         <Typography variant="body2">
-                            {post?.userNickname} | {post?.createdAt}
+                            <Link to={`/myPage/${post?.userId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                {post?.userNickname}
+                            </Link>
+                            {" | "}
+                            {post?.createdAt}
                         </Typography>
                         
                         {isAuthor && (

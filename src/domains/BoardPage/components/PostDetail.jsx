@@ -5,6 +5,7 @@ import { CategoryLabel } from '../constants/Category';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faTrashCan, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import { Stack, Box, Button, TextField, Typography, Divider } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const PostDetail = ({
     post = null, 
@@ -22,6 +23,11 @@ const PostDetail = ({
     const isAuthor = post?.userId === userInfo?.id;
 
     const handleSubmitComment = () => {
+        if (!userInfo) {
+            alert("댓글을 작성하려면 로그인해야 합니다.");
+            return;
+        }
+
         if (comment.content.trim()) {
             onSubmitComment({
                 content: comment.content,
@@ -30,10 +36,6 @@ const PostDetail = ({
             setComment({ content: '' });
         }
     };
-
-    if (!userInfo) {
-        return <Typography variant="body1">로그인 후 댓글을 작성할 수 있습니다.</Typography>;
-    }
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 4 }}>
@@ -54,7 +56,11 @@ const PostDetail = ({
                         alignItems: 'center' 
                     }}>
                         <Typography variant="body2">
-                            {post?.userNickname} | {post?.createdAt}
+                            <Link to={`/myPage/${post?.userId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                {post?.userNickname}
+                            </Link>
+                            {" | "}
+                            {post?.createdAt}
                         </Typography>
                         
                         {isAuthor && (
@@ -117,8 +123,8 @@ const PostDetail = ({
                                     key={`fixed-${fixedComment.id}`}
                                     comment={fixedComment}
                                     comments={comments}
-                                    isAuthor={post?.userId === userInfo?.id}
-                                    isCommentUser={fixedComment.userId === userInfo?.id}
+                                    isAuthor={isAuthor}
+                                    isCommentUser={fixedComment.userId === (userInfo?.id || null)}
                                     onFixedComment={onFixedComment}
                                     onDeleteComment={onDeleteComment}
                                     onSubmitComment={onSubmitComment}
@@ -133,7 +139,7 @@ const PostDetail = ({
                                     key={`comment-${comment.id}`}
                                     comment={comment}
                                     isAuthor={isAuthor}
-                                    isCommentUser={comment.userId === userInfo.id}
+                                    isCommentUser={comment.userId === (userInfo?.id || null)}
                                     onFixedComment={onFixedComment}
                                     onDeleteComment={onDeleteComment}
                                     onSubmitComment={onSubmitComment}

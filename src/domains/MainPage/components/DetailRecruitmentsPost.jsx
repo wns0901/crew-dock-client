@@ -2,9 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../apis/baseApi";
 import {
-  Grid, Container, TextField, Select, MenuItem,
-  FormControl, InputLabel, Button, Box,
-  Typography, Divider, Paper, Chip
+    Grid, Container, TextField, Select, MenuItem,
+    FormControl, InputLabel, Button, Box,
+    Typography, Divider, Paper, Chip,
+    Stack
 } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { region, position, proceedMethod } from "../components/Filter"
@@ -17,6 +18,7 @@ const DetailRecruitmentPost = () => {
     const [post, setPost] = useState(null);
     const [stacks, setStacks] = useState([]); // 스택
     const [loading, setLoading] = useState(true);
+    const [attachments, setAttachments] = useState([]);
 
     useEffect(() => {
         if (!recruitmentsId) return;
@@ -40,7 +42,10 @@ const DetailRecruitmentPost = () => {
                 console.error("❌ 모집글 상세 불러오기 실패:", error);
                 setLoading(false);
             });
-    }, [recruitmentsId]);
+        api.get(`/recruitments/${recruitmentsId}/attachments`)
+            .then(res => setAttachments(res.data))
+            .catch(error => console.error("❌ 첨부 파일 가져오기 실패:", error));
+    }, []);
 
     if (loading) {
         return <Typography variant="h6" sx={{ textAlign: "center", mt: 5 }}>로딩 중...</Typography>;
@@ -72,14 +77,31 @@ const DetailRecruitmentPost = () => {
         navigate(`/recruitments/edit/${recruitmentsId}`);
     };
 
-    
+    const handleDownloadAttachment = (attachmentId, fileName) => {
+        try {
+            const response = api.get(`recruitments/${recruitmentsId}/attachments`,
+                { responseType: 'blob' }
+            );
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('첨부파일 다운로드 실패:', error);
+        }
+    };
+
+
     return (
         <Container maxWidth="md">
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 4, mb: 2 }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                     {post.title}
                 </Typography>
-                
+
                 {isAuthor ? (
                     // ✅ 작성자일 경우: 수정 & 삭제 버튼 표시
                     <Box>
@@ -107,52 +129,52 @@ const DetailRecruitmentPost = () => {
                 <Divider sx={{ mb: 2 }} />
 
                 <Grid container spacing={2}>
-                <Grid item xs={4}>
-                    <TextField
-                        fullWidth
-                        label="모집 분야"
-                        variant="outlined"
-                        value={position.find(p => p.value === post.recruitedField)?.label || "알 수 없음"}
-                        InputProps={{ readOnly: true, sx: { color: "black" } }} // ✅ readOnly 적용
-                    />
-                </Grid>
-
                     <Grid item xs={4}>
-                        <TextField fullWidth label="진행 기간" 
-                        variant="outlined"  value={post.period ? post.period : "없음"}  
-                        InputProps={{ readOnly: true }} />
+                        <TextField
+                            fullWidth
+                            label="모집 분야"
+                            variant="outlined"
+                            value={position.find(p => p.value === post.recruitedField)?.label || "알 수 없음"}
+                            InputProps={{ readOnly: true, sx: { color: "black" } }} // ✅ readOnly 적용
+                        />
                     </Grid>
 
                     <Grid item xs={4}>
-                        <TextField fullWidth type="date" label="모집 마감일" 
-                        variant="outlined" value={post.deadline} 
-                        InputProps={{ readOnly: true }} />
+                        <TextField fullWidth label="진행 기간"
+                            variant="outlined" value={post.period ? post.period : "없음"}
+                            InputProps={{ readOnly: true }} />
+                    </Grid>
+
+                    <Grid item xs={4}>
+                        <TextField fullWidth type="date" label="모집 마감일"
+                            variant="outlined" value={post.deadline}
+                            InputProps={{ readOnly: true }} />
                     </Grid>
 
                     {/* 지역/진행방식/모집인원 */}
                     <Grid item xs={4}>
-                        <TextField fullWidth label="지역" 
-                        variant="outlined" value={region.find(r => r.value === post.region)?.label || "알 수 없음"} 
-                        InputProps={{ readOnly: true }} />
+                        <TextField fullWidth label="지역"
+                            variant="outlined" value={region.find(r => r.value === post.region)?.label || "알 수 없음"}
+                            InputProps={{ readOnly: true }} />
                     </Grid>
 
                     <Grid item xs={4}>
-                        <TextField fullWidth label="진행 방식" 
-                        value={proceedMethod.find(p => p.value === post.proceedMethod)?.label || "알 수 없음"}
-                        InputProps={{ readOnly: true }} />
+                        <TextField fullWidth label="진행 방식"
+                            value={proceedMethod.find(p => p.value === post.proceedMethod)?.label || "알 수 없음"}
+                            InputProps={{ readOnly: true }} />
                     </Grid>
 
                     <Grid item xs={4}>
-                        <TextField fullWidth label="모집 인원" 
-                        id="standard-disabled"
-                        variant="outlined" 
-                        value={post.recruitedNumber} 
-                        InputProps={{ readOnly: true }} />
+                        <TextField fullWidth label="모집 인원"
+                            id="standard-disabled"
+                            variant="outlined"
+                            value={post.recruitedNumber}
+                            InputProps={{ readOnly: true }} />
                     </Grid>
 
                 </Grid>
             </Paper>
-            
+
             {/* 🔹 기술 스택 추가 */}
             <Paper elevation={0} sx={{ p: 2, mb: 1 }}>
                 <Typography variant="h6" sx={{ textAlign: "left" }}>기술 스택</Typography>
@@ -182,8 +204,24 @@ const DetailRecruitmentPost = () => {
                 <Typography variant="h6" sx={{ textAlign: "left" }}>소개 및 내용</Typography>
                 <Divider sx={{ mb: 2 }} />
                 <div style={{ height: "300px", overflowY: "auto", whiteSpace: "pre-wrap", border: "soild" }}>
-                {post.content}
+                    {post.content}
                 </div>
+            </Paper>
+
+            <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" sx={{ textAlign: "left" }}>첨부 파일</Typography>
+                <Divider sx={{ mb: 2 }} />
+                {attachments.length > 0 && (
+                    <Stack spacing={1}>
+                        {attachments.map((attachment, index) => (
+                            <Box key={index}>
+                                <Button onClick={() => handleDownloadAttachment(attachment.id, attachment.fileName)}>
+                                    {attachment.fileName}
+                                </Button>
+                            </Box>
+                        ))}
+                    </Stack>
+                )}
             </Paper>
 
             {/* 모집글 상세 내용 */}

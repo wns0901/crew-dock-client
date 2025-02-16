@@ -48,6 +48,7 @@ import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitm
 import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
 import UrgentIssues from "./domains/ProjectPage/components/UrgentIssues";
 import ProjectMainDashboard from "./domains/ProjectPage/components/ProjectMainDashBoard";
+import ProjectMainNotice from "./domains/ProjectPage/components/ProjectMainNotice";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -89,6 +90,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="manage" element={<ProjectManagement />} />
               <Route path="pending" element={<PendingMembers />} />
               <Route path="Urgent" element={<UrgentIssues />} />
+              <Route path="projectnotice" element={<ProjectMainNotice />} />
 
               <Route path="posts">
                 <Route index element={<ProjectListContainer />} />

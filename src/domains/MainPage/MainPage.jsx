@@ -4,11 +4,10 @@ import Banners from './components/Banners';
 import DeadlineProjects from './components/DeadlineProjects'
 import WriteBtn from './components/WriteBtn';
 import MainBanner from './components/MainBanner';
-
 const MainPage = () => {
     return (
         <>
-            <MainBanner/>
+           <MainBanner/>
             <DeadlineProjects/>
             <RecruitmentsCompoent/>
             <WriteBtn />

@@ -67,9 +67,8 @@ const UrgentIssues = () => {
 
   return (
     <TableContainer sx={{ mt: 3 }}>
-      <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-        ⏳ 마감 임박 일정
-      </Typography>
+   <h2 style={{ textAlign: "center", marginBottom: "20px" }}> ⏳ 마감 임박 일정</h2>
+
       <Table>
         <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
           <TableRow>

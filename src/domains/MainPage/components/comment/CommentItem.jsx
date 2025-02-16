@@ -2,8 +2,6 @@ import { Box, Typography, Button, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReplyIcon from "@mui/icons-material/Reply";
 import CommentForm from "./CommentForm";
-import { useContext } from "react";
-import { LoginContext } from "../../../../contexts/LoginContextProvider";
 
 const CommentItem = ({
   comment,
@@ -13,78 +11,74 @@ const CommentItem = ({
   replyToId,
   handleAddComment,
 }) => {
-  const { isLogin } = useContext(LoginContext);
-  console.log(isLogin);
-  
-  return (
-    <Box sx={{ mb: 2 }}>
-      {!comment.isDeleted ? (
-        <Box
-          sx={{
-            p: 2,
-            bgcolor: "background.paper",
-            borderRadius: 1,
-            boxShadow: "0 2px 4px rgba(0,0,0,0.08)", // 그림자 효과 추가
-          }}
-        >
-          {/* 첫 번째 줄: 닉네임과 버튼들 */}
-          <Box sx={{ mb: 1, overflow: "hidden" }}>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: "bold",
-                float: "left",
-              }}
-            >
-              {comment.userName}
-            </Typography>
-            <Box sx={{ float: "right" }}>
-              {comment.userId === userInfo?.id && (
-                <Button
-                  size="small"
-                  startIcon={<DeleteIcon />}
-                  onClick={(e) => onDelete(comment.id)}
-                >
-                  삭제
-                </Button>
-              )}
-              {comment.parentCommentId !== null ||(isLogin && (
-                <Button
-                  size="small"
-                  startIcon={<ReplyIcon />}
-                  onClick={() => onReply(comment.id)}
-                >
-                  답글
-                </Button>
-              ))}
-            </Box>
-          </Box>
+  if (!comment) return null; // comment가 없을 경우 처리
 
-          {/* 두 번째 줄: 내용 */}
-          <Box sx={{ mb: 1, clear: "both" }}>
-            <Typography variant="body1">{comment.content}</Typography>
-          </Box>
+  const CommentContent = () => {
+    if (comment.isDeleted) {
+      return comment.childs?.length > 0 ? (
+        <Typography variant="body1">삭제된 댓글입니다.</Typography>
+      ) : null;
+    }
 
-          {/* 세 번째 줄: 작성일 */}
-          <Box sx={{ textAlign: "right" }}>
-            <Typography variant="caption" color="text.secondary">
-              {comment.createdAt}
-            </Typography>
+    return (
+      <>
+        <Box sx={{ mb: 1, overflow: "hidden" }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: "bold",
+              float: "left",
+            }}
+          >
+            {comment.userName}
+          </Typography>
+          <Box sx={{ float: "right" }}>
+            {comment.userId === userInfo?.id && (
+              <Button
+                size="small"
+                startIcon={<DeleteIcon />}
+                onClick={(e) => onDelete(comment.id)}
+              >
+                삭제
+              </Button>
+            )}
+            {!comment.parentCommentId && (
+              <Button
+                size="small"
+                startIcon={<ReplyIcon />}
+                onClick={() => onReply(comment.id)}
+              >
+                답글
+              </Button>
+            )}
           </Box>
         </Box>
-      ) : 
-      comment.childs.length === 0 ||
-      (<Box
-          sx={{
-            p: 2,
-            bgcolor: "background.paper",
-            borderRadius: 1,
-            boxShadow: "0 2px 4px rgba(0,0,0,0.08)", // 삭제된 댓글에도 동일한 그림자 적용
-          }}
-        >
-          <Typography variant="body1">삭제된 댓글입니다.</Typography>
-        </Box>)
-      }
+
+        <Box sx={{ mb: 1, clear: "both" }}>
+          <Typography variant="body1">{comment.content}</Typography>
+        </Box>
+
+        <Box sx={{ textAlign: "right" }}>
+          <Typography variant="caption" color="text.secondary">
+            {comment.createdAt}
+          </Typography>
+        </Box>
+      </>
+    );
+  };
+
+  return (
+    <Box sx={{ mb: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          bgcolor: "background.paper",
+          borderRadius: 1,
+          boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
+        }}
+      >
+        <CommentContent />
+      </Box>
 
       {/* 답글 입력 폼 */}
       {replyToId === comment.id && (

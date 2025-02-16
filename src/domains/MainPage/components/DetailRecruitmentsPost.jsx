@@ -446,8 +446,7 @@ const DetailRecruitmentPost = () => {
             </Paper>
         
             {/* 댓글 */}
-            <Typography variant="h6" sx={{ textAlign: "left" }}>댓글</Typography>
-                <Divider sx={{ mb: 2 }} />
+            
             <Comment url={`/recruitments/${recruitmentsId}`}/>
         </Container>
     );

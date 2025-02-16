@@ -7,8 +7,6 @@ import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 
-const API_BASE_URL = api.defaults.baseURL; 
-
 const ScrapsPage = () => {
     const navigate = useNavigate();
     const { userId: paramUserId } = useParams();
@@ -42,9 +40,9 @@ const ScrapsPage = () => {
 
         const fetchUserData = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/user/${userId}`);
+                const response = await api.get(`b b /user/${userId}`);
                 if (!response.ok) throw new Error("유저 데이터 불러오기 실패");
-                const data = await response.json();
+                const data = await response.data();
                 console.log("[DEBUG] 유저 데이터:", data);
                 setUser(data);
             } catch (error) {

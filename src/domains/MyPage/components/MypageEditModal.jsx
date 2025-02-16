@@ -5,7 +5,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import axios from "axios";
 import { Password } from "@mui/icons-material";
 import api from "../../../apis/baseApi";
 
@@ -38,7 +37,7 @@ const MypageEdit = ({ open, onClose, userId }) => {
     useEffect(() => {
         if (!effectiveUserId) return;
 
-        axios.get(`${API_BASE_URL}/user/${effectiveUserId}`)
+        api.get(`/user/${effectiveUserId}`)
             .then((response) => {
                 setUserData({
                     ...response.data,
@@ -49,7 +48,7 @@ const MypageEdit = ({ open, onClose, userId }) => {
             })
             .catch((error) => console.error("❌ 유저 정보 불러오기 실패:", error));
 
-        axios.get(`${API_BASE_URL}/stacks/all`)
+        api.get(`/stacks/all`)
             .then((response) => {
                 const mapping = new Map(response.data.map((stack, index) => [stack, index + 1]));
                 setStackIdMap(mapping);
@@ -87,8 +86,8 @@ const MypageEdit = ({ open, onClose, userId }) => {
         formData.append("file", selectedFile);
 
         try {
-            const response = await axios.patch(
-                `${API_BASE_URL}/user/${effectiveUserId}/profile-img`,
+            const response = await api.patch(
+                `/user/${effectiveUserId}/profile-img`,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
@@ -122,8 +121,8 @@ const MypageEdit = ({ open, onClose, userId }) => {
                 stackIds: userData.stackIds.map(stack => stackIdMap.get(stack)).filter(id => id !== undefined),
             };
 
-            const response = await axios.patch(
-                `${API_BASE_URL}/user/${effectiveUserId}`,
+            const response = await api.patch(
+                `/user/${effectiveUserId}`,
                 updatedUserData,
                 { headers: { "Content-Type": "application/json" } }
             );

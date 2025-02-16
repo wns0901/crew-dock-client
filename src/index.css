@@ -9,3 +9,7 @@
 body, button, input, textarea, * {
     font-family: 'KOMACON', Arial, sans-serif !important;
 }
+
+input[type="password"] {
+    font-family: Arial, sans-serif !important;
+}

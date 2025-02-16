@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ 상세 페이지 이동
 import api from "../../../apis/baseApi";
 import {
@@ -16,6 +16,7 @@ import {
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";  // 빈 북마크
 import BookmarkIcon from "@mui/icons-material/Bookmark";  // 채워진 북마크
 import { position, proceedMethod, region } from "../components/Filter"; // 필터 유지
+import { LoginContext } from "../../../contexts/LoginContextProvider";  // LoginContext 
 
 const RecruitmentsComponent = () => {
   const navigate = useNavigate(); // 네비게이션 함수
@@ -31,7 +32,8 @@ const RecruitmentsComponent = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [stacks, setStacks] = useState([]);
   const [scrappedPosts, setScrappedPosts] = useState({}); // 스크랩 상태 관리
-  
+  const { userInfo } = useContext(LoginContext);  // LoginContext에서 userInfo 가져오기
+  const userId = userInfo.id;  
   // 모집글 데이터 가져오기 (필터링 반영)
   useEffect(() => {
     const params = new URLSearchParams();
@@ -58,6 +60,19 @@ const RecruitmentsComponent = () => {
       })
       .catch((error) => console.error("데이터 가져오기 실패:", error));
   }, [filters, page]);
+
+
+  useEffect(() => {
+    if (userId) {
+      api
+        .get(`/recruitments/scraps?userId=${userId}`)
+        .then((response) => {
+          const scrappedIds = response.data.map(post => post.recruitmentPostId); // 스크랩된 게시글 ID 리스트
+          setScrappedPosts(scrappedIds);
+        })
+        .catch((error) => console.error("스크랩 게시글 가져오기 실패:", error));
+    }
+  }, [userId]);
 
   // 프로젝트별 기술 스택 가져오기
   useEffect(() => {
@@ -131,25 +146,23 @@ const RecruitmentsComponent = () => {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays > 0 ? `D-${diffDays}` : diffDays === 0 ? "D-Day" : "마감됨";
     };
-    const handleScrap = async (id) => {  // async 추가
-      const userId = localStorage.getItem("userId"); 
-      if (!userId) {
-        alert("로그인이 필요합니다.");
-        return;
-      }
-    
-      try {
-        if (scrappedPosts[id]) {
-          await api.delete(`/recruitments/${id}/scrap`);  //
-          setScrappedPosts((prev) => ({ ...prev, [id]: false }));
-        } else {
-          await api.post(`/recruitments/${id}/scrap`);  //
-          setScrappedPosts((prev) => ({ ...prev, [id]: true }));
-        }
-      } catch (error) {
-        console.error("스크랩 실패:", error);
-      }
-    };
+
+      // 스크랩 추가/삭제
+  const handleScrap = (recruitmentPostId) => {
+    if (scrappedPosts.includes(recruitmentPostId)) {
+      api.delete(`/recruitments/${recruitmentPostId}/scrap?userId=${userId}`)
+        .then(() => {
+          setScrappedPosts(prev => prev.filter(id => id !== recruitmentPostId));
+        })
+        .catch((error) => console.error("스크랩 삭제 실패:", error));
+    } else {
+      api.post(`/recruitments/${recruitmentPostId}/scrap?userId=${userId}`)
+        .then(() => {
+          setScrappedPosts(prev => [...prev, recruitmentPostId]);
+        })
+        .catch((error) => console.error("스크랩 추가 실패:", error));
+    }
+  };
 
   return (
     <div>
@@ -249,13 +262,17 @@ const RecruitmentsComponent = () => {
                     <Typography variant="caption">마감일: {project.deadline || "미정"}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Chip label={calculateDDay(project.deadline)} color="error" size="small" />
-                      <IconButton onClick={() => handleScrap(project.id)}>
-                    {scrappedPosts[project.id] ? (
-                      <BookmarkIcon sx={{ color: "gray" }} />  // 스크랩됨
-                    ) : (
-                      <BookmarkBorderIcon sx={{ color: "gray" }} />  // 스크랩 안됨
-                    )}
-                    </IconButton>
+                      <IconButton onClick={(event) => {
+  event.stopPropagation(); // 상세 페이지로 이동하는 이벤트 전파를 막음
+  handleScrap(project.id);
+}}>
+  {scrappedPosts.includes(project.id) ? (
+    <BookmarkIcon sx={{ color: "gray" }} />  // 스크랩됨
+  ) : (
+    <BookmarkBorderIcon sx={{ color: "gray" }} />  // 스크랩 안됨
+  )}
+</IconButton>
+
                     </Box>
                     </Box>
                   <hr/>

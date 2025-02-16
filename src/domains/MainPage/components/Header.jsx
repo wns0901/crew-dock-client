@@ -1,9 +1,11 @@
 import React, { useContext, useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, Box } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; // 🔥 화살표 아이콘 추가
 import { useNavigate } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "../asset/CrewDockLogo.png"; // 로고 이미지 경로 설정
+import "../../../index.css";
+import "../css/Header.css"; // ✅ CSS 파일 추가
 
 const Header = () => {
     const { isLogin, userInfo, logout } = useContext(LoginContext);
@@ -24,32 +26,48 @@ const Header = () => {
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
-            <Toolbar>
-             
+        <AppBar position="static" sx={{ backgroundColor: "#ffffff", boxShadow: "none" }}> {/* ✅ 그림자 제거 */}
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}> {/* ✅ 상단바 정렬 고정 */}
+                
+                {/* 로고 */}
                 <IconButton edge="start" color="inherit" onClick={() => navigate("/")}>
-    <img src={Logo} alt="로고" style={{ width: 60, height: 60 }} />  
-</IconButton>
+                    <img src={Logo} alt="로고" style={{ width: 90, height: 80 }} />
+                </IconButton>
 
+                {/* 네비게이션 버튼 */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: "40px" }}> {/* ✅ 버튼 가로 정렬 */}
+                    <Button className="nav-button board-button" onClick={() => navigate("/posts")}>
+                        게시판
+                    </Button>
+                    <Button className="nav-button project-button" onClick={() => navigate(`/mypage/projects`)}>
+                        내 프로젝트
+                    </Button>
 
-                <Typography variant="h6" sx={{ flexGrow: 1, marginLeft: 1 }}>
-                   
-                </Typography>
-
-             
-                <Box>
-                    <Button color="inherit" onClick={() => navigate("/posts")}>게시판</Button>
-                    <Button color="inherit" onClick={() => navigate(`/mypage/projects`)}>내 프로젝트</Button>
-
-                    
+                    {/* 로그인 상태 확인 */}
                     {isLogin ? (
                         <>
-                            <Button color="inherit" onClick={handleMenuOpen}>
-                                <Typography variant="body1" sx={{ fontSize: "1.3rem" }}>
+                            <Button
+                                sx={{
+                                    color: "#000000",
+                                    display: "flex",
+                                    alignItems: "center", // ✅ 김쩔미 + ▼ 아이콘 가로 정렬
+                                    gap: "5px" // ✅ 이름과 화살표 간격 조절
+                                }}
+                                onClick={handleMenuOpen}
+                            >
+                                <Typography 
+                                    variant="body1" 
+                                    sx={{ 
+                                        fontSize: "1.5rem", 
+                                        color: "#000000", 
+                                        fontWeight: "bold"
+                                    }}
+                                >
                                     {userInfo.nickname}
                                 </Typography>
-                            </Button>님 환영합니다.
-    
+                                <KeyboardArrowDownIcon sx={{ fontSize: "1.5rem", color: "#000000" }} /> {/* 🔥 화살표 추가 */}
+                            </Button>
+
                             <Menu
                                 anchorEl={anchorEl}
                                 open={Boolean(anchorEl)}
@@ -60,7 +78,7 @@ const Header = () => {
                             </Menu>
                         </>
                     ) : (
-                        <Button color="inherit" onClick={() => navigate("/login")}>로그인</Button>
+                        <Button sx={{ color: "#000000" }} onClick={() => navigate("/login")}>로그인</Button>
                     )}
                 </Box>
             </Toolbar>

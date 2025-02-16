@@ -140,21 +140,62 @@ const MyCalendar = ({}) => {
 
   // 일정 수정 후 상태 업데이트
   const handleUpdateEventData = (updateEvent) => {
-    setEvents((events) => 
-      events.map((event) => (event.id === updateEvent.id ? updateEvent : event))
-    )
+    const newEvent = {
+      id: updateEvent.id,
+      title: updateEvent.content,
+      start: updateEvent.startDate,
+      end: updateEvent.endDate,
+      sTime: updateEvent.startTime,
+      eTime: updateEvent.endTime,
+      projectId: updateEvent.projectId,
+      isHoliday: updateEvent.holiday || false
+    };
+  
+    setEvents(prev => [newEvent, ...prev]);
+  
+    const today = new Date();
+    const eventStartDate = new Date(newEvent.start);
+    const eventEndDate = new Date(newEvent.end);
+  
+    if (
+      eventStartDate.toDateString() === today.toDateString() ||
+      (eventStartDate <= today && eventEndDate >= today)
+    ) {
+      setTodayEvents(prev => [newEvent, ...prev]);
+    }
   }
 
-  // 삭제된 일정 제거
+  // 삭제된 일정 제거후 상태 업데이트
   const handleDeleteEvent = (calendarId) => {
     setEvents((prevEvents) => prevEvents.filter((event) => event.id !== calendarId));
   };
 
   // 일정 추가 후 상태 업데이트 
   const onAddSchedule = (data) => {
-    setEvents(prev => [data, ...prev]);
-  }
-
+    const newEvent = {
+      id: data.id,
+      title: data.content,
+      start: data.startDate,
+      end: data.endDate,
+      sTime: data.startTime,
+      eTime: data.endTime,
+      projectId: data.projectId,
+      isHoliday: data.holiday || false
+    };
+  
+    setEvents(prev => [newEvent, ...prev]);
+  
+    const today = new Date();
+    const eventStartDate = new Date(newEvent.start);
+    const eventEndDate = new Date(newEvent.end);
+  
+    if (
+      eventStartDate.toDateString() === today.toDateString() ||
+      (eventStartDate <= today && eventEndDate >= today)
+    ) {
+      setTodayEvents(prev => [newEvent, ...prev]);
+    }
+  };
   
   // FullCalendar의 월이 변경될 때 currentMonth 업데이트
   const handleMonthChange = (info) => {

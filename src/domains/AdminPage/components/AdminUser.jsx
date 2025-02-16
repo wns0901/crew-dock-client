@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AdminUser = () => {
@@ -22,8 +23,8 @@ const AdminUser = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/admin/users`) // 백엔드 API 호출
+    api
+      .get(`/admin/users`) // 백엔드 API 호출
       .then((response) => {
         setUsers(response.data);
         setLoading(false);

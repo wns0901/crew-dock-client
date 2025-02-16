@@ -48,6 +48,7 @@ const DetailRecruitmentPost = () => {
                 setLoading(false);
             });
     }, [recruitmentsId]);
+    
 
     if (loading) {
         return <Typography variant="h6" sx={{ textAlign: "center", mt: 5 }}>로딩 중...</Typography>;
@@ -85,6 +86,36 @@ const DetailRecruitmentPost = () => {
         dispath(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
     };
     
+    
+    const handleApply = () => {
+        if (!userInfo) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+    
+        if (!post || !post.projectId) {
+            alert("프로젝트 ID를 찾을 수 없습니다.");
+            return;
+        }
+    
+        api.post(`/projects/${post.projectId}/members`, { userId: userInfo.id })
+            .then(response => {
+                console.log("📌 [DEBUG] 신청 응답:", response.data);
+                const { message, projectId, userId, status } = response.data;
+    
+                alert(`${message} (프로젝트 ID: ${projectId}, 사용자 ID: ${userId}, 상태: ${status})`);
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.error("❌ [ERROR] 신청 실패:", error.response.data);
+                    alert("신청 실패: " + (error.response.data.error || "알 수 없는 오류"));
+                } else {
+                    alert("신청 중 오류가 발생했습니다.");
+                }
+            });
+    };
+    
+
     return (
         <Container maxWidth="md">
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 4, mb: 2 }}>
@@ -103,20 +134,35 @@ const DetailRecruitmentPost = () => {
                         </Button>
                     </Box>
                 ) : (
-                    // 작성자가 아닐 경우: 채팅 & 신청 버튼 표시
+                    // 🔹 로그인한 사용자만 "채팅", "신청" 버튼 표시
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={handleChatBtn}>
                             채팅
                         </Button>
-                        <Button variant="contained" color="success" onClick={() => alert("신청이 완료되었습니다!")}>
+                        <Button 
+                            variant="contained" 
+                            color="success" 
+                            onClick={() => {
+                                if (userInfo) {
+                                    handleApply();
+                                } else {
+                                    alert("로그인 부탁드립니다.");
+                                }
+                            }}
+                        >
                             신청
-                        </Button>
+                        </Button> 
+
                     </Box>
                 )}
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography variant="body1" marginTop={-1}>
+            <Typography 
+                variant="body1" 
+                marginTop={-1} 
+                sx={{ cursor: "pointer" }}
+                onClick={() => navigate(`/mypage/${post.user?.userId}`)} >
                 {post.user?.nickName ?? "알 수 없음"}
             </Typography>
             <Typography variant="body1" marginTop={-1}>

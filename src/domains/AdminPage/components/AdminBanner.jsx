@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AdminBanner = () => {
@@ -23,7 +24,7 @@ const AdminBanner = () => {
   // 배너 목록 조회
   const fetchBanners = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/admin/banners`);
+      const response = await api.get(`/admin/banners`);
       setBanners(response.data);
     } catch (error) {
       console.error("배너 목록 불러오기 실패:", error);
@@ -51,7 +52,7 @@ const AdminBanner = () => {
     formData.append("file", selectedFile);
 
     try {
-      await axios.post(`${BASE_URL}/admin/banners`, formData, {
+      await api.post(`/admin/banners`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       resetForm();
@@ -75,8 +76,8 @@ const AdminBanner = () => {
     if (selectedFile) formData.append("file", selectedFile);
 
     try {
-      await axios.put(
-        `${BASE_URL}/admin/banners/${editingBanner.id}`,
+      await api.put(
+        `/admin/banners/${editingBanner.id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -94,7 +95,7 @@ const AdminBanner = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`${BASE_URL}/admin/banners/${id}`);
+      await api.delete(`/admin/banners/${id}`);
       fetchBanners();
     } catch (error) {
       console.error("배너 삭제 실패:", error);
@@ -104,7 +105,7 @@ const AdminBanner = () => {
   // 활성화 상태 변경 (토글)
   const toggleBannerActivation = async (banner) => {
     try {
-      await axios.patch(`${BASE_URL}/admin/banners/${banner.id}/activate`, {
+      await api.patch(`/admin/banners/${banner.id}/activate`, {
         activate: !banner.activate,
       });
 

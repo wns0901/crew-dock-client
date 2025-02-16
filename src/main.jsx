@@ -15,6 +15,7 @@ import ProjectSettings from "./domains/ProjectPage/components/ProjectSettings";
 import ProjectManagement from "./domains/ProjectPage/components/ProjectManagement";
 import PendingMembers from "./domains/ProjectPage/components/PendingMembers";
 import Layout from "./domains/MainPage/components/Layout";
+import Footer from "./domains/MainPage/components/footer";
 import PostCreateContainer from "./domains/BoardPage/containers/PostCreateContainer";
 import PostDetailContainer from "./domains/BoardPage/containers/PostDetailContainer";
 import PostEditContainer from "./domains/BoardPage/containers/PostEditiorContainer";
@@ -46,6 +47,9 @@ import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
 import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
 import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
 import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
+import UrgentIssues from "./domains/ProjectPage/components/UrgentIssues";
+import ProjectMainDashboard from "./domains/ProjectPage/components/ProjectMainDashBoard";
+import ProjectMainNotice from "./domains/ProjectPage/components/ProjectMainNotice";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -78,7 +82,7 @@ createRoot(document.getElementById("root")).render(
             
             <Route path="/projects/:projectId" element={<ProjectMain />}>
 
-              <Route index element={<ProjectCalendar />} />
+              <Route index element={<ProjectMainDashboard />} />
               <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
               <Route path="members" element={<ProjectMembers />} />
@@ -86,6 +90,8 @@ createRoot(document.getElementById("root")).render(
               <Route path="settings" element={<ProjectSettings />} />
               <Route path="manage" element={<ProjectManagement />} />
               <Route path="pending" element={<PendingMembers />} />
+              <Route path="Urgent" element={<UrgentIssues />} />
+              <Route path="projectnotice" element={<ProjectMainNotice />} />
 
               <Route path="posts">
                 <Route index element={<ProjectListContainer />} />

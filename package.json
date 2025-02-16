@@ -48,13 +48,15 @@
     "react-dropzone": "^14.3.5",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-slick": "^0.30.3",
     "react-social-login-buttons": "^4.1.0",
     "react-toastify": "^11.0.3",
     "redux": "^5.0.1",
     "rollup": "^4.34.7",
+    "slick-carousel": "^1.8.1",
     "sockjs-client": "^1.6.1",
     "styled-components": "^6.1.14",
-    "sweetalert2": "^11.16.0",
+    "sweetalert2": "^11.6.13",
     "sweetalert2-react-content": "^5.1.0"
   },
   "devDependencies": {

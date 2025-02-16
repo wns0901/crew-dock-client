@@ -231,3 +231,4 @@ const DetailRecruitmentPost = () => {
 };
 
 export default DetailRecruitmentPost;
+

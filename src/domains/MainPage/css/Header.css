@@ -1,0 +1,34 @@
+.nav-button {
+    font-size: 1.5rem;
+    font-family: 'Dovemayo_gothic', Arial, sans-serif !important;
+    border-radius: 30px !important; /* 둥근 버튼 */
+    padding: 10px 20px !important;
+    font-weight: bold !important;
+    text-transform: none !important; /* 대문자 변환 방지 */
+    margin: 0 5px !important; /* 버튼 간격 조정 (양옆으로 15px) */
+    transition: all 0.3s ease !important;
+    min-width: 160px; /* 버튼 크기 고정 */
+}
+
+/* 🔥 게시판 버튼 (연한 민트색 배경) */
+.project-button {
+    background-color: #81bbf5 !important;
+    color: #ffffff !important;
+    border: 2px solid #81bbf5 !important;
+}
+
+.project-button:hover {
+    background-color: #76a3d0 !important; /* 호버 시 색 변경 */
+    border: 2px solid #76a3d0 !important;
+}
+
+/* 🔥 내 프로젝트 버튼 (흰색 배경 + 검은 테두리) */
+.board-button {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #a6a6a6 !important;
+}
+
+.board-button:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}

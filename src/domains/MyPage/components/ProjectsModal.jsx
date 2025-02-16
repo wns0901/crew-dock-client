@@ -5,11 +5,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { LoginContext } from "../../../contexts/LoginContextProvider"; // ✅ LoginContext 가져오기
-import axios from "axios";
 import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
-
-const API_BASE_URL = api.defaults.baseURL; 
 
 const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
     const { userInfo } = useContext(LoginContext); // ✅ userInfo 가져오기
@@ -25,16 +22,15 @@ const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
     const [stacks, setStacks] = useState([]);
 
     useEffect(() => {
-        // ✅ 기술 스택 불러오기
-        axios.get(`${API_BASE_URL}/stacks/all`)
-            .then((response) => setStacks(response.data))
+        api.get(`/stacks/all`)
+            .then((response) => {
+                console.log("📌 불러온 기술 스택 데이터:", response.data);
+                setStacks(response.data);  // ✅ `setStacks`를 객체 배열로 저장
+            })
             .catch((error) => console.error("🚨 기술 스택 불러오기 실패:", error));
-
-        // ✅ userInfo에서 hopePosition 가져와서 position에 저장
-        if (userInfo?.hopePosition) {
-            setNewProject(prev => ({ ...prev, position: userInfo.hopePosition }));
-        }
     }, [userInfo]);
+    
+    
 
     const handleInputChange = (e) => {
         setNewProject({ ...newProject, [e.target.name]: e.target.value });
@@ -45,6 +41,7 @@ const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
     };
 
     const handleSubmit = () => {
+        alert("프로젝트 생성 완료 ! ");
         handleCreateProject(newProject);
     };
 
@@ -85,15 +82,24 @@ const ProjectsModal = ({ open, handleClose, handleCreateProject }) => {
                 {/* 🔥 기술 스택 선택 */}
                 <Autocomplete
                     multiple
-                    options={stacks}
-                    value={newProject.stacks}
-                    onChange={handleStackChange}
-                    getOptionLabel={(option) => option}
-                    renderTags={(value, getTagProps) => value.map((option, index) => (
-                        <Chip label={option} {...getTagProps({ index })} key={option} />
-                    ))}
+                    options={stacks.map((stack, index) => ({ id: index + 1, stackName: stack }))} // ✅ 객체 배열로 변환
+                    value={newProject.stacks}  
+                    getOptionLabel={(option) => (typeof option === "string" ? option : option.stackName)} // ✅ 문자열 & 객체 둘 다 처리
+                    isOptionEqualToValue={(option, value) => option.id === value.id} // ✅ 정확한 비교
+                    onChange={(event, value) => {
+                        console.log("📌 선택한 스택 (객체 리스트):", value);
+                        setNewProject({ ...newProject, stacks: value }); 
+                    }}
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            <Chip label={option.stackName} {...getTagProps({ index })} key={option.id} /> // ✅ key 설정
+                        ))
+                    }
                     renderInput={(params) => <TextField {...params} label="기술 스택" placeholder="스택 추가" />}
                 />
+
+
+
 
                 <Box display="flex" justifyContent="space-between" mt={3}>
                     <Button variant="contained" color="primary" onClick={handleSubmit}>추가</Button>

@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import ChartDataLabels from "chartjs-plugin-datalabels"; // 데이터 라벨 플러그인 추가
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 // Chart.js 모듈 등록
 ChartJS.register(
   BarElement,
@@ -28,8 +29,8 @@ const AdminStackUsage = () => {
 
   useEffect(() => {
     // axios로 데이터 가져오기 (GET /admin/stacks/usage)
-    axios
-      .get(`${BASE_URL}/admin/stacks/usage`)
+    api
+      .get(`/admin/stacks/usage`)
       .then((response) => {
         setStackUsageData(response.data);
       })

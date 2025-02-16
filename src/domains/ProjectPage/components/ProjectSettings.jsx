@@ -12,6 +12,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
+import api from "../../../apis/baseApi";
 
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -45,7 +46,7 @@ const ProjectSettings = () => {
 
     useEffect(() => {
         // 프로젝트 정보 가져오기
-        axios.get(`${BASE_URL}/projects/${projectId}`)
+        api.get(`/projects/${projectId}`)
             .then((response) => {
                 const projectData = response.data;
                 
@@ -66,7 +67,7 @@ const ProjectSettings = () => {
             });
 
         // 프로젝트 멤버 조회
-        axios.get(`${BASE_URL}/projects/${projectId}/members`)
+        api.get(`/projects/${projectId}/members`)
             .then((response) => {
                 const members = response.data;
                 const captainMember = members.find(member => member.authority === "CAPTAIN");
@@ -151,7 +152,7 @@ const ProjectSettings = () => {
         }
     
         // Content-Type은 자동으로 'multipart/form-data'로 설정됨
-     axios.patch(`${BASE_URL}/projects`, formData)
+        api.patch(`/projects`, formData)
     .then(() => {
         alert("프로젝트 정보가 수정되었습니다.");
         navigate(`/projects/${projectId}`);

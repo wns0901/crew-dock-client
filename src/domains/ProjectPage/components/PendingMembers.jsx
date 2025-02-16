@@ -4,6 +4,7 @@ import axios from "axios";
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { Link } from "react-router-dom";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const PendingMembers = () => {
   const { projectId } = useParams();
@@ -19,7 +20,7 @@ const PendingMembers = () => {
 
   const fetchPendingMembers = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/projects/${projectId}/members`);
+      const response = await api.get(`/projects/${projectId}/members`);
       console.log("API 응답 데이터:", response.data);
 
       const filteredMembers = response.data.filter((member) => member.status === "REQUEST");
@@ -31,7 +32,7 @@ const PendingMembers = () => {
 
   const handleApprove = async (userId) => {
     try {
-      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
+      await api.patch(`/projects/${projectId}/members`, {
         userId: userId,
         authority: "CREW",
         status: "APPROVE",
@@ -45,7 +46,7 @@ const PendingMembers = () => {
 
   const handleReject = async (userId) => {
     try {
-      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
+      await api.patch(`/projects/${projectId}/members`, {
         userId: userId,
         status: "WITHDRAW",
       });

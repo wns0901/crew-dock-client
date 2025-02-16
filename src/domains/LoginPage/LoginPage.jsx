@@ -81,6 +81,7 @@ const LoginPage = () => {
             onChange={changeValue}
             fullWidth
             required
+            inputProps={{ style: { fontFamily: "inherit" } }}
           />
           <Button
             type="submit"

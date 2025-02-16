@@ -151,7 +151,7 @@ const RecruitmentComment = () => {
                     </Box>
                 )}
 
-                {/* ✅ 대댓글 렌더링 (최대 1단계) */}
+                {/* 대댓글 렌더링 (최대 1단계) */}
                 {comment.replies.length > 0 && renderComments(comment.replies, level + 1)}
             </Box>
         ));

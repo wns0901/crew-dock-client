@@ -142,7 +142,7 @@ const PostsPage = () => {
                                 return (
                                     <Grid item xs={12} sm={6} md={4} key={index}>
                                         <Card sx={{ cursor: "pointer", "&:hover": { boxShadow: 3 } }}
-                                            onClick={() => navigate(`/recruitment/${recruit.id}`)}>
+                                            onClick={() => navigate(`/recruitments/${recruit.id}`)}>
                                             <CardContent>
                                                 {/* 🔥 제목 & 상태 한 줄 정리 */}
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -187,7 +187,7 @@ const PostsPage = () => {
                                 posts.map((post, index) => (
                                     <Grid item xs={12} sm={6} md={4} key={index}>
                                         <Card sx={{ cursor: "pointer", "&:hover": { boxShadow: 3 } }}
-                                            onClick={() => navigate(`/post/${post.id}`)}>
+                                            onClick={() => navigate(`/posts/${post.id}`)}>
                                             <CardContent>
                                                 
                                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

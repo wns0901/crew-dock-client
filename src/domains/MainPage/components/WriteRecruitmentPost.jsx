@@ -418,3 +418,4 @@ const WriteRecruitmentPost = () => {
 
 
     export default WriteRecruitmentPost;
+

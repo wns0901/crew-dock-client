@@ -5,6 +5,7 @@ import { Direction, DirectionLabel } from '../constants/Direction';
 import { LoginContext } from '../../../contexts/LoginContextProvider';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
+import dayjs from 'dayjs';
 import { 
     Box, 
     Stack,
@@ -125,7 +126,7 @@ const ProjectPostList = ({
                             <CardContent>
                                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                                     <Chip label={DirectionLabel[post.direction]} color="primary" size="small" />
-                                    <Typography variant="caption">{post?.createdAt}</Typography>
+                                    <Typography variant="caption">{dayjs(post?.createdAt).format("YYYY-MM-DD")}</Typography>
                                 </Box>
                                 <Typography variant="h6" gutterBottom>{post.title}</Typography>
                                 <Typography variant="body2" color="text.secondary">{post?.userNickname}</Typography>

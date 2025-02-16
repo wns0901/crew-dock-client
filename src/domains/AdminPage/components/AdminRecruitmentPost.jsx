@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AdminRecruitmentPost = () => {
@@ -19,8 +20,8 @@ const AdminRecruitmentPost = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/admin/recruitmentposts`)
+    api
+      .get(`/admin/recruitmentposts`)
       .then((response) => {
         setRecruitmentPosts(response.data);
         setLoading(false);

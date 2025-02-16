@@ -5,7 +5,7 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import AnchorIcon from "@mui/icons-material/Anchor"
-
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const ProjectInfo = () => {
@@ -19,9 +19,9 @@ const ProjectInfo = () => {
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const response = await fetch(`${BASE_URL}/projects/${projectId}`);
-                if (!response.ok) throw new Error("프로젝트 정보를 가져오는데 실패했습니다.");
-                const data = await response.json();
+                const response = await api.get(`/projects/${projectId}`);
+                
+                const {data} = response;
                 setProject(data);
             } catch (error) {
                 setError(error);

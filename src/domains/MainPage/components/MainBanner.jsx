@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import { Box, Card, CardMedia, Typography } from "@mui/material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const MainBanner = () => {
@@ -13,7 +13,7 @@ const MainBanner = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/admin/banners`);
+        const response = await api.get(`/admin/banners`);
         const activeBanners = response.data.filter((banner) => banner.activate);
         setBanners(activeBanners);
       } catch (error) {
@@ -61,7 +61,7 @@ const MainBanner = () => {
                   borderRadius: "4px",
                 }}
               >
-                {banner.title}
+               
               </Typography>
             </Card>
           ))}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Typography } from "@mui/material";
-
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // 상태 & 우선순위 한글 변환 매핑
@@ -41,7 +41,7 @@ const UrgentIssues = () => {
 
     const fetchIssues = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/projects/${projectId}/issues`);
+        const response = await api.get(`/projects/${projectId}/issues`);
         const issues = response.data;
 
         const today = new Date();

@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const AdminPosts = () => {
@@ -25,8 +26,8 @@ const AdminPosts = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/admin/posts`)
+    api
+      .get(`/admin/posts`)
       .then((response) => {
         setPosts(response.data);
         setLoading(false);
@@ -41,7 +42,7 @@ const AdminPosts = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      await axios.delete(`${BASE_URL}/admin/posts/${postId}`);
+      await api.delete(`/admin/posts/${postId}`);
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
     } catch (error) {
       console.error("Error deleting post:", error);

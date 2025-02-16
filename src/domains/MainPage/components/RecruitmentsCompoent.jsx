@@ -32,8 +32,8 @@ const RecruitmentsComponent = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [stacks, setStacks] = useState([]);
   const [scrappedPosts, setScrappedPosts] = useState({}); // 스크랩 상태 관리
-  const { userInfo } = useContext(LoginContext);  // LoginContext에서 userInfo 가져오기
-  const userId = userInfo.id;  
+  const { userInfo, isLogin } = useContext(LoginContext);  // LoginContext에서 userInfo 가져오기
+  const userId = userInfo?.id;  
   // 모집글 데이터 가져오기 (필터링 반영)
   useEffect(() => {
     const params = new URLSearchParams();
@@ -266,7 +266,7 @@ const RecruitmentsComponent = () => {
   event.stopPropagation(); // 상세 페이지로 이동하는 이벤트 전파를 막음
   handleScrap(project.id);
 }}>
-  {scrappedPosts.includes(project.id) ? (
+  {(isLogin && scrappedPosts.includes(project.id)) ? (
     <BookmarkIcon sx={{ color: "gray" }} />  // 스크랩됨
   ) : (
     <BookmarkBorderIcon sx={{ color: "gray" }} />  // 스크랩 안됨

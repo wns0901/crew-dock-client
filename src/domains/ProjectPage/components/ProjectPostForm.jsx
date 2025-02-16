@@ -25,7 +25,7 @@ import {
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 
 const ProjectPostForm = ({
-  initialData = { category: '', title: '', content: '', direction: 'NONE' },
+  initialData = { category: '', title: '', content: '', direction: 'NONE', attachments: [] },
   isEdit = false,
   onSubmit = () => {},
   onCancel = () => {},
@@ -34,7 +34,7 @@ const ProjectPostForm = ({
   const [direction, setDirection] = useState(initialData.direction);
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
-  const [attachments, setAttachments] = useState([]);
+  const [attachments, setAttachments] = useState(initialData.attachments || [])
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [tempAttachments, setTempAttachments] = useState([])
@@ -44,6 +44,7 @@ const ProjectPostForm = ({
     setDirection(initialData.direction);
     setTitle(initialData.title);
     setContent(initialData.content);
+    setAttachments(initialData.attachments || []);
   }, [initialData]);
 
   const handleSubmit = (e) => {
@@ -57,7 +58,7 @@ const ProjectPostForm = ({
     if (files) {
       const newAttachments = Array.from(files).map(file => ({
         type: 'file',
-        name: file.name,
+        name: file.fileName,
         file
       }));
       setTempAttachments([...tempAttachments, ...newAttachments]);
@@ -212,7 +213,13 @@ ProjectPostForm.propTypes = {
   initialData: PropTypes.shape({
     direction: PropTypes.string,
     title: PropTypes.string,
-    content: PropTypes.string
+    content: PropTypes.string,
+    attachments: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number,
+      type: PropTypes.string,
+      name: PropTypes.string,
+      url: PropTypes.string
+    }))
   }),
   isEdit: PropTypes.bool,
   onSubmit: PropTypes.func,

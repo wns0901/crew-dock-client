@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { position, proceedMethod, region } from "../../MainPage/components/Filter";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
-import { useNavigate } from "react-router-dom"; // 추가
-import RecruitmentAttachmentUpload from "./RecruitmentAttachmentUpload";
+import { useNavigate } from "react-router-dom";
 
 const WriteRecruitmentPost = () => {
     const navigate = useNavigate();
@@ -65,7 +64,7 @@ const WriteRecruitmentPost = () => {
 
     
     const handleSubmit = () => {
-        console.log("🔹 handleSubmit 실행됨!"); // ✅ 디버깅 로그
+        console.log("🔹 handleSubmit 실행됨!"); // 디버깅 로그
     
         if (!title.trim()) {
             alert("제목을 입력해주세요.");
@@ -96,9 +95,9 @@ const WriteRecruitmentPost = () => {
             return;
         }
     
-        console.log("🔹 proceedMethod 값 확인:", selectedMethod); // ✅ 현재 값 확인용 로그
+        console.log("🔹 proceedMethod 값 확인:", selectedMethod); // 현재 값 확인용 로그
     
-        // ✅ postData를 생성
+        // postData를 생성
         const postData = {
             title,
             content,
@@ -106,7 +105,7 @@ const WriteRecruitmentPost = () => {
             recruitedField,
             recruitedNumber,
             region: selectedRegion,
-            proceedMethod: selectedMethod.toUpperCase(), // ✅ ENUM과 일치하도록 변환
+            proceedMethod: selectedMethod.toUpperCase(), // ENUM과 일치하도록 변환
             user: {
                 userId: userInfo?.id || null,
                 userName: userInfo?.username || "",
@@ -115,25 +114,35 @@ const WriteRecruitmentPost = () => {
             projectId: Number(projectId),
         };
     
-        console.log("🔹 전송할 모집글 데이터:", JSON.stringify(postData, null, 2)); // ✅ 최종 JSON 확인
-    
-        api.post("/recruitments", postData)
-            .then(() => {
-                console.log("✅ 모집글이 정상적으로 저장됨");
-                alert("모집글이 성공적으로 저장되었습니다!");
-                const createdPostId = response.data.id; 
-                navigate(`/recruitments/${createdPostId}`); // 상세 페이지로 이동
-            })
-            .catch((error) => {
-                console.error("❌ 모집글 저장 실패:", error);
-                if (error.response) {
-                    console.error("❌ 백엔드 응답:", error.response.data);
-                    alert(`저장 실패: ${error.response.data.message || "알 수 없는 오류 발생"}`);
-                } else {
-                    console.error("❌ 백엔드에서 응답이 없습니다.");
-                    alert("서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.");
-                }
-            });
+        console.log("🔹 전송할 모집글 데이터:", JSON.stringify(postData, null, 2)); // 최종 JSON 확인
+
+            api.post("/recruitments", postData)
+                .then((response) => {
+                    console.log("✅ 모집글 저장 성공:", response.data); // 응답 데이터 확인
+                    console.log("⭐백엔드 응답 데이터:", response.data);
+
+                    const createdPostId = response.data?.id; // 응답에서 id 추출
+                    console.log("📢 생성된 모집글 ID:", createdPostId); // ID 확인
+
+                    if (!createdPostId) {
+                        console.error("❌ 생성된 ID가 없습니다. 백엔드 응답 확인 필요");
+                        alert("저장이 완료되었지만, 모집글 ID를 찾을 수 없습니다.");
+                        return;
+                    }
+
+                    navigate(`/recruitments/${createdPostId}`); // 올바른 ID로 이동
+                })
+                .catch((error) => {
+                    console.error("❌ 모집글 저장 실패:", error);
+                    if (error.response) {
+                        console.error("📢 백엔드 응답 데이터:", error.response.data);
+                        alert(`저장 실패: ${error.response.data.message || "알 수 없는 오류 발생"}`);
+                    } else {
+                        alert("서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.");
+                    }
+                });
+
+        
     };    
     
 
@@ -159,10 +168,20 @@ const WriteRecruitmentPost = () => {
                             <Divider sx={{ mb: 2 }} />
         
                             <Grid container spacing={2}>
+
                                 <Grid item xs={4}>
                                     <FormControl fullWidth>
                                         <InputLabel>모집 분야</InputLabel>
-                                        <Select value={recruitedField} onChange={(e) => setRecruitedField(e.target.value)}>
+                                        <Select
+                                            multiple
+                                            value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
+                                            onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
+                                            renderValue={(selected) =>
+                                                selected
+                                                    .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
+                                                    .join(", ") // 선택된 값들을 문자열로 표시
+                                            }
+                                        >
                                             {position.map((item) => (
                                                 <MenuItem key={item.value} value={item.value}>
                                                     {item.label}
@@ -171,7 +190,7 @@ const WriteRecruitmentPost = () => {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-        
+
                                 <Grid item xs={4}>
                                     <TextField
                                         fullWidth

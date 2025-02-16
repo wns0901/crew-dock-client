@@ -35,7 +35,7 @@ const Header = () => {
                 </IconButton>
 
                 {/* 네비게이션 버튼 */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: "40px" }}> {/* ✅ 버튼 가로 정렬 */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}> {/* ✅ 버튼 가로 정렬 */}
                     <Button className="nav-button board-button" onClick={() => navigate("/posts")}>
                         게시판
                     </Button>
@@ -78,7 +78,7 @@ const Header = () => {
                             </Menu>
                         </>
                     ) : (
-                        <Button sx={{ color: "#000000" }} onClick={() => navigate("/login")}>로그인</Button>
+                        <Button sx={{ color: "#000000", fontSize: "1.3em" }} onClick={() => navigate("/login")}>로그인</Button>
                     )}
                 </Box>
             </Toolbar>

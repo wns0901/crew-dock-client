@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'Dovemayo_gothic';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.1/Dovemayo_gothic.woff2') format('woff2');
+    font-family: 'KOMACON';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_seven@1.2/KOMACON.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 /* 모든 요소에 폰트 강제 적용 */
 body, button, input, textarea, * {
-    font-family: 'Dovemayo_gothic', Arial, sans-serif !important;
+    font-family: 'KOMACON', Arial, sans-serif !important;
 }

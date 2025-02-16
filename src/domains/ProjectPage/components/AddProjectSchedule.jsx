@@ -52,33 +52,43 @@ const AddProjectSchedule = ({ projectId, userId, selectedDate, onClose, events, 
         title: response.data.content,
         start: response.data.startDate,
         end: response.data.endDate,
+        sTime: response.data.startTime,
+        eTime: response.data.endTime,
+        projectId: response.data.projectId,
+        isHoliday: response.data.holiday || false
       };
 
-       // 오늘 일정 필터링
-       const today = new Date();
-       if (Array.isArray(response.data)) {
-         const filteredEvents = response.data
-           .filter((event) => {
-             const eventStartDate = new Date(event.start);
-             const eventEndDate = new Date(event.end);
-             return (
-               eventStartDate.toDateString() === today.toDateString() ||
-               (eventStartDate <= today && eventEndDate >= today)
-             );
-           })
-           .sort((a, b) => {
-             // 시작 시간이 빠른 일정이 먼저 오도록 정렬
-             if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
-             return a.sTime.localeCompare(b.sTime);
-           });
+      // setEvents(prev => new Set([...prev, eventData]));
+
+     // 오늘 일정 필터링
+     const today = new Date();
+     if (Array.isArray(response.data)) {
+       const filteredEvents = response.data
+         .filter((event) => {
+           const eventStartDate = new Date(event.start);
+           const eventEndDate = new Date(event.end);
+           return (
+             eventStartDate.toDateString() === today.toDateString() ||
+             (eventStartDate <= today && eventEndDate >= today)
+           );
+         })
+         .sort((a, b) => {
+           // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+           if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+           return a.sTime.localeCompare(b.sTime);
+         });
    
-           setTodays(filteredEvents); // 필터링된 일정만 업데이트
+        // setTodays(filteredEvents); // 필터링된 일정만 업데이트
         setTodays([... todays, eventData])
         console.log("오늘의 일정: ", filteredEvents);
-       }
-       onClose(); // 모달 닫기
-      onAddSchedule(response.data);
-      alert("일정이 추가되었습니다.");
+        //  setTodays(filteredEvents);
+        }
+        setTodays((prevEvents) => prevEvents.map((event) => (event.id === eventData.id ? eventData : event)));
+        // setTodays(prev => new Set([...prev, eventData]));
+        onClose(); // 모달 닫기
+        onAddSchedule(response.data);
+        alert("일정이 추가되었습니다.");
+
     } catch (error) {
       console.error("Failed to add project schedule", error);
     }
@@ -89,26 +99,30 @@ const AddProjectSchedule = ({ projectId, userId, selectedDate, onClose, events, 
     onClose(); // 모달 닫기
   };
 
-   // 추가 버튼 클릭 시 일정 추가
-   const handleAddClick = (event) => {
+  // 추가 버튼 클릭 시 일정 추가
+  const handleAddClick = (event) => {
     handleSubmit(event); // 일정 추가 함수 호출
   };
 
-
   return (
     <Dialog
-        // anchorEl={true}
-        open={open}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-            sx: {
-            borderRadius: "1.5rem",
-            p: 2,
-            boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
-            position:"absolute"
-            },
-        }}
+      anchorEl={true}
+      open={open}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: "1.5rem",
+          p: 2,
+          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
+          position: "absolute",  // 이 부분을 추가하여 날짜 근처로 위치시킬 수 있음
+        },
+      }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: "transparent",  // 배경을 투명하게 설정
+        }
+      }}
     >
       <IconButton
         onClick={handleCancelClick}

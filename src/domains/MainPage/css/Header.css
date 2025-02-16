@@ -12,9 +12,9 @@
 
 /* 🔥 게시판 버튼 (연한 민트색 배경) */
 .project-button {
-    background-color: #88bef5 !important;
+    background-color: #81bbf5 !important;
     color: #ffffff !important;
-    border: 2px solid #88bef5 !important;
+    border: 2px solid #81bbf5 !important;
 }
 
 .project-button:hover {

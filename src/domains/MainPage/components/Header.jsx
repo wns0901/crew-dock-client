@@ -6,14 +6,15 @@ import { LoginContext } from "../../../contexts/LoginContextProvider";
 import Logo from "../asset/CrewDockLogo.png"; // 로고 이미지 경로 설정
 import "../../../index.css";
 import "../css/Header.css"; // ✅ CSS 파일 추가
-
+import { Navigate } from "react-router-dom";
 const Header = () => {
     const { isLogin, userInfo, logout } = useContext(LoginContext);
     const navigate = useNavigate();
     const location = useLocation(); // ✅ 현재 경로 가져오기
     const [anchorEl, setAnchorEl] = useState(null);
-
+    const { roles } = useContext(LoginContext);
     // ✅ 마이페이지 또는 프로젝트 페이지인지 확인
+    
     const isMypageOrProject = location.pathname.startsWith("/mypage") || location.pathname.startsWith("/projects");
 
     const handleMenuOpen = (event) => {
@@ -96,7 +97,16 @@ const Header = () => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleMenuClose}
                             >
-                                <MenuItem onClick={() => { navigate(`/mypage/${userInfo.id}`); handleMenuClose(); }}>마이페이지</MenuItem>
+                              <MenuItem onClick={() => { 
+    if (roles?.isAdmin) {
+        navigate(`/admin`);
+    } else {
+        navigate(`/mypage/${userInfo.id}`);
+    }
+    handleMenuClose();
+}}>
+    마이페이지
+</MenuItem>
                                 <MenuItem onClick={handleLogout}>로그아웃</MenuItem>
                             </Menu>
                         </>

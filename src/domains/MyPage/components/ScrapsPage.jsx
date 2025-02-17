@@ -209,7 +209,7 @@ const ScrapsPage = () => {
                                                             <ListItem 
                                                                 key={rIndex} 
                                                                 sx={{ cursor: "pointer", "&:hover": { backgroundColor: "#f5f5f5" } }}
-                                                                onClick={() => navigate(`/recruitment/${recruitment.id}`)}
+                                                                onClick={() => navigate(`/recruitments/${recruitment.id}`)}
                                                             >
                                                                 <ListItemText 
                                                                     primary={`↳ ${recruitment.title}`}

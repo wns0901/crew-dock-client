@@ -87,22 +87,28 @@ const DetailRecruitmentPost = () => {
             return;
         }
     
-        api.post(`/projects/${post.projectId}/members`, { userId: userInfo.id })
-            .then(response => {
-                console.log("📌 [DEBUG] 신청 응답:", response.data);
-                const { message, projectId, userId, status } = response.data;
-    
-                alert(`${message} (프로젝트 ID: ${projectId}, 사용자 ID: ${userId}, 상태: ${status})`);
-            })
-            .catch(error => {
-                if (error.response) {
-                    console.error("❌ [ERROR] 신청 실패:", error.response.data);
-                    alert("신청 실패: " + (error.response.data.error || "알 수 없는 오류"));
-                } else {
-                    alert("신청 중 오류가 발생했습니다.");
-                }
-            });
-    };
+
+            api.post(`/projects/${post.projectId}/members`, { userId: userInfo.id })
+                .then(response => {
+                    alert("프로젝트를 신청하셨습니다.");
+                })
+                .catch(error => {
+                    if (error.response) {
+                        const errorMessage = error.response.data.error;
+                        
+                        if (errorMessage === "이미 소속된 프로젝트입니다.") {
+                            alert("이미 해당 프로젝트의 멤버로 소속되어 있습니다.");
+                        } else if (errorMessage === "이미 지원한 프로젝트입니다.") {
+                            alert("이미 지원한 프로젝트입니다.");
+                        } else {
+                            alert("신청 중 오류가 발생했습니다.");
+                        }
+                    } else {
+                        alert("서버 오류가 발생했습니다.");
+                    }
+                });
+        };
+        
     
 
     return (
@@ -125,29 +131,34 @@ const DetailRecruitmentPost = () => {
                 ) : (
                     // 🔹 로그인한 사용자만 "채팅", "신청" 버튼 표시
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            sx={{ mr: 1 }} 
-                            onClick={() => alert("채팅 기능은 아직 구현되지 않았습니다.")}
-                        >
-                            채팅
-                        </Button>
-                        <Button 
-                            variant="contained" 
-                            color="success" 
-                            onClick={() => {
-                                if (userInfo) {
-                                    handleApply();
-                                } else {
-                                    alert("로그인 부탁드립니다.");
-                                }
-                            }}
-                        >
-                            신청
-                        </Button> 
+                    <Button 
+                        variant="outlined" 
+                        color="primary" 
+                        sx={{ mr: 1 }} 
+                        onClick={() => {
+                            if (!isLogin) {
+                                alert("로그인이 필요합니다.");
+                                return;
+                            }
+                        }}
+                    >
+                        채팅
+                    </Button>
 
-                    </Box>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={() => {
+                            if (!isLogin) {
+                                alert("로그인이 필요합니다.");
+                                return;
+                            }
+                            handleApply();
+                        }}
+                    >
+                        신청
+                    </Button> 
+                </Box>
                 )}
             </Box>
 

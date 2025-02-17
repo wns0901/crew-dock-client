@@ -15,7 +15,9 @@ import {
   Paper,
 } from "@mui/material";
 import api from "../../../apis/baseApi";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const Resignations = () => {
   const [resignations, setResignations] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -30,19 +32,33 @@ const Resignations = () => {
 
   const fetchResignations = async (projectId) => {
     try {
-      console.log("Fetching resignations for projectId:", projectId);
-      const response = await api.get(
-        `/projects/${projectId}/resignations`
+      const response = await api.get(`/projects/${projectId}/resignations`);
+
+      const resignationsWithNickNames = await Promise.all(
+        response.data.map(async (resignation) => {
+          const userNickName = await fetchUserNickName(resignation.userId);
+          return { ...resignation, userNickName };
+        })
       );
-      setResignations(response.data.filter((resignation) => resignation.member.status === "APPROVE"));
+
+      setResignations(resignationsWithNickNames);
     } catch (error) {
       console.error("탈퇴 조회 실패:", error);
     }
   };
 
+  const fetchUserNickName = async (userId) => {
+    try {
+      const response = await api.get(`/user/${userId}`);
+      return response.data.nickname;
+    } catch (error) {
+      console.error("닉네임 조회 실패:", error);
+      return "알 수 없음";
+    }
+  };
+
   const handleOpenModal = async (resignationId) => {
     try {
-      console.log("Fetching resignation details:", resignationId);
       const response = await api.get(
         `/projects/${projectId}/resignations/${resignationId}`
       );
@@ -55,9 +71,12 @@ const Resignations = () => {
 
   const handleAcceptResignation = async (resignationId, userId) => {
     try {
-      await api.delete(
-        `/projects/${projectId}/members/${userId}`
-      );
+      // 탈퇴 처리를 위한 멤버 삭제
+      await api.delete(`/projects/${projectId}/members/${userId}`);
+  
+      // 탈퇴 요청 삭제
+      await api.delete(`/projects/${projectId}/resignations/${resignationId}`);
+  
       alert("탈퇴 처리 완료.");
       handleCloseModal();
       fetchResignations(projectId);
@@ -69,9 +88,7 @@ const Resignations = () => {
 
   const handleRejectResignation = async (resignationId) => {
     try {
-      await api.delete(
-        `/projects/${projectId}/resignations/${resignationId}`
-      );
+      await api.delete(`/projects/${projectId}/resignations/${resignationId}`);
       alert("탈퇴 신청 거절 완료");
       handleCloseModal();
       fetchResignations(projectId);
@@ -89,7 +106,7 @@ const Resignations = () => {
   return (
     <Box p={3}>
       <Typography variant="h5">탈퇴 요청</Typography>
-     
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -105,7 +122,8 @@ const Resignations = () => {
                 onClick={() => handleOpenModal(resignation.id)}
                 style={{ cursor: "pointer" }}
               >
-                <TableCell>{resignation.member?.user?.nickname || "알 수 없음"}</TableCell>
+                <TableCell>{resignation.userNickName || "알 수 없음"}</TableCell>
+
                 <TableCell>
                   {(() => {
                     try {
@@ -140,7 +158,7 @@ const Resignations = () => {
           }}
         >
           <Typography variant="h6">
-            {selectedResignation?.member?.user?.nickname || "알 수 없음"}님의 탈퇴 사유
+            {selectedResignation?.userNickName || "알 수 없음"}님의 탈퇴 사유
           </Typography>
           <Typography mb={3}>
             {(() => {
@@ -164,7 +182,7 @@ const Resignations = () => {
               onClick={() =>
                 handleAcceptResignation(
                   selectedResignation?.id,
-                  selectedResignation?.member?.id
+                  selectedResignation?.userId // userId를 사용합니다.
                 )
               }
             >

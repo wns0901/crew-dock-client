@@ -83,10 +83,12 @@ const ProjectMembers = () => {
         `/projects/${projectId}/resignations/members`,
         { content: resignation },
         {
-          params: { userId: selectedMember.user.id },
+          params: { userId: userInfo.id },
           headers: { "Content-Type": "application/json" },
         }
       );
+      console.log("userinfo 하는거",userInfo.id);
+      console.log("유저 : " ,selectedMember.user.userId);
       alert("탈퇴 신청 완료");
       handleCloseModal();
     } catch (error) {

@@ -77,11 +77,13 @@ const EditRecruitmentPost = () => {
 
         // 프로젝트 스택 불러오기
         if (postData.projectId) {
+          console.log("📌 프로젝트 ID:", postData.projectId); // projectId 확인
           const stackResponse = await api.get(
-            `/projects/${postData.projectId}/stacks`
+            `/projects/${postData.projectId}/stacks`,
           );
+
           setStacks(
-            stackResponse.data.map((s) => s.stack?.name || "스택 없음")
+            stackResponse.data.map((s) => s.stackName || "스택 없음")
           );
         }
 
@@ -250,7 +252,7 @@ const EditRecruitmentPost = () => {
         variant="h4"
         sx={{ mt: 4, mb: 3, fontWeight: "bold", textAlign: "left" }}
       >
-        {title} 수정
+        {title}
       </Typography>
 
       <Paper elevation={0} sx={{ p: 2, mb: 1 }}>
@@ -259,30 +261,29 @@ const EditRecruitmentPost = () => {
         </Typography>
         <Divider sx={{ mb: 2 }} />
 
-      <Grid container spacing={2}>
-
-              <Grid item xs={4}>
-                  <FormControl fullWidth>
-                      <InputLabel>모집 분야</InputLabel>
-                      <Select
-                          multiple
-                          value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
-                          onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
-                          renderValue={(selected) =>
-                              selected
-                                  .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
-                                  .join(", ") // 선택된 값들을 문자열로 표시
-                          }
-                      >
-                          {position.map((item) => (
-                              <MenuItem key={item.value} value={item.value}>
-                                  {item.label}
-                              </MenuItem>
-                          ))}
-                      </Select>
-                  </FormControl>
-              </Grid>
-
+          <Grid container spacing={2}>
+          <Grid item xs={4}>{/* 모집 분야 */}
+          <FormControl fullWidth>
+              <InputLabel>모집 분야</InputLabel>
+              <Select
+                  multiple
+                  value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
+                  onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
+                  renderValue={(selected) =>
+                      selected
+                          .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
+                          .join(", ") // 선택된 값들을 문자열로 표시
+                  }
+              >
+                  {position.map((item) => (
+                      <MenuItem key={item.value} value={item.value}>
+                          {item.label}
+                      </MenuItem>
+                  ))}
+              </Select>
+          </FormControl>
+          </Grid>
+          
           <Grid item xs={4}>
             <TextField
               fullWidth

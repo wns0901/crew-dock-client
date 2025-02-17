@@ -59,6 +59,26 @@ const DetailRecruitmentPost = () => {
         return <Typography variant="h6" color="error" sx={{ textAlign: "center", mt: 5 }}>모집글을 찾을 수 없습니다.</Typography>;
     }
 
+    const boxStyle = {
+        position: "relative",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        padding: "16px 20px 8px",
+        minHeight: "30px",
+        display: "flex",
+        alignItems: "center",
+    };
+    
+    const labelStyle = {
+        position: "absolute",
+        top: "-8px", left: "7px",
+        backgroundColor: "white",
+        padding: "0 4px",
+        fontSize: "12px",
+        color: "#7d7777"
+    };
+    
+
     const isAuthor = userInfo?.id === post.user?.userId;
 
     const handleDelete = () => {
@@ -162,13 +182,7 @@ const DetailRecruitmentPost = () => {
                         variant="outlined" 
                         color="primary" 
                         sx={{ mr: 1 }} 
-                        onClick={() => {
-                            if (!isLogin) {
-                                alert("로그인이 필요합니다.");
-                                return;
-                            }
-                            handleChatBtn
-                        }}
+                        onClick={handleChatBtn}
                     >
                         채팅
                     </Button>
@@ -209,209 +223,67 @@ const DetailRecruitmentPost = () => {
 
                 <Grid container spacing={2}>
                 {/* 모집 분야 */}
+                    <Grid item xs={4}>
+                        <Box sx={boxStyle}>
+                            <Typography sx={labelStyle}>모집 분야</Typography>
+                            <Typography marginTop={-1}>
+                                {
+                                    post.recruitedField
+                                        ?.split(",")
+                                        .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
+                                        .join(", ") || "없음"
+                                }
+                            </Typography>
+                        </Box>
+                    </Grid>
+
+                {/* 진행 기간 */}
+                    <Grid item xs={4}>
+                        <Box sx={boxStyle}>
+                            <Typography sx={labelStyle}>진행 기간</Typography>
+                            <Typography marginTop={-1}>{post.period || "없음"}</Typography>
+                        </Box>
+                    </Grid>
+
+                {/* 모집 마감일 */}
                 <Grid item xs={4}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 20px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px", 
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    모집 분야
-                    </Typography>
-                    <Typography variant="body1" marginTop={-1}>
-            {
-                post.recruitedField
-                    ?.split(",") // 문자열을 배열로 변환
-                    .map(value => position.find(p => p.value === value)?.label || "알 수 없음") // label 찾기
-                    .join(", ") // 배열을 문자열로 변환하여 출력
-            }
-        </Typography>
-                </Box>
+                    <Box sx={boxStyle}>
+                        <Typography sx={labelStyle}>모집 마감일</Typography>
+                        <Typography marginTop={-1}>
+                            {post.deadline}
+                        </Typography>
+                    </Box>
                 </Grid>
-
-                    {/* 진행 기간 */}
-                <Grid item xs={4}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px", 
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    진행 기간
-                    </Typography>
-
-                    {/* 실제 값 */}
-                    <Typography variant="body1" marginTop={-1}>
-                    {post.period ? post.period : "없음"}
-                    </Typography>
-                </Box>
-                </Grid>
-
-
-
-                                   {/* 모집기간 */}
-                <Grid item xs={4}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px",  
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    모집 기간
-                    </Typography>
-
-                    {/* 실제 값 */}
-                    <Typography variant="body1" marginTop={-1}>
-                    {post.deadline}
-                    </Typography>
-                </Box>
-                </Grid>
-
 
                     {/* 지역/진행방식/모집인원 */}
-                  {/* 지역 */}
-                <Grid item xs={4} mt={0.5}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px", 
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    지역
-                    </Typography>
+                        {/* 지역 */}
+                    <Grid item xs={4}>
+                        <Box sx={boxStyle}>
+                            <Typography sx={labelStyle}>지역</Typography>
+                            <Typography>
+                                {region.find(r => r.value === post.region)?.label || "알 수 없음"}
+                            </Typography>
+                        </Box>
+                    </Grid>
 
-                    {/* 실제 값 */}
-                    <Typography variant="body1" marginTop={-1}>
-                    {region.find(r => r.value === post.region)?.label || "알 수 없음"}
-                    </Typography>
-                </Box>
-                </Grid>
+                    {/* 진행 방식 */}
+                    <Grid item xs={4}>
+                        <Box sx={boxStyle}>
+                            <Typography sx={labelStyle}>진행 방식</Typography>
+                            <Typography>
+                                {proceedMethod.find(p => p.value === post.proceedMethod)?.label || "알 수 없음"}
+                            </Typography>
+                        </Box>
+                    </Grid>
 
+                    {/* 모집 인원 */}
+                    <Grid item xs={4}>
+                        <Box sx={boxStyle}>
+                            <Typography sx={labelStyle}>모집 인원</Typography>
+                            <Typography>{post.recruitedNumber || "미정"}</Typography>
+                        </Box>
+                    </Grid>
 
-                 {/* 진행방식 */}
-                 <Grid item xs={4} mt={0.5}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px", 
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    진행 방식
-                    </Typography>
-
-                    {/* 실제 값 */}
-                    <Typography variant="body1" marginTop={-1}>
-                    {proceedMethod.find(p => p.value === post.proceedMethod)?.label || "알 수 없음"}
-                    </Typography>
-                </Box>
-                </Grid>
-
-                <Grid item xs={4} mt={0.5}>
-                <Box sx={{
-                    position: "relative",  // 제목을 박스 내부에서 배치
-                    border: "1px solid #ccc",  // 테두리 유지
-                    borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
-                    minHeight: "30px",         // TextField 높이와 동일하게 설정
-                    display: "flex",
-                    alignItems: "center",
-                }}>
-                    {/* 제목 */}
-                    <Typography 
-                    variant="caption" 
-                    color="textSecondary" 
-                    sx={{ 
-                        position: "absolute", 
-                        top: "-8px", left: "7px", 
-                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
-                        padding: "0 4px", 
-                        fontSize: "12px" 
-                    }}
-                    >
-                    모집 인원
-                    </Typography>
-
-                    {/* 실제 값 */}
-                    <Typography variant="body1" marginTop={-1}>
-                    {post.recruitedNumber}
-                    </Typography>
-                </Box>
-                </Grid>
                 </Grid>
             </Paper>
 
@@ -437,7 +309,24 @@ const DetailRecruitmentPost = () => {
             <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
                 <Typography variant="h6" sx={{ textAlign: "left" }}>프로젝트 정보</Typography>
                 <Divider sx={{ mb: 2 }} />
-                <TextField fullWidth label="프로젝트명" variant="outlined" value={post.projectName} InputProps={{ readOnly: true }} />
+                {/* <TextField fullWidth label="프로젝트명" variant="outlined" value={post.projectName} InputProps={{ readOnly: true }} /> */}
+                <Box
+                sx={{
+                    width: '100%',
+                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '20px 14px',
+                    maxHeight: '40px',
+                }}
+                >
+                <Typography variant="h5" sx={{ flexGrow: 1 }}>
+                    {post.projectName}
+                </Typography>
+                </Box>
+
+
             </Paper>
             <Divider sx={{ mb: 2 }} />
 

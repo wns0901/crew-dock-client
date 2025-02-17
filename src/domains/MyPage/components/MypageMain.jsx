@@ -194,7 +194,7 @@ const MypageMain = () => {
                                             border: "1px solid #ddd", 
                                             padding: 2, 
                                             borderRadius: 2, 
-                                            height: "120px", 
+                                            height: "150px", 
                                             display: "flex", 
                                             flexDirection: "column", 
                                             justifyContent: "space-between",
@@ -207,17 +207,17 @@ const MypageMain = () => {
                                     >
                                         <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
                                         
-                                        <Typography variant="subtitle1" fontWeight="bold">
+                                        <Typography variant="subtitle1" fontWeight="bold"  fontSize={20}>
                                             {post?.title ? `[${post.title}]` : "작성된 글 없음"}
                                         </Typography>
-                                        <Typography>
+                                        <Typography sx={{ fontSize: "1.2rem"}}>
                                                 {post?.recruitedField ? "모집글" : "게시글"}
                                             </Typography>
                                         </Box>    
                                     
                                         <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                        <Typography>{post?.createdAt ? dayjs(post.createdAt).format("YYYY-MM-DD") : "-"}</Typography>
-                                        <Typography>
+                                        <Typography sx={{ fontSize: "1.2rem"}}>{post?.createdAt ? dayjs(post.createdAt).format("YYYY-MM-DD") : "-"}</Typography>
+                                        <Typography sx={{ fontSize: "1.2rem"}}>
                                           댓글 수 : {(post?.comments?.length || 0) + (post?.filteredComments?.length || 0)}
                                         </Typography>
                                         </Box>
@@ -257,12 +257,13 @@ const MypageMain = () => {
                                           }}
                                           onClick={() => project && navigate(`/projects/${project.id}`)}
                                       >
-                                          <Typography variant="subtitle1" fontWeight="bold">
+                                          <Typography variant="subtitle1" fontWeight="bold"  fontSize={20}>
                                               {project ? `"${project.name}"` : "프로젝트 없음"}
                                           </Typography>
                                           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                                               {project?.stacks?.map((stack) => (
-                                                  <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
+                                                  <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" sx={{
+                                                    fontSize: "1.2rem"}} />
                                               ))}
                                           </Box>
                                       </Box>
@@ -297,14 +298,15 @@ const MypageMain = () => {
                                         }}
                                         onClick={() => portfolio && navigate(`/mypage/portfolios`)}
                                     >
-                                        <Typography variant="subtitle1" fontWeight="bold">
+                                        <Typography variant="subtitle1" fontWeight="bold"  fontSize={20}>
                                             {portfolio ? `"${portfolio.title}"` : "포트폴리오 없음"}
                                         </Typography>
                                     
                                         {/* ✅ 포트폴리오 기술 스택 표시 */}
-                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: "auto", pb: 1 }}>
+                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: "auto", pb: 1 ,fontSize: "1.3rem"}}>
                                             {portfolio?.portfolioStacks?.map((stack) => (
-                                                <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
+                                                <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" sx={{
+                                                    fontSize: "1.2rem"}}/>
                                             ))}
                                         </Box>
                                     </Box>
@@ -351,12 +353,12 @@ const MypageMain = () => {
                                         >
                                             {/* ✅ 제목 & 마감 여부 표시 */}
                                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                <Typography variant="subtitle1" fontWeight="bold">
+                                                <Typography variant="subtitle1" fontWeight="bold"  fontSize={20}> 
                                                     {scrap.title}
                                                 </Typography>
                                                 <Typography
                                                     sx={{
-                                                        fontSize: "0.875rem",
+                                                        fontSize: "1.3rem",
                                                         fontWeight: "bold",
                                                         color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
                                                     }}
@@ -366,9 +368,9 @@ const MypageMain = () => {
                                             </Box>
                                                 
                                             {/* ✅ 작성 날짜 & 댓글 수 */}
-                                            <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                                <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
-                                                <Typography>댓글 {scrap.commentCount}개</Typography>
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "1.3rem", color: "#666" }}>
+                                                <Typography sx={{ fontSize: "1.2rem" }}>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
+                                                <Typography sx={{ fontSize: "1.2rem" }}>댓글 {scrap.commentCount}개</Typography>
                                             </Box>
                                         </Box>
                                     </Grid>

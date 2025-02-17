@@ -113,14 +113,14 @@ const PostsPage = () => {
             <Box sx={{ flexGrow: 1, padding: "40px" }}>
                 {/* 🔥 모집글 & 게시판 탭 */}
                 <Tabs value={tabIndex} onChange={(e, newIndex) => setTabIndex(newIndex)} sx={{ marginBottom: "20px" }}>
-                    <Tab label="📢 모집글" />
-                    <Tab label="📝 커뮤니티 글" />
+                    <Tab label="📢 모집글" sx={{ fontSize: "1.5rem", fontWeight: "bold" }}  />
+                    <Tab label="📝 커뮤니티 글" sx={{ fontSize: "1.5rem", fontWeight: "bold" }} />
                 </Tabs>
 
                 {/* 🔥 모집글 리스트 */}
                 {tabIndex === 0 && (
-                    <Box>
-                        <Typography variant="h6" sx={{ mb: 2 }}>📢 모집글</Typography>
+                    <Box sx={{marginTop: "60px"}}>
+                        
                         <Grid container spacing={2}>
                             {recruitments.slice(0, visibleCount).map((recruit, index) => {
                                 const today = dayjs().startOf("day"); // 🔥 오늘 날짜 (시간 제거)
@@ -146,12 +146,12 @@ const PostsPage = () => {
                                             <CardContent>
                                                 {/* 🔥 제목 & 상태 한 줄 정리 */}
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="subtitle1" fontWeight="bold">
+                                                    <Typography variant="subtitle1" fontWeight="bold" fontSize={20}>
                                                         {recruit.title}
                                                     </Typography>
                                                     <Typography
                                                         sx={{
-                                                            fontSize: "0.875rem",
+                                                            fontSize: "1.3rem",
                                                             fontWeight: "bold",
                                                             color: daysLeft === null ? "blue" : daysLeft < 0 ? "red" : "blue",
                                                         }}
@@ -161,11 +161,11 @@ const PostsPage = () => {
                                                 </Box>
                                                     
                                                 {/* 🔥 모집 날짜 & 댓글 수 */}
-                                                <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                                    <Typography variant="body2" color="textSecondary">
+                                                <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "space-between", fontSize: "1.3rem", color: "#666" }}>
+                                                    <Typography variant="body2" color="textSecondary" sx={{ fontSize: "1.2rem" }}>
                                                         {dayjs(recruit.createdAt).format("YYYY-MM-DD")}
                                                     </Typography>
-                                                    <Typography>
+                                                    <Typography sx={{ fontSize: "1.2rem" }}>
                                                         댓글 수 : {(recruit.comments?.length || 0)}
                                                     </Typography>
                                                 </Box>
@@ -180,8 +180,8 @@ const PostsPage = () => {
 
                 {/* 🔥 게시판 리스트 */}
                 {tabIndex === 1 && (
-                    <Box>
-                        <Typography variant="h6" sx={{ mb: 2 }}>📝 커뮤니티 글</Typography>
+                    <Box marginTop={"60px"}>
+                        
                         <Grid container spacing={2}>
                             {posts.length > 0 ? (
                                 posts.map((post, index) => (
@@ -191,7 +191,7 @@ const PostsPage = () => {
                                             <CardContent>
                                                 
                                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="subtitle1" fontWeight="bold">
+                                                    <Typography variant="subtitle1" fontWeight="bold" fontSize={20}>
                                                         {post.title}
                                                     </Typography>
                                                     <Typography variant="body2" 
@@ -202,6 +202,7 @@ const PostsPage = () => {
                                                         border: "2px solid", // 🔥 모든 카테고리에 테두리 적용
                                                         borderColor: post.category === "NONE" ? "gray" : post.category === "FORUM" ? "black" : "black",
                                                         borderRadius: "16px",
+                                                        fontSize: "1.3rem",
                                                         backgroundColor: "rgba(0, 0, 0, 0.05)", // 🔥 연한 배경색 적용
                                                         color: post.category === "NONE" ? "gray" : post.category === "FORUM" ? "black" : "black",
                                                       }}>
@@ -209,10 +210,10 @@ const PostsPage = () => {
                                                     </Typography>
                                                 </Box>
                                                 <Box sx={{ marginTop: "60px", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                                    <Typography variant="body2" color="textSecondary">
+                                                    <Typography variant="body2" color="textSecondary"  sx={{ fontSize: "1.2rem" }}>
                                                         {dayjs(post.createdAt).format("YYYY-MM-DD")}
                                                     </Typography>
-                                                    <Typography>
+                                                    <Typography sx={{ fontSize: "1.2rem" }}>
                                                         댓글 수 : {(post.comments?.length || 0)}
                                                     </Typography>
                                                 </Box>

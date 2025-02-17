@@ -59,7 +59,7 @@ const MypageSidebar = ({ user }) => {
 
             {/* 사용자 정보 */}
             <Box sx={{ display: "flex", alignItems: "center", ml: 2, mb: 1 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" fontWeight="bold" fontSize={20}>
                     {user?.name || "사용자"} ({user?.nickname || "닉네임 없음"})
                 </Typography>
                 {isOwner && (
@@ -70,10 +70,10 @@ const MypageSidebar = ({ user }) => {
             </Box>
 
             {/* 포지션 & 한줄 소개 */}
-            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%", color: "gray", ml: 2 }}>
+            <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%", fontSize: 20, color: "gray", ml: 2 }}>
                 {user?.hopePosition || "포지션(미등록)"}
             </Typography>
-            <Typography sx={{ textAlign: "center", width: "100%", mt: 2, fontSize: 14, color: "gray", ml: 2 }}>
+            <Typography sx={{ textAlign: "center", width: "100%", mt: 2, fontSize: 17, color: "gray", ml: 2 }}>
                 {user?.selfIntroduction || "한줄 소개가 없습니다."}
             </Typography>
 
@@ -111,9 +111,10 @@ const MypageSidebar = ({ user }) => {
             {isOwner && (
             <Box sx={{ mt: 3, width: "100%" }}>
                 <Typography
+                    marginTop={3}
                     variant="subtitle2"
                     fontWeight={isActive("/mypage") ? "bold" : "normal"}
-                    sx={{ mb: 1, textAlign: "left", ml: 2, cursor: "pointer" }}
+                    sx={{ mb: 1, textAlign: "left", ml: 2, cursor: "pointer", fontSize: 20 }}
                     onClick={() => navigate("/mypage")}
                 >
                     마이페이지
@@ -127,6 +128,7 @@ const MypageSidebar = ({ user }) => {
                         mb: 1,
                         ml: 4,
                         cursor: "pointer",
+                        fontSize: 18
                     }}
                     onClick={() => navigate("/mypage/posts")}
                 >
@@ -141,6 +143,7 @@ const MypageSidebar = ({ user }) => {
                         mb: 1,
                         ml: 4,
                         cursor: "pointer",
+                        fontSize: 18
                     }}
                     onClick={() => navigate("/mypage/portfolios")}
                 >
@@ -155,6 +158,7 @@ const MypageSidebar = ({ user }) => {
                         mb: 1,
                         ml: 4,
                         cursor: "pointer",
+                        fontSize: 18
                     }}
                     onClick={() => navigate("/mypage/projects")}
                 >
@@ -169,6 +173,7 @@ const MypageSidebar = ({ user }) => {
                         mb: 1,
                         ml: 4,
                         cursor: "pointer",
+                        fontSize: 18
                     }}
                     onClick={() => navigate("/mypage/scraps")}
                 >

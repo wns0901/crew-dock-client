@@ -4,7 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import styled from "styled-components";
 import api from "../../../apis/baseApi";
 import ProjectSelectModal from "./ProjectSelectModal";
-import ProjectAlert from "./ProjectAlert"; // Alert 컴포넌트 추가
+import ProjectAlertModal from "./ProjectAlertModal"; // Alert 컴포넌트 추가
 import { LoginContext } from "../../../contexts/LoginContextProvider"; // 로그인 정보 가져오기
 
 const WriteBtn = () => {
@@ -57,7 +57,7 @@ const WriteBtn = () => {
       />
 
       {/* 방장 프로젝트 없을 때 Alert 표시 */}
-      <ProjectAlert open={isAlertOpen} handleClose={() => setIsAlertOpen(false)} />
+      <ProjectAlertModal open={isAlertOpen} handleClose={() => setIsAlertOpen(false)} />
     </>
   );
 };

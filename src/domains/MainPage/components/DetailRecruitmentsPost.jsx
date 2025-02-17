@@ -14,16 +14,15 @@ import Comment from "./comment/Comment";
 import { useDispatch } from "react-redux";
 import { makeChatRoom } from "../../../containers/userSocketStatusSlice"; 
 
-
 const DetailRecruitmentPost = () => {
     const { userInfo, isLogin } = useContext(LoginContext);
-    const { recruitmentsId } = useParams(); // URL에서 모집글 ID 가져오기
+    const { recruitmentsId } = useParams(); 
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
-    const [stacks, setStacks] = useState([]); // 스택
+    const [stacks, setStacks] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [attachments, setAttachments] = useState([]);
-    const dispath = useDispatch();
+    const dispatch = useDispatch();  // dispatch 오타 수정
 
     useEffect(() => {
         if (!recruitmentsId) return;
@@ -34,11 +33,10 @@ const DetailRecruitmentPost = () => {
                 setPost(response.data);
                 setLoading(false);
 
-                // ✅ 모집글의 프로젝트 ID를 사용해 기술 스택 조회
                 if (response.data.projectId) {
                     api.get(`/projects/${response.data.projectId}/stacks`)
                         .then(res => {
-                            setStacks(res.data.map(stack => stack.stackName)); // ✅ 스택 이름만 저장
+                            setStacks(res.data.map(stack => stack.stackName)); 
                         })
                         .catch(error => console.error("❌ 프로젝트 스택 가져오기 실패:", error));
                 }
@@ -47,10 +45,11 @@ const DetailRecruitmentPost = () => {
                 console.error("❌ 모집글 상세 불러오기 실패:", error);
                 setLoading(false);
             });
+
         api.get(`/recruitments/${recruitmentsId}/attachments`)
             .then(res => setAttachments(res.data))
             .catch(error => console.error("❌ 첨부 파일 가져오기 실패:", error));
-    }, []);
+    }, [recruitmentsId]);
 
     if (loading) {
         return <Typography variant="h6" sx={{ textAlign: "center", mt: 5 }}>로딩 중...</Typography>;
@@ -60,9 +59,8 @@ const DetailRecruitmentPost = () => {
         return <Typography variant="h6" color="error" sx={{ textAlign: "center", mt: 5 }}>모집글을 찾을 수 없습니다.</Typography>;
     }
 
-    const isAuthor = userInfo?.id === post.user?.userId; //작성자인지 확인
+    const isAuthor = userInfo?.id === post.user?.userId;
 
-    // 모집글 삭제
     const handleDelete = () => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
@@ -77,70 +75,69 @@ const DetailRecruitmentPost = () => {
             });
     };
 
-    // 모집글 수정 페이지로 이동
     const handleEdit = () => {
         navigate(`/recruitments/edit/${recruitmentsId}`);
     };
 
     const handleChatBtn = () => {
         console.log("채팅 버튼 클릭");
-        
+
         if (!isLogin) {
             alert("로그인이 필요합니다.");
             return;
         }
 
-        dispath(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
+        dispatch(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
     };
-    
-    
+
     const handleApply = () => {
         if (!userInfo) {
             alert("로그인이 필요합니다.");
             return;
         }
-    
+
         if (!post || !post.projectId) {
             alert("프로젝트 ID를 찾을 수 없습니다.");
             return;
         }
-    
+
         api.post(`/projects/${post.projectId}/members`, { userId: userInfo.id })
             .then(response => {
-                console.log("📌 [DEBUG] 신청 응답:", response.data);
-                const { message, projectId, userId, status } = response.data;
-    
-                alert(`${message} (프로젝트 ID: ${projectId}, 사용자 ID: ${userId}, 상태: ${status})`);
+                alert("프로젝트를 신청하셨습니다.");
             })
             .catch(error => {
                 if (error.response) {
-                    console.error("❌ [ERROR] 신청 실패:", error.response.data);
-                    alert("신청 실패: " + (error.response.data.error || "알 수 없는 오류"));
+                    const errorMessage = error.response.data.error;
+
+                    if (errorMessage === "이미 소속된 프로젝트입니다.") {
+                        alert("이미 해당 프로젝트의 멤버로 소속되어 있습니다.");
+                    } else if (errorMessage === "이미 지원한 프로젝트입니다.") {
+                        alert("이미 지원한 프로젝트입니다.");
+                    } else {
+                        alert("신청 중 오류가 발생했습니다.");
+                    }
                 } else {
-                    alert("신청 중 오류가 발생했습니다.");
+                    alert("서버 오류가 발생했습니다.");
                 }
             });
+
+            const handleDownloadAttachment = (attachmentId, fileName) => {
+                try {
+                    const response = api.get(`recruitments/${recruitmentsId}/attachments`,
+                        { responseType: 'blob' }
+                    );
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', fileName);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.parentNode.removeChild(link);
+                } catch (error) {
+                    console.error('첨부파일 다운로드 실패:', error);
+                }
+            };
     };
-    
-
-    const handleDownloadAttachment = (attachmentId, fileName) => {
-        try {
-            const response = api.get(`recruitments/${recruitmentsId}/attachments`,
-                { responseType: 'blob' }
-            );
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', fileName);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-        } catch (error) {
-            console.error('첨부파일 다운로드 실패:', error);
-        }
-    };
-
-
     return (
         <Container maxWidth="md">
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 4, mb: 2 }}>
@@ -161,24 +158,35 @@ const DetailRecruitmentPost = () => {
                 ) : (
                     // 🔹 로그인한 사용자만 "채팅", "신청" 버튼 표시
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Button variant="outlined" color="primary" sx={{ mr: 1 }} onClick={handleChatBtn}>
-                            채팅
-                        </Button>
-                        <Button 
-                            variant="contained" 
-                            color="success" 
-                            onClick={() => {
-                                if (isLogin) {
-                                    handleApply();
-                                } else {
-                                    alert("로그인이 필요합니다.");
-                                }
-                            }}
-                        >
-                            신청
-                        </Button> 
+                    <Button 
+                        variant="outlined" 
+                        color="primary" 
+                        sx={{ mr: 1 }} 
+                        onClick={() => {
+                            if (!isLogin) {
+                                alert("로그인이 필요합니다.");
+                                return;
+                            }
+                            handleChatBtn
+                        }}
+                    >
+                        채팅
+                    </Button>
 
-                    </Box>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={() => {
+                            if (!isLogin) {
+                                alert("로그인이 필요합니다.");
+                                return;
+                            }
+                            handleApply();
+                        }}
+                    >
+                        신청
+                    </Button> 
+                </Box>
                 )}
             </Box>
 
@@ -200,15 +208,41 @@ const DetailRecruitmentPost = () => {
                 <Divider sx={{ mb: 2 }} />
 
                 <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                        <TextField
-                            fullWidth
-                            label="모집 분야"
-                            variant="outlined"
-                            value={position.find(p => p.value === post.recruitedField)?.label || "알 수 없음"}
-                            InputProps={{ readOnly: true, sx: { color: "black" } }} // ✅ readOnly 적용
-                        />
-                    </Grid>
+                {/* 모집 분야 */}
+                <Grid item xs={4}>
+                <Box sx={{
+                    position: "relative",  // 제목을 박스 내부에서 배치
+                    border: "1px solid #ccc",  // 테두리 유지
+                    borderRadius: "5px",       // 둥근 모서리
+                    padding: "16px 20px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
+                    minHeight: "30px",         // TextField 높이와 동일하게 설정
+                    display: "flex",
+                    alignItems: "center",
+                }}>
+                    {/* 제목 */}
+                    <Typography 
+                    variant="caption" 
+                    color="textSecondary" 
+                    sx={{ 
+                        position: "absolute", 
+                        top: "-8px", left: "7px", 
+                        backgroundColor: "white",  // 배경 흰색으로 해서 테두리와 분리
+                        padding: "0 4px", 
+                        fontSize: "12px" 
+                    }}
+                    >
+                    모집 분야
+                    </Typography>
+                    <Typography variant="body1" marginTop={-1}>
+            {
+                post.recruitedField
+                    ?.split(",") // 문자열을 배열로 변환
+                    .map(value => position.find(p => p.value === value)?.label || "알 수 없음") // label 찾기
+                    .join(", ") // 배열을 문자열로 변환하여 출력
+            }
+        </Typography>
+                </Box>
+                </Grid>
 
                     <Grid item xs={4}>
                         <TextField fullWidth label="진행 기간"

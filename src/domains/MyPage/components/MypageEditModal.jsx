@@ -10,7 +10,7 @@ import api from "../../../apis/baseApi";
 
 const API_BASE_URL = api.defaults.baseURL; 
 
-const MypageEdit = ({ open, onClose, userId }) => {
+const MypageEdit = ({ open, onClose, userId, setuserdate, setProfileImg }) => {
     const { userInfo, setUserInfo } = useContext(LoginContext);
     const effectiveUserId = userId || userInfo?.id;
 
@@ -95,6 +95,7 @@ const MypageEdit = ({ open, onClose, userId }) => {
             if (response.data.profileImgUrl) {
                 setUserData(prev => ({ ...prev, profileImgUrl: response.data.profileImgUrl }));
                 setPreviewImg(response.data.profileImgUrl);
+                setProfileImg(response.data.profileImgUrl);
                 alert("프로필 이미지가 변경되었습니다!");
             } else {
                 throw new Error("서버에서 이미지 URL을 반환하지 않음");

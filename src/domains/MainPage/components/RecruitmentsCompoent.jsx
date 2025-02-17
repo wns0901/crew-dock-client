@@ -432,9 +432,6 @@ const RecruitmentsComponent = () => {
                     <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                       {project.user?.nickName || "익명"}
                     </Typography>
-                    <Typography variant="body2">
-                      댓글 수: {project.commentCnt}
-                    </Typography>
                   </Box>
                 </CardContent>
               </Card>

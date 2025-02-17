@@ -45,7 +45,7 @@ const DeadlineProjects = () => {
       .then(response => {
         const postDatas = response.data.content.map((post) => ({
           ...post,
-          commentCnt: 5,
+          commentCnt:5,
         }));
         setProjects(postDatas);
         console.log(1, postDatas);
@@ -212,7 +212,6 @@ const DeadlineProjects = () => {
               <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                 {project.user?.nickName || "익명"}
               </Typography>
-              <Typography variant="body2">댓글 수: {project.commentCnt}</Typography>
             </Box>
           </CardContent>
         </Card>

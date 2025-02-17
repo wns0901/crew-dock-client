@@ -58,6 +58,8 @@ const EditRecruitmentPost = () => {
   const [urlInput, setUrlInput] = useState("");
   const [tempAttachments, setTempAttachments] = useState([]);
 
+  console.log("📌 useParams()에서 받은 recruitmentId:", recruitmentId);
+  
   // 기존 모집글 데이터 불러오기
   useEffect(() => {
     if (!recruitmentId) return; // recruitmentId 없으면 실행 안 함
@@ -257,22 +259,29 @@ const EditRecruitmentPost = () => {
         </Typography>
         <Divider sx={{ mb: 2 }} />
 
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <FormControl fullWidth>
-              <InputLabel>모집 분야</InputLabel>
-              <Select
-                value={recruitedField}
-                onChange={(e) => setRecruitedField(e.target.value)}
-              >
-                {position.map((item) => (
-                  <MenuItem key={item.value} value={item.value}>
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+      <Grid container spacing={2}>
+
+              <Grid item xs={4}>
+                  <FormControl fullWidth>
+                      <InputLabel>모집 분야</InputLabel>
+                      <Select
+                          multiple
+                          value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
+                          onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
+                          renderValue={(selected) =>
+                              selected
+                                  .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
+                                  .join(", ") // 선택된 값들을 문자열로 표시
+                          }
+                      >
+                          {position.map((item) => (
+                              <MenuItem key={item.value} value={item.value}>
+                                  {item.label}
+                              </MenuItem>
+                          ))}
+                      </Select>
+                  </FormControl>
+              </Grid>
 
           <Grid item xs={4}>
             <TextField

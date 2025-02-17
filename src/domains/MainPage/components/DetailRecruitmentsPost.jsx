@@ -186,7 +186,7 @@ const DetailRecruitmentPost = () => {
                     position: "relative",  // 제목을 박스 내부에서 배치
                     border: "1px solid #ccc",  // 테두리 유지
                     borderRadius: "5px",       // 둥근 모서리
-                    padding: "16px 14px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
+                    padding: "16px 20px 8px",  // 내부 여백 조정 (제목과 값 간격 확보)
                     minHeight: "30px",         // TextField 높이와 동일하게 설정
                     display: "flex",
                     alignItems: "center",
@@ -205,11 +205,6 @@ const DetailRecruitmentPost = () => {
                     >
                     모집 분야
                     </Typography>
-
-                    {/* 실제 값 */}
-                    {/* <Typography variant="body1" marginTop={-1}>
-                    {position.find(p => p.value === post.recruitedField)?.label || "알 수 없음"}
-                    </Typography> */}
                     <Typography variant="body1" marginTop={-1}>
             {
                 post.recruitedField

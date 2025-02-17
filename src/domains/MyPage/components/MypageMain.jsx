@@ -162,12 +162,13 @@ const MypageMain = () => {
     }
 
     return (
-        <Box sx={{ display: "flex",  minHeight: "100vh", overflowY: "auto" }}>
+        <Box sx={{ display: "flex",  minHeight: "100vh", minWidth: "35vh", overflowY: "auto" }}>
             {/* ✅ 좌측 사이드바 */}
             <Box sx={{display: "flex", 
         minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
         overflowY: "auto",
         backgroundColor: "#f9f9f9",
+        minWidth: "35vh",
         alignItems: "stretch",
         borderRight: "1px solid #ccc" }} >
                 <MypageSidebar user={user}></MypageSidebar>
@@ -178,8 +179,6 @@ const MypageMain = () => {
                 {/* 섹션 1: 일정 관리 + 작성글 */}
                 <Box mb={4}>
                     <Typography variant="h6" >📅 일정 관리</Typography>
-                    {/* <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}>
-                    </Box> */}
                     <MyCalendar/>
                 </Box>
                 <Box mb={4}>

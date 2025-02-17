@@ -1,6 +1,6 @@
 import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Category, CategoryLabel } from '../constants/Category';
 // import '../styles/PostFormStyle.css';
 import { 
@@ -16,6 +16,7 @@ import {
     Container
   } from '@mui/material';
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
+import { LoginContext } from '../../../contexts/LoginContextProvider';
 
 const PostForm = ({
   initialData = { category: '', title: '', content: '', direction: 'NONE' },
@@ -27,12 +28,17 @@ const PostForm = ({
   const [category, setCategory] = useState(initialData.category);
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
+  const {userInfo} = useContext(LoginContext);
 
   useEffect(() => {
     setCategory(initialData.category);
     setTitle(initialData.title);
     setContent(initialData.content);
 }, [initialData]);
+
+if(!userInfo) {
+  return <Typography variant="body1">로그인 후 게시글을 작성할 수 있습니다.</Typography>;
+}
 
   const handleSubmit = (e) => {
     e.preventDefault();

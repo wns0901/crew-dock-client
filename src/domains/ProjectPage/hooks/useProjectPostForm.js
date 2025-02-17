@@ -5,17 +5,26 @@ import { Direction } from "../constants/Direction";
 
 export const useProjectPostForm = () => {
     const navigate = useNavigate();
-    const {roles} = useContext(LoginContext);
+    const {roles, projectRoles} = useContext(LoginContext);
+
+    const isCaptain = projectRoles.some(role => role.role.isCaptain);
 
     const directionOptions = Object.values(Direction).filter(direction => {
         const isAdmin = roles?.isAdmin ?? false;
         if (isAdmin) {
           return true;
         }
-        return direction === Direction.MINUTES ||
-            direction === Direction.REFERENCE ||
-            direction === Direction.NONE ||
-            direction === Direction.FORUM
+        if (isCaptain) {
+            return direction === Direction.NOTICE || 
+                   direction === Direction.MINUTES ||
+                   direction === Direction.REFERENCE ||
+                   direction === Direction.NONE ||
+                   direction === Direction.FORUM;
+          }
+          return direction === Direction.MINUTES ||
+                 direction === Direction.REFERENCE ||
+                 direction === Direction.NONE ||
+                 direction === Direction.FORUM;
     });
 
     const validatePost = (postData) => {

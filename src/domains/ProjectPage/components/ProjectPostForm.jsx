@@ -1,6 +1,6 @@
 import MDEditor from '@uiw/react-md-editor';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Direction, DirectionLabel } from '../constants/Direction';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -23,6 +23,7 @@ import {
   Divider,
 } from '@mui/material';
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
+import { LoginContext } from '../../../contexts/LoginContextProvider';
 
 const ProjectPostForm = ({
   initialData = { category: '', title: '', content: '', direction: 'NONE', attachments: [] },
@@ -38,14 +39,18 @@ const ProjectPostForm = ({
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [tempAttachments, setTempAttachments] = useState([])
-
-
+  const {userInfo} = useContext(LoginContext);
+  
   useEffect(() => {
     setDirection(initialData.direction);
     setTitle(initialData.title);
     setContent(initialData.content);
     setAttachments(initialData.attachments || []);
   }, [initialData]);
+
+  if(!userInfo) {
+    return <Typography variant="body1">로그인 후 게시글을 작성할 수 있습니다.</Typography>;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -119,7 +119,7 @@ const AdminPosts = () => {
                     color: "blue",
                     textDecoration: "underline",
                   }}
-                  onClick={() => navigate(`/post/${post.id}`)}
+                  onClick={() => navigate(`/posts/${post.id}`)}
                 >
                   {post.title}
                 </TableCell>

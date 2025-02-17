@@ -83,7 +83,7 @@ const ChatWindowModal = styled.div`
   height: 600px;
   background-color: white;
   border-radius: 10px;
-  position: absolute;
+  position: fixed;
   right: 3%;
   bottom: 10%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

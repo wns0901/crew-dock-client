@@ -193,47 +193,47 @@ const WriteRecruitmentPost = () => {
     return (
         <Container maxWidth="md">
             {/* 프로젝트 모집글 작성 제목 */}
-            <Typography variant="h4" sx={{ mt: 4, mb: 3, fontWeight: "bold", textAlign: "left" }}>
+            <Typography variant="h3" sx={{ mt: 4, mb: 3, fontWeight: "bold", textAlign: "left" }}>
                 프로젝트 모집글 작성
             </Typography>
 
             {/* 프로젝트 ID가 없는 경우 예외 처리 */}
             {!projectId ? (
-                <Typography variant="h6" color="error" sx={{ textAlign: "center", mt: 5 }}>
+                <Typography variant="h5" color="error" sx={{ textAlign: "center", mt: 5 }}>
                     잘못된 접근입니다. 프로젝트를 선택해주세요.
                 </Typography>
             ) : (
                 <>
                     {/* 모집 정보 섹션 */}
                     <Paper elevation={0} sx={{ p: 2, mb: 1 }}>
-                        <Typography variant="h6" sx={{ textAlign: "left" }}>
+                        <Typography variant="h5" sx={{ textAlign: "left" }}>
                             모집 정보
                         </Typography>
                         <Divider sx={{ mb: 2 }} />
 
                         <Grid container spacing={2}>
-
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <InputLabel>모집 분야</InputLabel>
-                                <Select
-                                    multiple
-                                    value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
-                                    onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
-                                    renderValue={(selected) =>
-                                        selected
-                                            .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
-                                            .join(", ") // 선택된 값들을 문자열로 표시
-                                    }
-                                >
-                                    {position.map((item) => (
-                                        <MenuItem key={item.value} value={item.value}>
-                                            {item.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <Grid item xs={4}>{/* 모집 분야 */}
+                        <FormControl fullWidth>
+                            <InputLabel>모집 분야</InputLabel>
+                            <Select
+                                multiple
+                                value={recruitedField ? recruitedField.split(",") : []} // 문자열을 배열로 변환
+                                onChange={(e) => setRecruitedField(e.target.value.join(","))} // 배열을 문자열로 변환하여 저장
+                                renderValue={(selected) =>
+                                    selected
+                                        .map(value => position.find(p => p.value === value)?.label || "알 수 없음")
+                                        .join(", ") // 선택된 값들을 문자열로 표시
+                                }
+                            >
+                                {position.map((item) => (
+                                    <MenuItem key={item.value} value={item.value}>
+                                        {item.label}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         </Grid>
+
 
                             <Grid item xs={4}>
                                 <TextField
@@ -346,7 +346,14 @@ const WriteRecruitmentPost = () => {
                     <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
                         <Typography variant="h6" sx={{ textAlign: "left" }}>소개 및 내용</Typography>
                         <Divider sx={{ mb: 2 }} />
-                        <MDEditor value={content} onChange={setContent} style={{ height: "300px" }} />
+                        <MDEditor
+                        value={content}
+                        onChange={setContent}
+                        preview="live"
+                        data-color-mode="light"
+                        height={550}
+                    />
+
                     </Paper>
 
                     {/* 첨부파일 추가 */}
@@ -415,7 +422,7 @@ const WriteRecruitmentPost = () => {
                     </Dialog>
 
                     {/* 🔹 작성 버튼 */}
-                    <Box sx={{ textAlign: "right", mt: 3 }}>
+                    <Box sx={{ textAlign: "right", mt: 3, mb: 4}}>
                         <Button variant="contained" color="primary" size="large" onClick={handleSubmit}>
                             작성 완료
                         </Button>

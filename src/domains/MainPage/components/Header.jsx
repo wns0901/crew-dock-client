@@ -26,7 +26,7 @@ const Header = () => {
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#ffffff", boxShadow: "none" }}> {/* ✅ 그림자 제거 */}
+        <AppBar position="static" sx={{ backgroundColor: "#ffffff", boxShadow: "none", width: "85%", marginLeft: "auto", marginRight:"auto"  }}> {/* ✅ 그림자 제거 */}
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}> {/* ✅ 상단바 정렬 고정 */}
                 
                 {/* 로고 */}

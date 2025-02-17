@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { DirectionLabel } from "../constants/Direction";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,6 +15,7 @@ import {
 import { Link } from "react-router-dom";
 import Comment from "../../MainPage/components/comment/Comment";
 import { useParams } from "react-router-dom";
+import { LoginContext } from "../../../contexts/LoginContextProvider";
 
 const ProjectPostDetail = ({
   post = null,
@@ -27,6 +28,14 @@ const ProjectPostDetail = ({
   const [comment, setComment] = useState({ content: "" });
   const isAuthor = post?.userId === userInfo?.id;
   const { postId, projectId } = useParams();
+  const {projectRoles} = useContext(LoginContext);
+
+  const isCaptain = projectRoles.some(role => role.role.isCaptain);
+
+  if(!isCaptain) {
+    return <Typography variant="body1">팀장만 작성할 수 있습니다.</Typography>;
+  }
+
 
   const handleSubmitComment = () => {
     if (comment.content.trim()) {

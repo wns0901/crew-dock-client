@@ -53,9 +53,39 @@ const SettingsSideBar = () => {
           if (newValue === 2) navigate(`/projects/${projectId}/pending`);
         }}
       >
-        <BottomNavigationAction label="세부 사항" />
-        <BottomNavigationAction label="엑세스" />
-        <BottomNavigationAction label="신청 관리" />
+        <BottomNavigationAction
+          label="세부 사항"
+          sx={{
+            "& .MuiBottomNavigationAction-label": {
+              fontSize: "18px", // 기본 크기
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+              fontSize: "18px", // 선택된 상태에서도 같은 크기 유지
+            },
+          }}
+        />
+        <BottomNavigationAction
+          label="엑세스"
+          sx={{
+            "& .MuiBottomNavigationAction-label": {
+              fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+              fontSize: "18px",
+            },
+          }}
+        />
+        <BottomNavigationAction
+          label="신청 관리"
+          sx={{
+            "& .MuiBottomNavigationAction-label": {
+              fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+              fontSize: "18px",
+            },
+          }}
+        />
       </BottomNavigation>
     </Box>
   );

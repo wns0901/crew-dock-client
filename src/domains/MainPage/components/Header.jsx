@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, Box } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; // 🔥 화살표 아이콘 추가
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ 현재 경로 확인을 위해 useLocation 추가
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import Logo from "../asset/CrewDockLogo.png"; // 로고 이미지 경로 설정
 import "../../../index.css";
@@ -10,7 +10,11 @@ import "../css/Header.css"; // ✅ CSS 파일 추가
 const Header = () => {
     const { isLogin, userInfo, logout } = useContext(LoginContext);
     const navigate = useNavigate();
+    const location = useLocation(); // ✅ 현재 경로 가져오기
     const [anchorEl, setAnchorEl] = useState(null);
+
+    // ✅ 마이페이지 또는 프로젝트 페이지인지 확인
+    const isMypageOrProject = location.pathname.startsWith("/mypage") || location.pathname.startsWith("/projects");
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -26,16 +30,29 @@ const Header = () => {
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#ffffff", boxShadow: "none", width: "85%", marginLeft: "auto", marginRight:"auto"  }}> {/* ✅ 그림자 제거 */}
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}> {/* ✅ 상단바 정렬 고정 */}
-                
-                {/* 로고 */}
+        <AppBar 
+            position="static" 
+            sx={{ 
+                backgroundColor: "#ffffff", 
+                boxShadow: "none", 
+                width: isMypageOrProject ? "100%" : "80%", // ✅ 마이페이지/프로젝트에서는 100%, 나머지는 85%
+                marginLeft: "auto", 
+                marginRight: "auto", 
+                padding: isMypageOrProject ? "0 80px" : "0" // ✅ 마이페이지/프로젝트에서는 좌우 패딩 80px 추가
+            }}
+        >
+            <Toolbar sx={{ 
+                display: "flex", 
+                justifyContent: isMypageOrProject ? "space-between" : "space-between", 
+                alignItems: "center" 
+            }}> 
+                {/* ✅ 로고 (마이페이지/프로젝트에서는 왼쪽 정렬) */}
                 <IconButton edge="start" color="inherit" onClick={() => navigate("/")}>
                     <img src={Logo} alt="로고" style={{ width: 90, height: 80 }} />
                 </IconButton>
 
-                {/* 네비게이션 버튼 */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}> {/* ✅ 버튼 가로 정렬 */}
+                {/* ✅ 네비게이션 (게시판, 내 프로젝트, 닉네임) */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: "30px" }}> 
                     <Button className="nav-button board-button" onClick={() => navigate("/posts")}>
                         게시판
                     </Button>

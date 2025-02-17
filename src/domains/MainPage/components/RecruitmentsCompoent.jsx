@@ -142,11 +142,11 @@ const RecruitmentsComponent = () => {
     fontWeight: "bold",
     display: "flex", 
     marginBottom: 2, 
-    paddingX: 20, 
+    paddingX: 30, 
     textAlign: "left", 
     maxWidth: "1200px", 
     marginLeft: "0",
-    marginTop: 3,
+    marginTop: 20,
     justifyContent: "flex-start" // Flexbox에서 왼쪽 정렬 보장
   }}
 >
@@ -154,7 +154,7 @@ const RecruitmentsComponent = () => {
 </Typography>
 
 {/* 필터 UI 박스 */}
-<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", marginBottom: 2, paddingX: 20, maxWidth: "1200px", marginX: "0" }}>
+<Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", marginBottom: 2,  paddingX: 30, maxWidth: "1200px", marginX: "0" }}>
   <TextField 
   select 
   label="기술 스택" 
@@ -224,7 +224,7 @@ const RecruitmentsComponent = () => {
 
 </Box>
 
-<Grid container spacing={3} sx={{ padding: 2, paddingX: 26, justifyContent: "center", flexWrap: "wrap" }}>
+<Grid container spacing={3} sx={{ padding: 2, paddingX: 26, justifyContent: "center", flexWrap: "wrap", marginBottom: 2 }}>
   {projects.length === 0 ? (
     <Typography variant="h6">모집 중인 프로젝트가 없습니다.</Typography>
   ) : (
@@ -326,7 +326,7 @@ const RecruitmentsComponent = () => {
             count={totalPages} 
             page={page} 
             onChange={(event, value) => setPage(value)}
-            sx={{ display: "flex", justifyContent: "center", mt: 3.5 }}
+            sx={{ display: "flex", justifyContent: "center", mt: 3.5 , marginBottom: 5 }}
           />
   </div>
   );

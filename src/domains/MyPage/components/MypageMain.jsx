@@ -170,7 +170,7 @@ const MypageMain = () => {
         backgroundColor: "#f9f9f9",
         alignItems: "stretch",
         borderRight: "1px solid #ccc" }} >
-                <MypageSidebar user={user} />
+                <MypageSidebar user={user}></MypageSidebar>
             </Box>
 
             {/* ✅ 메인 컨텐츠 영역 */}

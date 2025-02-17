@@ -56,7 +56,13 @@ const Header = () => {
                     <Button className="nav-button board-button" onClick={() => navigate("/posts")}>
                         게시판
                     </Button>
-                    <Button className="nav-button project-button" onClick={() => navigate(`/mypage/projects`)}>
+                    <Button className="nav-button project-button" onClick={() => {
+                      if(!isLogin) {
+                        alert("로그인이 필요합니다.")
+                        navigate("/login")
+                        return;
+                      }
+                      navigate(`/mypage/projects`)}}>
                         내 프로젝트
                     </Button>
 

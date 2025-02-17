@@ -21,14 +21,6 @@ const PostDetail = ({
   const isAuthor = post?.userId === userInfo?.id;
   const { postId } = useParams();
 
-  if (!userInfo) {
-    return (
-      <Typography variant="body1">
-        로그인 후 댓글을 작성할 수 있습니다.
-      </Typography>
-    );
-  }
-
   return (
     <Box
       sx={{ display: "flex", justifyContent: "center", width: "100%", mt: 4 }}

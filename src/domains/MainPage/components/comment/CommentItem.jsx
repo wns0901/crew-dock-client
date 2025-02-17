@@ -2,6 +2,8 @@ import { Box, Typography, Button, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReplyIcon from "@mui/icons-material/Reply";
 import CommentForm from "./CommentForm";
+import { useContext } from "react";
+import { LoginContext } from "../../../../contexts/LoginContextProvider";
 
 const CommentItem = ({
   comment,
@@ -12,7 +14,7 @@ const CommentItem = ({
   handleAddComment,
 }) => {
   if (!comment) return null; // comment가 없을 경우 처리
-
+  const {isLogin} = useContext(LoginContext);
   const CommentContent = () => {
     if (comment.isDeleted) {
       return comment.childs?.length > 0 ? (
@@ -42,7 +44,7 @@ const CommentItem = ({
                 삭제
               </Button>
             )}
-            {!comment.parentCommentId && (
+            {!comment.parentCommentId && isLogin && (
               <Button
                 size="small"
                 startIcon={<ReplyIcon />}

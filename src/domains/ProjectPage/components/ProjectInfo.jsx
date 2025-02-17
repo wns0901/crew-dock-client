@@ -6,7 +6,8 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import AnchorIcon from "@mui/icons-material/Anchor"
 import api from "../../../apis/baseApi";
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+import { Avatar } from "@mui/material";
+import GroupIcon from "@mui/icons-material/Group"; 
 
 const ProjectInfo = () => {
     const { projectId } = useParams();
@@ -71,18 +72,46 @@ const ProjectInfo = () => {
             <Box sx={{ flex: 1, padding: 2, overflowY: "auto", display: "flex", flexDirection: "column" }}>
                 {/* 프로젝트 이미지 */}
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                    <img
-                        src={project.imgUrl}
-                        alt="프로젝트 이미지"
-                        style={{
-                            width: "150px",
-                            height: "150px",
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                            border: "2px solid #ddd",
-                        }}
-                    />
-                </Box>
+    {project.imgUrl ? (
+        <img
+            src={project.imgUrl}
+            
+            style={{
+                width: "150px",
+                height: "150px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ddd",
+            }}
+        />
+    ) : (
+        <Avatar 
+            sx={{ width: 150, height: 150, fontSize: 40, bgcolor: "#ddd" }}
+        >
+           <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+    {project.imgUrl ? (
+        <img
+            src={project.imgUrl}
+            alt="프로젝트 이미지"
+            style={{
+                width: "150px",
+                height: "150px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ddd",
+            }}
+        />
+    ) : (
+        <Avatar 
+            sx={{ width: 150, height: 150, fontSize: 40, bgcolor: "#ddd" }}
+        >
+    <GroupIcon sx={{ fontSize: 80, color: "#ffffff" }} />
+        </Avatar>
+    )}
+</Box>
+        </Avatar>
+    )}
+</Box>
                
                 <Typography variant="h5" component="div" gutterBottom>
                 <AnchorIcon sx={{ fontSize: 25, color: "red", }} /> {project.name}

@@ -252,7 +252,7 @@ const EditRecruitmentPost = () => {
         variant="h4"
         sx={{ mt: 4, mb: 3, fontWeight: "bold", textAlign: "left" }}
       >
-        {title} 수정
+        {title}
       </Typography>
 
       <Paper elevation={0} sx={{ p: 2, mb: 1 }}>

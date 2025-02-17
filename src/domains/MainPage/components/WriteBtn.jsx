@@ -64,7 +64,7 @@ const WriteBtn = () => {
 
 const WriteBtnIcon = styled(AddIcon)`
   position: fixed;
-  bottom: 9%;
+  bottom: 12%;
   right: 3%;
   background-color: white;
   border-radius: 50%;

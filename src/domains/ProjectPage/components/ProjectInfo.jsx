@@ -167,7 +167,7 @@ const ProjectInfo = () => {
 
                 <Typography variant="body2" color="text.secondary">
                     <strong>소개:</strong> {project.introduction}
-                <Box sx={{ marginBottom: 18 }} />
+                <Box sx={{ marginBottom: 15 }} />
                 </Typography>
 
 {/* 네비게이션 바 */}

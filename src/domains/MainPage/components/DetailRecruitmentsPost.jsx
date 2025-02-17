@@ -315,7 +315,24 @@ const DetailRecruitmentPost = () => {
             <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
                 <Typography variant="h6" sx={{ textAlign: "left" }}>프로젝트 정보</Typography>
                 <Divider sx={{ mb: 2 }} />
-                <TextField fullWidth label="프로젝트명" variant="outlined" value={post.projectName} InputProps={{ readOnly: true }} />
+                {/* <TextField fullWidth label="프로젝트명" variant="outlined" value={post.projectName} InputProps={{ readOnly: true }} /> */}
+                <Box
+                sx={{
+                    width: '100%',
+                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '20px 14px',
+                    maxHeight: '40px',
+                }}
+                >
+                <Typography variant="h5" sx={{ flexGrow: 1 }}>
+                    {post.projectName}
+                </Typography>
+                </Box>
+
+
             </Paper>
             <Divider sx={{ mb: 2 }} />
 

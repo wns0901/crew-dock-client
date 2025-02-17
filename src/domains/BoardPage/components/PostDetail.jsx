@@ -11,7 +11,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Comment from "../../MainPage/components/comment/Comment";
 
 const PostDetail = ({
@@ -46,7 +46,14 @@ const PostDetail = ({
             }}
           >
             <Typography variant="body2">
-              {post?.userNickname} | {post?.createdAt}
+            <Link
+                to={`/myPage/${post?.userId}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {post?.userNickname}
+              </Link>
+              {" | "}
+              {post?.createdAt}
             </Typography>
 
             {isAuthor && (

@@ -15,7 +15,7 @@ const API_BASE_URL = api.defaults.baseURL;
 const ProjectsPage = () => {
     const navigate = useNavigate();
     const { userId: paramUserId } = useParams();
-    const { userInfo } = useContext(LoginContext);
+    const { userInfo, isLogin } = useContext(LoginContext);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState({});
     const [projects, setProjects] = useState([]);
@@ -36,8 +36,11 @@ const ProjectsPage = () => {
 
     useEffect(() => {
         console.log("🔴🔴🔴🔴🔴🔴🔴🔴useEffect 실행됨됨")
-        if (!userInfo || !userInfo.id) {
+        
+        if (!isLogin) {
             console.warn("🔴 로그인 정보가 없음, 로그인 체크 중...");
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
             return;
         }
 

@@ -46,10 +46,11 @@ import RegisterPage from "./domains/RegisterPage/RegisterPage";
 import SocialRegisterPage from "./domains/RegisterPage/SocialRegisterPage";
 import ProjectCalendar from "./domains/ProjectPage/components/ProjectCalendar";
 import DetailRecruitmentsPost from "./domains/MainPage/components/DetailRecruitmentsPost";
-import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost"; 
+import EditRecruitmentPost from "./domains/MainPage/components/EditRecruitmentPost";
 import UrgentIssues from "./domains/ProjectPage/components/UrgentIssues";
 import ProjectMainDashboard from "./domains/ProjectPage/components/ProjectMainDashBoard";
 import ProjectMainNotice from "./domains/ProjectPage/components/ProjectMainNotice";
+import AdminCheck from "./domains/AdminPage/components/AdminCheck";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -58,16 +59,25 @@ createRoot(document.getElementById("root")).render(
         <ChatComponent />
         <Routes>
           <Route element={<Layout />}>
-
             {/* <Route path="/" element={<SampleIndex />} /> */}
             <Route path="/" element={<MainPage />} />
             <Route
               path="/recruitmemt/write"
               element={<WriteRecruitmentPost />}
             />
-            <Route path="/recruitment/write" element={<WriteRecruitmentPost />} />
-            <Route path="/recruitments/:recruitmentsId" element={<DetailRecruitmentsPost />} />  {/* 동적 라우트 추가 */}
-            <Route path="/recruitments/edit/:recruitmentId" element={<EditRecruitmentPost />} />
+            <Route
+              path="/recruitment/write"
+              element={<WriteRecruitmentPost />}
+            />
+            <Route
+              path="/recruitments/:recruitmentsId"
+              element={<DetailRecruitmentsPost />}
+            />{" "}
+            {/* 동적 라우트 추가 */}
+            <Route
+              path="/recruitments/edit/:recruitmentId"
+              element={<EditRecruitmentPost />}
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
@@ -79,9 +89,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/social-register" element={<SocialRegisterPage />} />
-            
             <Route path="/projects/:projectId" element={<ProjectMain />}>
-
               <Route index element={<ProjectMainDashboard />} />
               <Route path="issues" element={<ProjectIssue />} />
               <Route path="Git" element={<GitData />} />
@@ -97,37 +105,87 @@ createRoot(document.getElementById("root")).render(
                 <Route index element={<ProjectListContainer />} />
                 <Route path="create" element={<ProjectCreateContainer />} />
                 <Route path=":postId" element={<ProjectDetailContainer />} />
-                <Route
-                  path=":postId/edit"
-                  element={<ProjectEditContainer />}
-                />
+                <Route path=":postId/edit" element={<ProjectEditContainer />} />
               </Route>
-
             </Route>
-
             <Route path="/posts">
               <Route index element={<PostListContainers />} />
               <Route path="create" element={<PostCreateContainer />} />
               <Route path=":postId" element={<PostDetailContainer />} />
               <Route path=":postId/edit" element={<PostEditContainer />} />
             </Route>
-
-            <Route path="admin" element={<AdminDashboard />} />
-            <Route path="admin/user" element={<AdminUser />} />
-            <Route path="admin/project" element={<AdminProject />} />
-            <Route path="admin/stack" element={<AdminStack />} />
+            <Route
+              path="admin"
+              element={
+                <AdminCheck>
+                  <AdminDashboard />
+                </AdminCheck>
+              }
+            />
+            <Route
+              path="admin/user"
+              element={
+                <AdminCheck>
+                  <AdminUser />
+                </AdminCheck>
+              }
+            />
+            <Route
+              path="admin/project"
+              element={
+                <AdminCheck>
+                  <AdminProject />
+                </AdminCheck>
+              }
+            />
+            <Route
+              path="admin/stack"
+              element={
+                <AdminCheck>
+                  <AdminStack />
+                </AdminCheck>
+              }
+            />
             <Route
               path="admin/recruitment"
-              element={<AdminRecruitmentPost />}
+              element={
+                <AdminCheck>
+                  <AdminRecruitmentPost />
+                </AdminCheck>
+              }
             />
-            <Route path="admin/posts" element={<AdminPosts />} />
-            <Route path="admin/banners" element={<AdminBanner />} />
-            <Route path="admin/stackusage" element={<AdminStackUsage />} />
+            <Route
+              path="admin/posts"
+              element={
+                <AdminCheck>
+                  <AdminPosts />
+                </AdminCheck>
+              }
+            />
+            <Route
+              path="admin/banners"
+              element={
+                <AdminCheck>
+                  <AdminBanner />
+                </AdminCheck>
+              }
+            />
+            <Route
+              path="admin/stackusage"
+              element={
+                <AdminCheck>
+                  <AdminStackUsage />
+                </AdminCheck>
+              }
+            />
             <Route
               path="admin/hopeposition"
-              element={<AdminHopePositionUsage />}
+              element={
+                <AdminCheck>
+                  <AdminHopePositionUsage />
+                </AdminCheck>
+              }
             />
-
             <Route path="/mypage" element={<MypageMain />} />
             <Route path="/mypage/:userId" element={<MypageMain />} />
             <Route path="/mypage/posts" element={<PostsPage />} />
@@ -147,7 +205,6 @@ createRoot(document.getElementById("root")).render(
             <Route path="/mypage/projects" element={<ProjectsPage />} />
             <Route path="/mypage/scraps" element={<ScrapsPage />} />
             <Route path="/mypage/sidebar" element={<MypageSidebar />} />
-            
           </Route>
         </Routes>
       </LoginContextProvider>

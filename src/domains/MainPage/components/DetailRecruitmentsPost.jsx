@@ -16,13 +16,14 @@ import { makeChatRoom } from "../../../containers/userSocketStatusSlice";
 
 
 const DetailRecruitmentPost = () => {
-    const { userInfo } = useContext(LoginContext);
+    const { userInfo, isLogin } = useContext(LoginContext);
     const { recruitmentsId } = useParams(); // URL에서 모집글 ID 가져오기
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
     const [stacks, setStacks] = useState([]); // 스택
     const [loading, setLoading] = useState(true);
     const [attachments, setAttachments] = useState([]);
+    const dispath = useDispatch();
 
     useEffect(() => {
         if (!recruitmentsId) return;
@@ -68,7 +69,7 @@ const DetailRecruitmentPost = () => {
         api.delete(`/recruitments/${recruitmentsId}`)
             .then(() => {
                 alert("모집글이 삭제되었습니다.");
-                navigate("/main");
+                navigate("/");
             })
             .catch(error => {
                 console.error("❌ 모집글 삭제 실패:", error);
@@ -84,6 +85,11 @@ const DetailRecruitmentPost = () => {
     const handleChatBtn = () => {
         console.log("채팅 버튼 클릭");
         
+        if (!isLogin) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
         dispath(makeChatRoom({ senderId: userInfo.id, receiverId: post.user.userId }));
     };
     
@@ -162,10 +168,10 @@ const DetailRecruitmentPost = () => {
                             variant="contained" 
                             color="success" 
                             onClick={() => {
-                                if (userInfo) {
+                                if (isLogin) {
                                     handleApply();
                                 } else {
-                                    alert("로그인 부탁드립니다.");
+                                    alert("로그인이 필요합니다.");
                                 }
                             }}
                         >

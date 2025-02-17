@@ -11,7 +11,7 @@ export const usePostForm = () => {
     const categoryOptions = Object.values(Category).filter(category => {
         const isAdmin = roles?.isAdmin ?? false;
         if (isAdmin) {
-          return true;
+            return category === Category.NOTICE || category === Category.NONE || category === Category.FORUM;
         }
         return category === Category.NONE || category === Category.FORUM;
     });

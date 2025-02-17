@@ -40,7 +40,7 @@ const PostForm = ({
   }
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" style={{marginBottom: '30px'}}>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4 }}>
         <Stack spacing={3}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

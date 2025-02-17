@@ -77,11 +77,13 @@ const EditRecruitmentPost = () => {
 
         // 프로젝트 스택 불러오기
         if (postData.projectId) {
+          console.log("📌 프로젝트 ID:", postData.projectId); // projectId 확인
           const stackResponse = await api.get(
-            `/projects/${postData.projectId}/stacks`
+            `/projects/${postData.projectId}/stacks`,
           );
+
           setStacks(
-            stackResponse.data.map((s) => s.stack?.name || "스택 없음")
+            stackResponse.data.map((s) => s.stackName || "스택 없음")
           );
         }
 

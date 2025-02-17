@@ -6,7 +6,7 @@ const ProjectAlertModal = ({ open, handleClose }) => {
   const navigate = useNavigate();
 
   const handleCreateProject = () => {
-    navigate("/projects/new"); // 프로젝트 생성 페이지로 이동
+    navigate("/mypage/projects"); // 프로젝트 생성 페이지로 이동
   };
 
   return (

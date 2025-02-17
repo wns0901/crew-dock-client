@@ -316,7 +316,7 @@ const ProjectsPage = () => {
 
             <Box sx={{ flexGrow: 1, padding: "40px" }}>
                 <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-                    <Button variant="contained" sx={{ mb: 3 }} onClick={handleOpenModal}>프로젝트 추가하기</Button>
+                    <Button variant="contained" sx={{ mb: 3 , fontSize:20}} onClick={handleOpenModal}>프로젝트 추가하기</Button>
                 </Box>
 
                 {projects.length === 0 ? (
@@ -329,14 +329,14 @@ const ProjectsPage = () => {
                                     <CardContent>
                                         <Typography variant="h6" fontWeight="bold" sx={{ fontSize: "1.5rem" }}>[{project.name}］</Typography>
                                         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                                            <Typography sx={{ mt: 1 }}>나의 미해결 이슈: <strong>{issues[project.id] || 0}</strong></Typography>
+                                            <Typography sx={{ mt: 1, fontSize: "1.2rem" }}>나의 미해결 이슈: <strong>{issues[project.id] || 0}</strong></Typography>
                                             <Chip
                                                 label={getStatusLabel(project.status)}
                                                 sx={{ 
                                                     backgroundColor: getStatusColor(project.status),
                                                     color: "white",
-                                                    fontSize: "1.3rem",
-                                                    padding: "15px 25px",
+                                                    fontSize: "1.4rem",
+                                                    padding: "20px 20px",
                                                     fontWeight: "bold"
                                                 }}
                                             />

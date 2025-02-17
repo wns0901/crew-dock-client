@@ -35,7 +35,7 @@ const Header = () => {
             sx={{ 
                 backgroundColor: "#ffffff", 
                 boxShadow: "none", 
-                width: isMypageOrProject ? "100%" : "80%", // ✅ 마이페이지/프로젝트에서는 100%, 나머지는 85%
+                width: isMypageOrProject ? "100%" : "75%", // ✅ 마이페이지/프로젝트에서는 100%, 나머지는 85%
                 marginLeft: "auto", 
                 marginRight: "auto", 
                 padding: isMypageOrProject ? "0 80px" : "0" // ✅ 마이페이지/프로젝트에서는 좌우 패딩 80px 추가

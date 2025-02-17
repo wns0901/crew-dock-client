@@ -111,7 +111,7 @@ const PortfoliosPage = () => {
                 </Box>
 
                 <Box sx={{ flexGrow: 1, marginLeft: "10px", marginRight: "50px", padding: "40px" }}>
-                    <Typography variant="h5" fontWeight="bold" mb={3}>
+                    <Typography variant="h5" fontWeight="bold" mb={3} fontSize={30}>
                         📁 포트폴리오
                     </Typography>
 
@@ -121,7 +121,7 @@ const PortfoliosPage = () => {
                                 <Box display="flex" justifyContent="space-between" alignItems="center">
                                     <Button
                                         variant="text"
-                                        sx={{ fontSize: "1.2rem", fontWeight: "bold", textTransform: "none" }}
+                                        sx={{ fontSize: "1.6rem", fontWeight: "bold", textTransform: "none"  , color: "#333"}}
                                         onClick={() => togglePortfolio(portfolio.id)}
                                     >
                                         {portfolio.title}
@@ -130,15 +130,17 @@ const PortfoliosPage = () => {
                                         <Box sx={{ display: "flex", gap: 1 }}>
                                             <Button
                                                 variant="outlined"
-                                                size="small"
+                                                size="medium"
+                                                sx={{fontSize: "1.2rem"}}
                                                 onClick={() => navigate(`/mypage/portfolios/edit/${portfolio.id}`)}
                                             >
                                                 수정
                                             </Button>
                                             <Button
                                                 variant="outlined"
-                                                size="small"
+                                                size="medium"
                                                 color="error"
+                                                sx={{fontSize: "1.2rem"}}
                                                 onClick={() => handleDeletePortfolio(portfolio.id)}
                                             >
                                                 삭제
@@ -149,7 +151,7 @@ const PortfoliosPage = () => {
 
                                 <Box sx={{ display: "flex", gap: 1, mt: 2, flexWrap: "wrap" }}>
                                     {portfolio.portfolioStacks && portfolio.portfolioStacks.map((stack) => (
-                                        <Chip key={stack.id} label={`#${stack.stackName}`} size="small" variant="outlined" />
+                                        <Chip key={stack.id} label={`#${stack.stackName}`} size="medium" sx={{fontSize: "1.2rem"}} variant="outlined" />
                                     ))}
                                 </Box>
 
@@ -158,8 +160,13 @@ const PortfoliosPage = () => {
                                         "& img": { // ✅ 마크다운 내부 이미지 크기 조절
                                         maxWidth: "200px", // 원하는 최대 너비 설정
                                         height: "auto", // 비율 유지
-                                        display: "block"
-                                    } }}>
+                                        display: "block",
+                                    } ,
+                                    "& p, & h1, & h2, & h3, & h4, & h5, & h6": { // ✅ 글씨 크기 키우기
+                                        fontSize: "1.3rem", // 🔥 글씨 크기 키우기 (1.2rem ~ 1.5rem 추천)
+                                        lineHeight: "1.8",  // ✅ 가독성 향상을 위해 줄 간격 조절
+                                    }
+                                    }}>
                                         <MDEditor.Markdown source={portfolio.content} />
                                     </Box>
                                 )}

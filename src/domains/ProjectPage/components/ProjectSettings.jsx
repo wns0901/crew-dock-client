@@ -13,7 +13,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import api from "../../../apis/baseApi";
-
+import { Avatar } from "@mui/material";
+import GroupIcon from "@mui/icons-material/Group"; 
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -188,28 +189,32 @@ const ProjectSettings = () => {
     }}
 >
     {/* 원형 이미지 미리보기 */}
-    <Box 
-        sx={{ 
-            width: 120, 
-            height: 120, 
-            borderRadius: "50%", 
-            overflow: "hidden", 
-            border: "2px solid #ddd",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
-        }}
-    >
-{previewUrl || setPreviewUrl ? (
-    <img 
-        src={previewUrl || setPreviewUrl} 
-        alt="미리보기" 
-        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-    />
-) : (
-    <Typography variant="body2">이미지 없음</Typography>
-)}
-    </Box>
+    <Box
+    sx={{
+        width: 120,
+        height: 120,
+        borderRadius: "50%",
+        overflow: "hidden",
+        border: "2px solid #ddd",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    }}
+>
+    {previewUrl ? (
+        <img
+            src={previewUrl}
+            alt="미리보기"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+    ) : (
+        <Avatar
+            sx={{ width: 120, height: 120, fontSize: 40, bgcolor: "#ddd" }}
+        >
+            <GroupIcon sx={{ fontSize: 80, color: "#ffffff" }} />
+        </Avatar>
+    )}
+</Box>
 
    
 </Box>

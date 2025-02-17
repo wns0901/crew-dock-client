@@ -157,7 +157,7 @@ const PortfoliosEditPage = () => {
 
     return (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
-            <Box sx={{ width: "600px", backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: 1 }}>
+            <Box sx={{ width: "1500px", height: "800px", backgroundColor: "#fff", padding: "20px", borderRadius: "10px", boxShadow: 1 }}>
                 <Typography variant="h5" fontWeight="bold">
                     {isEditing ? "포트폴리오 수정" : "포트폴리오 생성"}
                 </Typography>
@@ -176,12 +176,12 @@ const PortfoliosEditPage = () => {
                     value={content}
                     onChange={setContent}
                     preview="live"
-                    height={300}
+                    height={450}
                     commands={customCommands}
                 />
 
                
-                <Typography sx={{ mt: 3, mb: 1 }}>기술 스택:</Typography>
+                <Typography sx={{ mt: 3, mb: 1 , fontSize:22}}>기술 스택:</Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                     {stacks.map((stack, index) => (
                         <Chip key={index} label={stack} onDelete={() => setStacks(stacks.filter(s => s !== stack))} />
@@ -197,7 +197,7 @@ const PortfoliosEditPage = () => {
                         displayEmpty
                         sx={{ ml: "auto", minWidth: "150px", textAlign: "right" }}
                     >
-                        <MenuItem value="" disabled>기술스택 추가</MenuItem>
+                        <MenuItem value="" disabled >기술스택 추가</MenuItem>
                         {availableStacks.filter(stack => !stacks.includes(stack)).map((stack, index) => (
                             <MenuItem key={index} value={stack}>{stack}</MenuItem>
                         ))}
@@ -205,10 +205,10 @@ const PortfoliosEditPage = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
+                    <Button variant="contained" color="primary" onClick={handleSubmit} sx={{fontSize: "1.2rem"}}>
                         {isEditing ? "수정 완료" : "생성 완료"}
                     </Button>
-                    <Button variant="outlined" color="error" onClick={() => navigate("/mypage/portfolios")}>
+                    <Button variant="outlined" color="error" onClick={() => navigate("/mypage/portfolios")} sx={{fontSize: "1.2rem"}}>
                         취소
                     </Button>
                 </Box>

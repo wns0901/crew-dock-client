@@ -124,14 +124,14 @@ const ScrapsPage = () => {
 
             <Box sx={{ flexGrow: 1, padding: "40px" }}>
                 <Tabs value={tabIndex} onChange={(e, newIndex) => setTabIndex(newIndex)} sx={{ marginBottom: "20px" }}>
-                    <Tab label="📌 스크랩한 모집글" />
-                    <Tab label="📢 내가 지원한 프로젝트" />
+                    <Tab label="📌 스크랩한 모집글" sx={{ fontSize: "1.5rem", fontWeight: "bold" }} />
+                    <Tab label="📢 내가 지원한 프로젝트" sx={{ fontSize: "1.5rem", fontWeight: "bold" }}  />
                 </Tabs>
 
                  {/* 🔥 스크랩한 모집글 */}
                  {tabIndex === 0 && (
                     <Box>
-                        <Typography variant="h6" sx={{ mb: 2 }}>📌 스크랩한 모집글</Typography>
+                        
                         {scrappedRecruitments.length === 0 ? (
                             <Typography>스크랩한 모집글이 없습니다.</Typography>
                         ) : (
@@ -149,11 +149,11 @@ const ScrapsPage = () => {
                                                 onClick={() => navigate('/recruitment/${recruit.id}')}>
                                                 <CardContent>
                                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <Typography variant="subtitle1" fontWeight="bold">
+                                                        <Typography variant="subtitle1" fontWeight="bold" fontSize={20}>
                                                             {recruit.title}
                                                         </Typography>
                                                         <Typography sx={{
-                                                            fontSize: "0.875rem",
+                                                            fontSize: "1.3rem",
                                                             fontWeight: "bold",
                                                             color: daysLeft === null ? "blue" : daysLeft < 0 ? "red" : "blue",
                                                         }}>
@@ -161,8 +161,11 @@ const ScrapsPage = () => {
                                                         </Typography>
                                                     </Box>
                                                     <Box sx={{ marginTop: "50px", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                                        <Typography variant="body2" color="textSecondary">
+                                                        <Typography variant="body2" color="textSecondary" sx={{ fontSize: "1.2rem" }}>
                                                             {dayjs(recruit.createdAt).format("YYYY-MM-DD")}
+                                                        </Typography>
+                                                        <Typography sx={{ fontSize: "1.2rem" }}>
+                                                            댓글 수 : {(recruit.comments?.length || 0)}
                                                         </Typography>
                                                     </Box>
                                                 </CardContent>
@@ -179,7 +182,7 @@ const ScrapsPage = () => {
 
                 {tabIndex === 1 && (
                     <Box>
-                        <Typography variant="h6" sx={{ mb: 2 }}>📢 내가 지원한 프로젝트</Typography>
+                        
                         {appliedProjects.length === 0 ? (
                             <Typography>지원한 프로젝트가 없습니다.</Typography>
                         ) : (

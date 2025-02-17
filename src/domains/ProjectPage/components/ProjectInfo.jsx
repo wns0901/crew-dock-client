@@ -167,35 +167,87 @@ const ProjectInfo = () => {
 
                 <Typography variant="body2" color="text.secondary">
                     <strong>소개:</strong> {project.introduction}
+                <Box sx={{ marginBottom: 18 }} />
                 </Typography>
 
-                {/* 네비게이션 바 */}
-                <BottomNavigation
-                    sx={{
-                        backgroundColor: "#f4f4f4",
-                        borderTop: "1px solid #ccc",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        paddingTop: 2,
-                    }}
-                    showLabels
-                    value={navValue}
-                    onChange={(event, newValue) => {
-                        setNavValue(newValue);
-                        if (newValue === 0) navigate(`/projects/${projectId}`);
-                        if (newValue === 1) navigate(`/projects/${projectId}/issues`);
-                        if (newValue === 2) navigate(`/projects/${projectId}/Git`);
-                        if (newValue === 3) navigate(`/projects/${projectId}/posts`);
-                        if (newValue === 4) navigate(`/projects/${projectId}/settings`);
-                    }}
-                >
-                    <BottomNavigationAction label="프로젝트" />
-                    <BottomNavigationAction label="이슈 관리" />
-                    <BottomNavigationAction label="커밋 관리" />
-                    <BottomNavigationAction label="게시판" />
-                    <BottomNavigationAction label="설정 및 관리" />
-                </BottomNavigation>
+{/* 네비게이션 바 */}
+<BottomNavigation
+    sx={{
+        backgroundColor: "#f4f4f4",
+  
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        paddingTop: 2,
+    }}
+    showLabels
+    value={navValue}
+    onChange={(event, newValue) => {
+        setNavValue(newValue);
+        if (newValue === 0) navigate(`/projects/${projectId}`);
+        if (newValue === 1) navigate(`/projects/${projectId}/issues`);
+        if (newValue === 2) navigate(`/projects/${projectId}/Git`);
+        if (newValue === 3) navigate(`/projects/${projectId}/posts`);
+        if (newValue === 4) navigate(`/projects/${projectId}/settings`);
+    }}
+>
+    <BottomNavigationAction
+        label="프로젝트"
+        sx={{
+            "& .MuiBottomNavigationAction-label": {
+                fontSize: "18px", // 기본 크기
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+                fontSize: "18px", // 선택된 상태에서도 같은 크기 유지
+            },
+        }}
+    />
+    <BottomNavigationAction
+        label="이슈 관리"
+        sx={{
+            "& .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+        }}
+    />
+    <BottomNavigationAction
+        label="커밋 관리"
+        sx={{
+            "& .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+        }}
+    />
+    <BottomNavigationAction
+        label="게시판"
+        sx={{
+            "& .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+        }}
+    />
+    <BottomNavigationAction
+        label="설정 및 관리"
+        sx={{
+            "& .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+            "&.Mui-selected .MuiBottomNavigationAction-label": {
+                fontSize: "18px",
+            },
+        }}
+    />
+</BottomNavigation>
+
             </Box>
         </Box>
     );

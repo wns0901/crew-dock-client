@@ -183,7 +183,7 @@ const PortfoliosPage = () => {
                     <Fab
                         color="primary"
                         aria-label="add"
-                        sx={{ position: "fixed", bottom: 20, right: 20 }}
+                        sx={{ position: "fixed", bottom: 70, right: 42 ,width:50, height:50}}
                         onClick={() => navigate("/mypage/portfolios/new")}
                     >
                         <AddIcon />

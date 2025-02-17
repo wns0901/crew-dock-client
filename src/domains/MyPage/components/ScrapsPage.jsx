@@ -165,7 +165,7 @@ const ScrapsPage = () => {
                                                             {dayjs(recruit.createdAt).format("YYYY-MM-DD")}
                                                         </Typography>
                                                         <Typography sx={{ fontSize: "1.2rem" }}>
-                                                            댓글 수 : {(recruit.comments?.length || 0)}
+                                                            댓글 수 : {(recruit.commentCount|| 0)}
                                                         </Typography>
                                                     </Box>
                                                 </CardContent>

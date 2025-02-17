@@ -17,6 +17,8 @@ import Comment from "../../MainPage/components/comment/Comment";
 const PostDetail = ({
   post = null,
   userInfo = null,
+  onUpdatePost = () => {},
+  onDeletePost = () => {},
 }) => {
   const isAuthor = post?.userId === userInfo?.id;
   const { postId } = useParams();

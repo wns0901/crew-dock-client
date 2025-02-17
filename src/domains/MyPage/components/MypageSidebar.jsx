@@ -8,6 +8,8 @@ import { faBlog, faCog } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import MypageEditModal from "./MypageEditModal";
+import api from "../../../apis/baseApi";  // ✅ api import 추가
+
 
 const MypageSidebar = ({ user }) => {
     const navigate = useNavigate();
@@ -36,17 +38,22 @@ const MypageSidebar = ({ user }) => {
 
     const fetchUpdatedUser = async () => {
         try {
-            const response = await get(`${API_BASE_URL}/user/${user.id}`);
+            const response = await api.get(`/user/${user.id}`);
             setProfileData(response.data); // 🔥 최신 데이터 반영
             setProfileImg(response.data.profileImgUrl || ""); // 🔥 프로필 이미지 업데이트
         } catch (error) {
             console.error("❌ 유저 정보 불러오기 실패:", error);
         }
     };
+
     useEffect(() => {
         console.log("[DEBUG] 유저 데이터 변경됨:", user);
         if (user?.profileImgUrl) {
             setProfileImg(user.profileImgUrl);
+        }
+
+        if(user?.id){
+            fetchUpdatedUser();
         }
     }, [user]);
 
@@ -60,7 +67,7 @@ const MypageSidebar = ({ user }) => {
             {/* 사용자 정보 */}
             <Box sx={{ display: "flex", alignItems: "center", ml: 2, mb: 1 }}>
                 <Typography variant="subtitle1" fontWeight="bold" fontSize={20}>
-                    {user?.name || "사용자"} ({user?.nickname || "닉네임 없음"})
+                    {profileData?.name || "사용자"} ({profileData?.nickname || "닉네임 없음"})
                 </Typography>
                 {isOwner && (
                 <IconButton onClick={() => setIsEditModalOpen(true)}>
@@ -71,16 +78,16 @@ const MypageSidebar = ({ user }) => {
 
             {/* 포지션 & 한줄 소개 */}
             <Typography variant="subtitle2" sx={{ textAlign: "center", width: "100%", fontSize: 20, color: "gray", ml: 2 }}>
-                {user?.hopePosition || "포지션(미등록)"}
+                {profileData?.hopePosition || "포지션(미등록)"}
             </Typography>
             <Typography sx={{ textAlign: "center", width: "100%", mt: 2, fontSize: 17, color: "gray", ml: 2 }}>
-                {user?.selfIntroduction || "한줄 소개가 없습니다."}
+                {profileData?.selfIntroduction || "한줄 소개가 없습니다."}
             </Typography>
 
             {/* 기술 스택 */}
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, justifyContent: "left", mt: 2, width: "100%", ml: 2 }}>
-                {user?.stacks && user.stacks.length > 0 ? (
-                    user.stacks.map((stack, index) => (
+                {profileData?.stacks && profileData.stacks.length > 0 ? (
+                    profileData.stacks.map((stack, index) => (
                         <Chip key={index} label={`#${stack}`} size="small" variant="outlined" />
                     ))
                 ) : (
@@ -189,9 +196,10 @@ const MypageSidebar = ({ user }) => {
                 open={isEditModalOpen} 
                 onClose={() => {
                     setIsEditModalOpen(false);
-                    fetchUpdatedUser(); // 🔥 모달 닫으면 최신 데이터 가져오기
+                    fetchUpdatedUser();
                 }} 
-                user={profileData} 
+                setuserData={setProfileData}
+                setProfileImg={setProfileImg}
              />
             )}
         </Box>

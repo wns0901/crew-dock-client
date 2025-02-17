@@ -162,13 +162,7 @@ const DetailRecruitmentPost = () => {
                         variant="outlined" 
                         color="primary" 
                         sx={{ mr: 1 }} 
-                        onClick={() => {
-                            if (!isLogin) {
-                                alert("로그인이 필요합니다.");
-                                return;
-                            }
-                            handleChatBtn
-                        }}
+                        onClick={() => handleChatBtn}
                     >
                         채팅
                     </Button>

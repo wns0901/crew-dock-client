@@ -51,7 +51,7 @@ import UrgentIssues from "./domains/ProjectPage/components/UrgentIssues";
 import ProjectMainDashboard from "./domains/ProjectPage/components/ProjectMainDashBoard";
 import ProjectMainNotice from "./domains/ProjectPage/components/ProjectMainNotice";
 import AdminCheck from "./domains/AdminPage/components/AdminCheck";
-
+import LetterGlitch from "./domains/AdminPage/components/LetterGlitch";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Provider store={myStore}>
@@ -206,6 +206,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/mypage/scraps" element={<ScrapsPage />} />
             <Route path="/mypage/sidebar" element={<MypageSidebar />} />
           </Route>
+          <Route path="sss" element={<LetterGlitch />} />
         </Routes>
       </LoginContextProvider>
     </Provider>

@@ -161,11 +161,11 @@ const RecruitmentsComponent = () => {
           fontWeight: "bold",
           display: "flex",
           marginBottom: 2,
-          paddingX: 20,
+          paddingX: 30,
           textAlign: "left",
           maxWidth: "1200px",
           marginLeft: "0",
-          marginTop: 3,
+          marginTop: 20,
           justifyContent: "flex-start", // Flexbox에서 왼쪽 정렬 보장
         }}
       >
@@ -179,7 +179,7 @@ const RecruitmentsComponent = () => {
           gap: 2,
           flexWrap: "wrap",
           marginBottom: 2,
-          paddingX: 20,
+          paddingX: 30,
           maxWidth: "1200px",
           marginX: "0",
         }}
@@ -273,6 +273,7 @@ const RecruitmentsComponent = () => {
           paddingX: 26,
           justifyContent: "center",
           flexWrap: "wrap",
+          marginBottom: 2,
         }}
       >
         {projects.length === 0 ? (
@@ -447,7 +448,7 @@ const RecruitmentsComponent = () => {
         count={totalPages}
         page={page}
         onChange={(event, value) => setPage(value)}
-        sx={{ display: "flex", justifyContent: "center", mt: 3.5 }}
+        sx={{ display: "flex", justifyContent: "center", mt: 3.5, marginBottom: 5 }}
       />
     </div>
   );

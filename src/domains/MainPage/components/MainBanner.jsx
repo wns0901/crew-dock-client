@@ -36,14 +36,14 @@ const MainBanner = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "1200px", margin: "0 auto", mt: 3 }}>
+    <Box sx={{ width: "100%", maxWidth: "1400px", margin: "0 auto", mt: 5 }}>
       {banners.length > 0 ? (
         <Slider {...settings}>
           {banners.map((banner) => (
             <Card key={banner.id} sx={{ width: "100%" }}>
               <CardMedia
                 component="img"
-                height="400"
+                height="450"
                 image={banner.url}
                 alt={banner.title}
                 sx={{ objectFit: "cover" }}

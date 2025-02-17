@@ -40,13 +40,14 @@ const MainBanner = () => {
       {banners.length > 0 ? (
         <Slider {...settings}>
           {banners.map((banner) => (
-            <Card key={banner.id} sx={{ width: "100%", boxShadow: 3 }}>
+            <Card key={banner.id} sx={{ width: "100%" }}>
               <CardMedia
                 component="img"
                 height="400"
                 image={banner.url}
                 alt={banner.title}
                 sx={{ objectFit: "cover" }}
+                
               />
               <Typography
                 variant="h6"
@@ -58,7 +59,6 @@ const MainBanner = () => {
                   backgroundColor: "rgba(0, 0, 0, 0.5)",
                   color: "#fff",
                   padding: "8px 16px",
-                  borderRadius: "4px",
                 }}
               >
                

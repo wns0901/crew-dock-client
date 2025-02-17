@@ -182,7 +182,7 @@ const DetailRecruitmentPost = () => {
                         variant="outlined" 
                         color="primary" 
                         sx={{ mr: 1 }} 
-                        onClick={() => handleChatBtn}
+                        onClick={handleChatBtn}
                     >
                         채팅
                     </Button>

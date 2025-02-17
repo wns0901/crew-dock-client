@@ -77,11 +77,13 @@ const EditRecruitmentPost = () => {
 
         // 프로젝트 스택 불러오기
         if (postData.projectId) {
+          console.log("📌 프로젝트 ID:", postData.projectId); // projectId 확인
           const stackResponse = await api.get(
-            `/projects/${postData.projectId}/stacks`
+            `/projects/${postData.projectId}/stacks`,
           );
+
           setStacks(
-            stackResponse.data.map((s) => s.stack?.name || "스택 없음")
+            stackResponse.data.map((s) => s.stackName || "스택 없음")
           );
         }
 
@@ -250,7 +252,7 @@ const EditRecruitmentPost = () => {
         variant="h4"
         sx={{ mt: 4, mb: 3, fontWeight: "bold", textAlign: "left" }}
       >
-        {title} 수정
+        {title}
       </Typography>
 
       <Paper elevation={0} sx={{ p: 2, mb: 1 }}>

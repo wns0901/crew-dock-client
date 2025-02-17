@@ -15,7 +15,6 @@ import dayjs from "dayjs";
 import api from "../../../apis/baseApi";
 import MyCalendar from "./MyCalendar";
 
-
 const API_BASE_URL = api.defaults.baseURL; 
 
 const MypageMain = () => {
@@ -61,8 +60,8 @@ const MypageMain = () => {
         const fetchUserData = async () => {
             try {
                 setLoading(true);
-                const userRes = await fetch(`${API_BASE_URL}/user/${userId}`);
-                const userData = await userRes.json();
+                const userRes = await api.get(`/user/${userId}`);
+                const userData = await userRes.data;
                 console.log("[DEBUG] 유저 정보:", userData);
                 setUser(userData);
             } catch (err) {
@@ -74,8 +73,8 @@ const MypageMain = () => {
 
         const fetchPosts = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/posts/user/${userId}?row=3`);
-                const postsData = await response.json();
+                const response = await api.get(`/posts/user/${userId}?row=3`);
+                const postsData = await response.data;
                 console.log("[DEBUG] 작성글 데이터:", postsData);
                 setPosts(postsData);
             } catch (err) {
@@ -85,8 +84,8 @@ const MypageMain = () => {
 
         const fetchRecruitments = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/recruitments/user/${userId}?row=3`);
-                const recruitmentsData = await response.json();
+                const response = await api.get(`/recruitments/user/${userId}?row=3`);
+                const recruitmentsData = await response.data;
                 console.log("[DEBUG] 모집글 데이터:", recruitmentsData);
                 setRecruitments(recruitmentsData);
             } catch (err) {
@@ -96,8 +95,8 @@ const MypageMain = () => {
 
         const fetchPortfolios = async () => {
             try {
-                const portfoliosRes = await fetch(`${API_BASE_URL}/portfolios/${userId}?row=3`);
-                const portfoliosData = await portfoliosRes.json();
+                const portfoliosRes = await api.get(`/portfolios/${userId}?row=3`);
+                const portfoliosData = await portfoliosRes.data;
                 console.log("[DEBUG] 포트폴리오 데이터:", portfoliosData);
                 setPortfolios(portfoliosData);
             } catch (err) {
@@ -108,7 +107,7 @@ const MypageMain = () => {
         const fetchProjects = async () => {
             try {
                 const accessToken = Cookies.get("accessToken");
-                const response = await fetch(`${API_BASE_URL}/projects/members?row=3`, {
+                const response = await api.get(`/projects/members?row=3`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${accessToken}`,
@@ -116,7 +115,7 @@ const MypageMain = () => {
                     }
                 });
 
-                const projectsData = await response.json();
+                const projectsData = await response.data;
                 console.log("[DEBUG] 프로젝트 데이터:", projectsData);
                 setProjects(projectsData);
             } catch (err) {
@@ -126,8 +125,8 @@ const MypageMain = () => {
 
         const fetchScrappedPosts = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/recruitments/scraps?userId=${userId}&row=3`);
-                const scrappedData = await response.json();
+                const response = await api.get(`/recruitments/scraps?userId=${userId}&row=3`);
+                const scrappedData = await response.data;
                 console.log("[DEBUG] 스크랩 데이터:", scrappedData);
                 setScrappedPosts(scrappedData);
             } catch (err) {
@@ -166,12 +165,12 @@ const MypageMain = () => {
         <Box sx={{ display: "flex",  minHeight: "100vh", overflowY: "auto" }}>
             {/* ✅ 좌측 사이드바 */}
             <Box sx={{display: "flex", 
-                minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
-                overflowY: "auto",
-                backgroundColor: "#f9f9f9",
-                alignItems: "stretch",
-                borderRight: "1px solid #ccc" }} >
-                <MypageSidebar user={user} />
+        minHeight: "100vh",  // ✅ 최소 높이 100vh (컨텐츠가 짧아도 사이드바 유지)
+        overflowY: "auto",
+        backgroundColor: "#f9f9f9",
+        alignItems: "stretch",
+        borderRight: "1px solid #ccc" }} >
+                <MypageSidebar user={user}></MypageSidebar>
             </Box>
 
             {/* ✅ 메인 컨텐츠 영역 */}
@@ -179,9 +178,8 @@ const MypageMain = () => {
                 {/* 섹션 1: 일정 관리 + 작성글 */}
                 <Box mb={4}>
                     <Typography variant="h6" >📅 일정 관리</Typography>
-                    {/* <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}> */}
-                        {/* <Typography>캘린더 영역</Typography> */}
-                    {/* </Box>  */}
+                    {/* <Box sx={{ border: "1px solid #ddd", padding: 2, borderRadius: 2, height: "300px", mb: 2 }}>
+                    </Box> */}
                     <MyCalendar/>
                 </Box>
                 <Box mb={4}>
@@ -205,7 +203,7 @@ const MypageMain = () => {
                                             color: post ? "black" : "#bbb",
                                             "&:hover": post ? { backgroundColor: "#f9f9f9" } : {}
                                         }}
-                                        onClick={() => post && navigate(post?.recruitedField ? `/recruitment/${post.id}` : `/post/${post.id}`)}
+                                        onClick={() => post && navigate(post?.recruitedField ? `/recruitments/${post.id}` : `/posts/${post.id}`)}
                                     >
                                         <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
                                         
@@ -257,7 +255,7 @@ const MypageMain = () => {
                                               color: project ? "black" : "#bbb",
                                               "&:hover": project ? { backgroundColor: "#f9f9f9" } : {},
                                           }}
-                                          onClick={() => project && navigate(`/project/${project.id}`)}
+                                          onClick={() => project && navigate(`/projects/${project.id}`)}
                                       >
                                           <Typography variant="subtitle1" fontWeight="bold">
                                               {project ? `"${project.name}"` : "프로젝트 없음"}
@@ -319,61 +317,88 @@ const MypageMain = () => {
 
 
                 <Box>
-                    <Typography variant="h6" sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
-                    onClick={() => navigate("/mypage/scraps")}>⭐ 스크랩한 모집글</Typography>
-                                 <Grid container spacing={3}>
-                                 {scrappedPosts.length > 0 ? scrappedPosts.map((scrap, index) => {
-                          const today = dayjs();
-                          const deadline = dayjs(scrap.deadline);
-                          const daysLeft = deadline.diff(today, "day"); // 🔥 남은 일 수 계산
-                          const status = daysLeft < 0 ? "마감" : `D-${daysLeft}`;
-
-                          return (
-                              <Grid item xs={4} key={scrap.recruitmentScrapId}>
-                                  <Box
-                                      sx={{
-                                          border: "1px solid #ddd",
-                                          padding: 3,
-                                          borderRadius: 2,
-                                          height: "140px",
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          justifyContent: "space-between",
-                                          cursor: "pointer",
-                                          "&:hover": { backgroundColor: "#f9f9f9" },
-                                      }}
-                                      onClick={() => navigate(`/recruitment/${scrap.recruitmentPostId}`)} // ✅ 모집글 상세 페이지 이동
-                                  >
-                                      {/* ✅ 제목 & 마감 여부 표시 */}
-                                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                          <Typography variant="subtitle1" fontWeight="bold">
-                                              {scrap.title}
-                                          </Typography>
-                                          <Typography
-                                              sx={{
-                                                  fontSize: "0.875rem",
-                                                  fontWeight: "bold",
-                                                  color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
-                                              }}
-                                          >
-                                              {status}
-                                          </Typography>
-                                      </Box>
-
-                                      {/* ✅ 작성 날짜 & 댓글 수 */}
-                                      <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
-                                          <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
-                                          <Typography>댓글 {scrap.commentCount}개</Typography>
-                                      </Box>
-                                  </Box>
-                              </Grid>
-                          );
-                      }) : (
-                          <Typography>스크랩한 모집글이 없습니다.</Typography>
-                      )}
-                  </Grid>
-
+                    <Typography 
+                        variant="h6" 
+                        sx={{ cursor: "pointer", "&:hover": { color: "blue" } }}
+                        onClick={() => navigate("/mypage/scraps")}
+                    >
+                        ⭐ 스크랩한 모집글
+                    </Typography>
+                                    
+                    <Grid container spacing={3}>
+                        {scrappedPosts.length > 0 ? (
+                            scrappedPosts.map((scrap, index) => {
+                                const today = dayjs();
+                                const deadline = dayjs(scrap.deadline);
+                                const daysLeft = deadline.diff(today, "day"); // 🔥 남은 일 수 계산
+                                const status = daysLeft < 0 ? "마감" : `D-${daysLeft}`;
+                            
+                                return (
+                                    <Grid item xs={4} key={scrap.recruitmentScrapId}>
+                                        <Box
+                                            sx={{
+                                                border: "1px solid #ddd",
+                                                padding: 3,
+                                                borderRadius: 2,
+                                                height: "140px",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "space-between",
+                                                cursor: "pointer",
+                                                "&:hover": { backgroundColor: "#f9f9f9" },
+                                            }}
+                                            onClick={() => navigate(`/recruitments/${scrap.recruitmentPostId}`)} // ✅ 모집글 상세 페이지 이동
+                                        >
+                                            {/* ✅ 제목 & 마감 여부 표시 */}
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                <Typography variant="subtitle1" fontWeight="bold">
+                                                    {scrap.title}
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: "0.875rem",
+                                                        fontWeight: "bold",
+                                                        color: daysLeft < 0 ? "red" : "blue", // 마감이면 빨강, 진행 중이면 파랑
+                                                    }}
+                                                >
+                                                    {status}
+                                                </Typography>
+                                            </Box>
+                                                
+                                            {/* ✅ 작성 날짜 & 댓글 수 */}
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", color: "#666" }}>
+                                                <Typography>{dayjs(scrap.createdAt).format("YYYY-MM-DD")}</Typography>
+                                                <Typography>댓글 {scrap.commentCount}개</Typography>
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                );
+                            })
+                        ) : (
+                            <Grid item xs={4}>
+                                <Box
+                                    sx={{
+                                        border: "1px solid #ddd",
+                                        padding: 3,
+                                        borderRadius: 2,
+                                        height: "140px",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor: "#f9f9f9",
+                                        color: "#bbb",
+                                    }}
+                                >
+                                    <Typography variant="subtitle1" fontWeight="bold">
+                                        스크랩한 모집글 없음
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        )}
+                    </Grid>
                 </Box>
+
             </Box>
         </Box>
     );

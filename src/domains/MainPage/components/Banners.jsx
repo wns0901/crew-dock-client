@@ -23,7 +23,20 @@ const Banners = () => {
         <div>
             {banners.length > 0 ? (
                 banners.map((banner) => (
-                    <Box key={banner.id} sx={{ width: "100%", height: "200px", backgroundColor: "lightgray", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+                    <Box key={banner.id} 
+                        sx={{
+                            width: "80%",
+                            maxWidth: "1200px",
+                            height: "180px",
+                            backgroundColor: "#EAF6FF",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "20px", // 둥근 모서리 적용
+                            padding: "20px",
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                            textAlign: "center"
+                        }}>
                         <Typography variant="h4">{banner.name}</Typography>
                     </Box>
                 ))

@@ -3,6 +3,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
 import ChartDataLabels from 'chartjs-plugin-datalabels';  // 데이터 라벨 플러그인 추가
+import api from "../../../apis/baseApi";
 
 // Chart.js 모듈 등록
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
@@ -14,7 +15,7 @@ const AdminHopePositionUsage = () => {
 
   useEffect(() => {
     // axios로 데이터 가져오기 (GET /admin/hopeposition/usage)
-    axios.get(`${BASE_URL}/admin/hopeposition/usage`)
+    api.get(`/admin/hopeposition/usage`)
       .then(response => {
         setHopePositionUsageData(response.data);
       })

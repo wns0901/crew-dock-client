@@ -107,18 +107,18 @@ const DeadlineProjects = () => {
       fontWeight: "bold",
       display: "flex", 
       marginBottom: 2, 
-      paddingX: 20, 
+      marginTop: 20,
+      paddingX: 30, 
       textAlign: "left", 
       maxWidth: "1200px", 
       marginLeft: "0",
       justifyContent: "flex-start" // Flexbox에서 왼쪽 정렬 보장
     }}
   >
-  곧 모집 마감인 프로젝트
+ 🔥 곧 모집 마감인 프로젝트
 </Typography>
-<Divider sx={{ my: 2 }} />
 
-<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+<Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" , paddingX: 30}}>
   <IconButton onClick={() => scrollRef.current.scrollLeft -= 400}>
     <ChevronLeftIcon />
   </IconButton>
@@ -134,6 +134,7 @@ const DeadlineProjects = () => {
       paddingX: 2,
       "&::-webkit-scrollbar": { display: "none" },
       maxWidth: "1800px",
+      
       whiteSpace: "nowrap"
     }}
   >

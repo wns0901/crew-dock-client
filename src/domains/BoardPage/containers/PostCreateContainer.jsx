@@ -33,21 +33,9 @@ const PostCreateContainer = () => {
 
       const postId = response.data.id;
 
-
-      // const imageUrls = extractImageUrls(postData.content);
-
-      // for (const url of imageUrls) {
-      //   if(url.startsWith('data:image')) {
-      //     const file = base64ToFile(url);
-      //     await createImgUrl(file);
-      //   } else {
-      //     await saveExternalImageUrl(postId, url);
-      //   }
-      // }
       navigate(`/posts/${postId}`);
     } catch (error) {
       console.error('Error:', error);
-      alert(error.message);
   }
 };
 

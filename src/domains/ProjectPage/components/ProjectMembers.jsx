@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { LoginContext } from "../../../contexts/LoginContextProvider";
 import { Link } from "react-router-dom";
+import api from "../../../apis/baseApi";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const ProjectMembers = () => {
   const { projectId } = useParams();
@@ -33,7 +34,7 @@ const ProjectMembers = () => {
 
   const fetchMembers = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/projects/${projectId}/members`);
+      const response = await api.get(`/projects/${projectId}/members`);
       setMembers(response.data);
     } catch (error) {
       console.error("멤버 조회 실패:", error);
@@ -57,12 +58,12 @@ const ProjectMembers = () => {
 
   const handleAuthority = async (userId) => {
     try {
-      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
+      await api.patch(`/projects/${projectId}/members`, {
         userId: userId,
         authority: "CAPTAIN",
       });
 
-      await axios.patch(`${BASE_URL}/projects/${projectId}/members`, {
+      await api.patch(`/projects/${projectId}/members`, {
         userId: userInfo.id,
         authority: "CREW",
       });
@@ -78,8 +79,8 @@ const ProjectMembers = () => {
       return;
     }
     try {
-      await axios.post(
-        `${BASE_URL}/projects/${projectId}/resignations/members`,
+      await api.post(
+        `/projects/${projectId}/resignations/members`,
         { content: resignation },
         {
           params: { userId: selectedMember.user.id },

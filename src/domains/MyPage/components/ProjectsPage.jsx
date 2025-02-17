@@ -15,7 +15,7 @@ const API_BASE_URL = api.defaults.baseURL;
 const ProjectsPage = () => {
     const navigate = useNavigate();
     const { userId: paramUserId } = useParams();
-    const { userInfo } = useContext(LoginContext);
+    const { userInfo, isLogin } = useContext(LoginContext);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState({});
     const [projects, setProjects] = useState([]);
@@ -36,8 +36,11 @@ const ProjectsPage = () => {
 
     useEffect(() => {
         console.log("🔴🔴🔴🔴🔴🔴🔴🔴useEffect 실행됨됨")
-        if (!userInfo || !userInfo.id) {
+        
+        if (!isLogin) {
             console.warn("🔴 로그인 정보가 없음, 로그인 체크 중...");
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
             return;
         }
 
@@ -250,16 +253,22 @@ const ProjectsPage = () => {
                 return;
             }
     
-            // ✅ 백엔드에서 기대하는 JSON 형식으로 변환
+            console.log("📌 선택한 스택 (객체 리스트):", newProject.stacks);
+    
+            // ✅ ID만 추출해서 변환
+            const stackIds = newProject.stacks.map(stack => stack.id);
+    
+            console.log("📌 변환된 스택 ID 리스트:", stackIds);
+    
             const requestData = {
-                name: newProject.name || "", // 프로젝트명
-                startDate: newProject.startDate, // 시작 날짜 (YYYY-MM-DD)
-                period: parseInt(newProject.period, 10) || 3, // 숫자로 변환
-                stacks: newProject.stacks ? newProject.stacks.map(stack => Number(stack.id)) : [], // 스택 ID 숫자로 변환
-                position: newProject.position || "FRONT" // 기본값 설정
+                name: newProject.name || "",
+                startDate: newProject.startDate,
+                period: parseInt(newProject.period, 10) || 3,
+                stacks: stackIds,  // ✅ ID 리스트만 전송
+                position: newProject.position || "FRONT"
             };
     
-            console.log("[DEBUG] 요청 데이터:", JSON.stringify(requestData, null, 2)); // 🔥 디버깅용 콘솔 출력
+            console.log("[DEBUG] 요청 데이터:", JSON.stringify(requestData, null, 2));
     
             const response = await fetch(`${API_BASE_URL}/projects/${userInfo.id}`, {
                 method: "POST",
@@ -267,7 +276,7 @@ const ProjectsPage = () => {
                     "Authorization": `Bearer ${accessToken}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(requestData) // ✅ JSON 변환 후 전송
+                body: JSON.stringify(requestData)
             });
     
             if (!response.ok) {
@@ -284,7 +293,8 @@ const ProjectsPage = () => {
         }
     };
     
-    
+
+  
 
     if (loading) {
         return (

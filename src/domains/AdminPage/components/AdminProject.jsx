@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import AdminSideBar from "./AdminSideBar";
+import api from "../../../apis/baseApi";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -23,7 +24,7 @@ const AdminProject = () => {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${BASE_URL}/admin/projects`);
+      const response = await api.get(`/admin/projects`);
       setProjects(response.data);
     } catch (error) {
       toast.error("프로젝트 데이터 로드 실패!");
@@ -35,7 +36,7 @@ const AdminProject = () => {
   // 프로젝트 삭제
   const handleDeleteProject = async (projectId) => {
     try {
-      await axios.delete(`${BASE_URL}/admin/projects/${projectId}`);
+      await api.delete(`/admin/projects/${projectId}`);
       setProjects(projects.filter((project) => project.id !== projectId));
       toast.success("프로젝트가 삭제되었습니다.");
     } catch (error) {

@@ -25,7 +25,7 @@ import {
 import { customCommands } from '../../../utils/mdEditorCustomImgIcon';
 
 const ProjectPostForm = ({
-  initialData = { category: '', title: '', content: '', direction: 'NONE' },
+  initialData = { category: '', title: '', content: '', direction: 'NONE', attachments: [] },
   isEdit = false,
   onSubmit = () => {},
   onCancel = () => {},
@@ -34,7 +34,7 @@ const ProjectPostForm = ({
   const [direction, setDirection] = useState(initialData.direction);
   const [title, setTitle] = useState(initialData.title);
   const [content, setContent] = useState(initialData.content);
-  const [attachments, setAttachments] = useState([]);
+  const [attachments, setAttachments] = useState(initialData.attachments || [])
   const [fileDialogOpen, setFileDialogOpen] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [tempAttachments, setTempAttachments] = useState([])
@@ -44,6 +44,7 @@ const ProjectPostForm = ({
     setDirection(initialData.direction);
     setTitle(initialData.title);
     setContent(initialData.content);
+    setAttachments(initialData.attachments || []);
   }, [initialData]);
 
   const handleSubmit = (e) => {
@@ -54,6 +55,8 @@ const ProjectPostForm = ({
 
   const handleFileChange = (e) => {
     const files = e.target.files;
+    console.log('files:', files);
+    
     if (files) {
       const newAttachments = Array.from(files).map(file => ({
         type: 'file',
@@ -162,7 +165,10 @@ const ProjectPostForm = ({
         ))}
       </Box>
 
-      <Dialog open={fileDialogOpen} onClose={() => setFileDialogOpen(false)}>
+      <Dialog open={fileDialogOpen} onClose={() => {
+        setTempAttachments([]);
+        setFileDialogOpen(false);
+        }}>
         <DialogTitle>첨부파일 추가</DialogTitle>
         <DialogContent>
           <Button variant="outlined" component="label" fullWidth startIcon={<CloudUploadIcon />}>
@@ -196,7 +202,10 @@ const ProjectPostForm = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setFileDialogOpen(false)} color="primary">
+          <Button onClick={() => {
+            setTempAttachments([])
+            setFileDialogOpen(false)
+            }} color="primary">
             닫기
           </Button>
           <Button onClick={handleSaveAttachments} color="primary">
@@ -212,7 +221,13 @@ ProjectPostForm.propTypes = {
   initialData: PropTypes.shape({
     direction: PropTypes.string,
     title: PropTypes.string,
-    content: PropTypes.string
+    content: PropTypes.string,
+    attachments: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number,
+      type: PropTypes.string,
+      name: PropTypes.string,
+      url: PropTypes.string
+    }))
   }),
   isEdit: PropTypes.bool,
   onSubmit: PropTypes.func,
@@ -223,3 +238,4 @@ ProjectPostForm.propTypes = {
 };
 
 export default ProjectPostForm;
+

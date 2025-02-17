@@ -36,7 +36,7 @@ const MypageSidebar = ({ user }) => {
 
     const fetchUpdatedUser = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/user/${user.id}`);
+            const response = await get(`${API_BASE_URL}/user/${user.id}`);
             setProfileData(response.data); // 🔥 최신 데이터 반영
             setProfileImg(response.data.profileImgUrl || ""); // 🔥 프로필 이미지 업데이트
         } catch (error) {

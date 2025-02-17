@@ -5,8 +5,9 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import DesignServicesIcon from "@mui/icons-material/DesignServices";
 import AnchorIcon from "@mui/icons-material/Anchor"
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+import api from "../../../apis/baseApi";
+import { Avatar } from "@mui/material";
+import GroupIcon from "@mui/icons-material/Group"; 
 
 const ProjectInfo = () => {
     const { projectId } = useParams();
@@ -19,9 +20,9 @@ const ProjectInfo = () => {
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const response = await fetch(`${BASE_URL}/projects/${projectId}`);
-                if (!response.ok) throw new Error("프로젝트 정보를 가져오는데 실패했습니다.");
-                const data = await response.json();
+                const response = await api.get(`/projects/${projectId}`);
+                
+                const {data} = response;
                 setProject(data);
             } catch (error) {
                 setError(error);
@@ -71,18 +72,46 @@ const ProjectInfo = () => {
             <Box sx={{ flex: 1, padding: 2, overflowY: "auto", display: "flex", flexDirection: "column" }}>
                 {/* 프로젝트 이미지 */}
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                    <img
-                        src={project.imgUrl}
-                        alt="프로젝트 이미지"
-                        style={{
-                            width: "150px",
-                            height: "150px",
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                            border: "2px solid #ddd",
-                        }}
-                    />
-                </Box>
+    {project.imgUrl ? (
+        <img
+            src={project.imgUrl}
+            
+            style={{
+                width: "150px",
+                height: "150px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ddd",
+            }}
+        />
+    ) : (
+        <Avatar 
+            sx={{ width: 150, height: 150, fontSize: 40, bgcolor: "#ddd" }}
+        >
+           <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+    {project.imgUrl ? (
+        <img
+            src={project.imgUrl}
+            alt="프로젝트 이미지"
+            style={{
+                width: "150px",
+                height: "150px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid #ddd",
+            }}
+        />
+    ) : (
+        <Avatar 
+            sx={{ width: 150, height: 150, fontSize: 40, bgcolor: "#ddd" }}
+        >
+    <GroupIcon sx={{ fontSize: 80, color: "#ffffff" }} />
+        </Avatar>
+    )}
+</Box>
+        </Avatar>
+    )}
+</Box>
                
                 <Typography variant="h5" component="div" gutterBottom>
                 <AnchorIcon sx={{ fontSize: 25, color: "red", }} /> {project.name}
@@ -154,12 +183,14 @@ const ProjectInfo = () => {
                     value={navValue}
                     onChange={(event, newValue) => {
                         setNavValue(newValue);
-                        if (newValue === 0) navigate(`/projects/${projectId}/issues`);
-                        if (newValue === 1) navigate(`/projects/${projectId}/Git`);
-                        if (newValue === 2) navigate(`/projects/${projectId}/posts`);
-                        if (newValue === 3) navigate(`/projects/${projectId}/settings`);
+                        if (newValue === 0) navigate(`/projects/${projectId}`);
+                        if (newValue === 1) navigate(`/projects/${projectId}/issues`);
+                        if (newValue === 2) navigate(`/projects/${projectId}/Git`);
+                        if (newValue === 3) navigate(`/projects/${projectId}/posts`);
+                        if (newValue === 4) navigate(`/projects/${projectId}/settings`);
                     }}
                 >
+                    <BottomNavigationAction label="프로젝트" />
                     <BottomNavigationAction label="이슈 관리" />
                     <BottomNavigationAction label="커밋 관리" />
                     <BottomNavigationAction label="게시판" />

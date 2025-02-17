@@ -30,7 +30,7 @@ const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvent
     try {
       // 서버 API에 맞게 요청 URL 변경
       const response = await api.post(
-          `/calendars?userId=${userId}`, 
+        `/calendars?userId=${userId}`, 
         {
           content: formData.content,
           startDate: formData.startDate.format("YYYY-MM-DD"),
@@ -39,7 +39,6 @@ const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvent
           endTime: formData.endTime.format("HH:mm:ss"),
           project: formData.project, // 프로젝트 ID가 있을 경우 포함
         }
-
       );
 
       const eventData = {
@@ -47,34 +46,42 @@ const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvent
         title: response.data.content,
         start: response.data.startDate,
         end: response.data.endDate,
-      }
+        sTime: response.data.startTime,
+        eTime: response.data.endTime,
+        projectId: response.data.projectId,
+        isHoliday: response.data.holiday || false
+      };
 
-      // 오늘 일정 필터링
-      const today = new Date();
-      if (Array.isArray(response.data)) {
-        const filteredEvents = response.data
-          .filter((event) => {
-            const eventStartDate = new Date(event.start);
-            const eventEndDate = new Date(event.end);
-            return (
-              eventStartDate.toDateString() === today.toDateString() ||
-              (eventStartDate <= today && eventEndDate >= today)
-            );
-          })
-          .sort((a, b) => {
-            // 시작 시간이 빠른 일정이 먼저 오도록 정렬
-            if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
-            return a.sTime.localeCompare(b.sTime);
-          });
-  
-        setTodays(filteredEvents); // 필터링된 일정만 업데이트
+      // setEvents(prev => new Set([...prev, eventData]));
+
+        // 오늘 일정 필터링
+     const today = new Date();
+     if (Array.isArray(response.data)) {
+       const filteredEvents = response.data
+         .filter((event) => {
+           const eventStartDate = new Date(event.start);
+           const eventEndDate = new Date(event.end);
+           return (
+             eventStartDate.toDateString() === today.toDateString() ||
+             (eventStartDate <= today && eventEndDate >= today)
+           );
+         })
+         .sort((a, b) => {
+           // 시작 시간이 빠른 일정이 먼저 오도록 정렬
+           if (!a.sTime || !b.sTime) return 0; // 시작 시간이 없으면 정렬하지 않음
+           return a.sTime.localeCompare(b.sTime);
+         });
+   
+        // setTodays(filteredEvents); // 필터링된 일정만 업데이트
         setTodays([... todays, eventData])
         console.log("오늘의 일정: ", filteredEvents);
-      }
-
-      onClose(); // 모달 닫기
-      onAddSchedule(response.data);
-      alert("일정이 추가되었습니다.");
+        //  setTodays(filteredEvents);
+        }
+        setTodays((prevEvents) => prevEvents.map((event) => (event.id === eventData.id ? eventData : event)));
+        // setTodays(prev => new Set([...prev, eventData]));
+        onClose(); // 모달 닫기
+        onAddSchedule(response.data);
+        alert("일정이 추가되었습니다.");
 
     } catch (error) {
       console.error("Failed to add schedule", error);
@@ -90,7 +97,6 @@ const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvent
   const handleAddClick = (event) => {
     handleSubmit(event); // 일정 추가 함수 호출
   };
-
 
   return (
     <Dialog
@@ -195,7 +201,7 @@ const AddSchedule = ({ userId, selectedDate, anchorEl, onClose, events, setEvent
         </Box>
       </DialogContent>
     </Dialog>
-    );
-  };
+  );
+};
 
 export default AddSchedule;

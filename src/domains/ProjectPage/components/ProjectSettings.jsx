@@ -82,7 +82,7 @@ const ProjectSettings = () => {
             });
 
         // 사용 가능한 스택 리스트 가져오기
-        axios.get(`${BASE_URL}/stacks`)
+        api.get(`/stacks`)
             .then((response) => {
                 const stacks = response.data.map((stack) => ({
                     id: stack.id,

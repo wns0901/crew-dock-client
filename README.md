@@ -28,7 +28,7 @@
 |**노경민**|모집글 CRUD 및 메인페이지 필터 옵션(백엔드) 모집글, 작성 모달(프론트)|
 
 ### 📍Skills
-![CrewDock Skills](https://github.com/user-attachments/assets/de795cb5-6430-4f57-82cb-45e88f5014f7)
+![CrewDock Skills](https://github.com/user-attachments/assets/c4de7d4f-1ca8-4692-90b3-a225d29fd844)
 
 <hr/>
 

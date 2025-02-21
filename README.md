@@ -20,19 +20,20 @@
 ### 👥 구성원 별 파트 및 주요 기능
 |구성원|맡은 파트|주요 기능|
 |------|---|---|
-|**장준영(팀장)**|백엔드와 프론트 시큐리티, 채팅의 백엔드, 프론트 구현,  깃액션과 도커를 이용한 CI/CD 구현, S3 설정 및 사용 메소드 구현|테스트3|
-|**김민혁**|팀 프로젝트 페이지 CRUD 및 프론트, 관리자 페이지 CRUD 및 프론트, 메인 페이지 배너, 스크랩 CRUD 및 프론트|테스트3|
-|**정문선**|마이페이지 백엔드 및 프론트, 포트폴리오 CRUD 및 프론트, 프로젝트 생성 백엔드 및 프론트|테스트3|
-|**황예은**|게시판페이지 프로젝트 페이지 CRUD 및 프론트, 모집글 페이지 첨부파일 (프론트)|테스트3|
-|**최시후**|프로젝트 이슈 페이지 CRUD 및 프론트, Full Calendar 를 사용한 마이페이지, 프로젝트 페이지 CRUD 및 프론트  |테스트3|
-|**노경민**|모집글 CRUD 및 메인페이지 필터 옵션(백엔드) 모집글, 작성 모달(프론트)|테스트3|
+|**장준영(팀장)**|백엔드와 프론트 시큐리티, 채팅의 백엔드, 프론트 구현,  깃액션과 도커를 이용한 CI/CD 구현, S3 설정 및 사용 메소드 구현|텍스트|
+|**김민혁**|팀 프로젝트 페이지 CRUD 및 프론트, 관리자 페이지 CRUD 및 프론트, 메인 페이지 배너, 스크랩 CRUD 및 프론트|텍스트|
+|**정문선**|마이페이지 백엔드 및 프론트, 포트폴리오 CRUD 및 프론트, 프로젝트 생성 백엔드 및 프론트|텍스트|
+|**황예은**|게시판페이지 프로젝트 페이지 CRUD 및 프론트, 모집글 페이지 첨부파일 (프론트)|텍스트|
+|**최시후**|프로젝트 이슈 페이지 CRUD 및 프론트, Full Calendar 를 사용한 마이페이지, 프로젝트 페이지 CRUD 및 프론트  |텍스트|
+|**노경민**|모집글 CRUD 및 메인페이지 필터 옵션(백엔드) 모집글, 작성 모달(프론트)|텍스트|
 
 ### 📍Skills
 ![CrewDock Skills](https://github.com/user-attachments/assets/de795cb5-6430-4f57-82cb-45e88f5014f7)
 
 <hr/>
 
-### 📍클라이언트 Github 
+### 📍서버 Github
+https://github.com/wns0901/CrewDock_Server
 
 ### 📍URL 규칙
 - **RESTful**: 복수형 명사만 사용하기!
@@ -66,12 +67,3 @@
 - Chore : 빌드 업무 수정, 패키지 매니저 수정
 - Conflict: 충돌 해결
 예제 [Feat/Back]: 이슈 내용
-
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
